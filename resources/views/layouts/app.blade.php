@@ -10,21 +10,26 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    {{-- <script src="{{ asset('js/app.js') }}" defer></script> --}}
+    {{-- favicon --}}
+    <link rel="shortcut icon" href="{{ asset('img/itrack_icon_2.png') }}" type="image/x-icon">
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
+    {{-- <link href="{{ URL::asset('css/app.css') }}" rel="stylesheet"> --}}
+    @yield('css_scripts')
 </head>
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
+            <div class="container-fluid px-0">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                    {{-- {{ config('app.name', 'Laravel') }} --}}
+                    <img src="{{ asset('img/2.png')}}" height="25px" style="border-radius: 4px; box-shadow: 2px 2px 2px black;" alt="">
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -33,7 +38,23 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
-
+                        @guest
+                            
+                        @else
+                        {{-- {{ route('login') }} --}}
+                            <li class="nav-item">
+                                <a class="nav-link" href="">Repositories</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="">Reminders</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="">Notes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href=""></a>
+                            </li>
+                        @endguest
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -75,9 +96,12 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="py-4 bg-light">
             @yield('content')
         </main>
     </div>
 </body>
+<script src="{{ asset('js/jquery-3.6.0.js') }}"></script>
+<script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
+@yield('js_scripts')
 </html>

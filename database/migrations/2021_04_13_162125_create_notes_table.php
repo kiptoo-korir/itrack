@@ -14,7 +14,8 @@ class CreateNotesTable extends Migration
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('owner');
-            $table->bigInteger('repository');
+            $table->enum('type', ['general', 'specific']);
+            $table->bigInteger('repository')->nullable();
             $table->text('message')->nullable();
             $table->string('title')->nullable();
             $table->timestamps();

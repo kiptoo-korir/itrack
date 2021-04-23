@@ -14,7 +14,8 @@ class CreateRemindersTable extends Migration
         Schema::create('reminders', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('owner');
-            $table->bigInteger('repository');
+            $table->enum('type', ['general', 'specific']);
+            $table->bigInteger('repository')->nullable();
             $table->string('title');
             $table->text('message');
             $table->timestampTz('due_date');

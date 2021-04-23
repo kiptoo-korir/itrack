@@ -15,7 +15,7 @@ class CreateRepositoriesTable extends Migration
             $table->id();
             $table->bigInteger('owner');
             $table->bigInteger('platform');
-            $table->bigInteger('repository_id');
+            $table->string('repository_id');
             $table->text('description');
             $table->string('name');
             $table->timestamps();
