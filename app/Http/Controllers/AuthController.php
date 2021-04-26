@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AccountType;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,10 @@ class AuthController extends Controller
 
     public function login_view()
     {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
         return view('auth.login');
     }
 
@@ -27,21 +32,23 @@ class AuthController extends Controller
             'password' => 'required|min:6|max:18|string',
         ]);
 
-        if (method_exists($this, 'hasTooManyLoginAttempts')
-            && $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
+        // if (method_exists($this, 'hasTooManyLoginAttempts')
+        //     && $this->hasTooManyLoginAttempts($request)) {
+        //     $this->fireLockoutEvent($request);
 
-            return $this->sendLockoutResponse($request);
-        }
+        //     return $this->sendLockoutResponse($request);
+        // }
 
         $email = $request->email;
         $password = $request->password;
 
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
             // redirect to the right route
+            $request->session()->regenerate();
+
             return redirect()->route('home');
         }
-        $this->incrementLoginAttempts($request);
+        // $this->incrementLoginAttempts($request);
 
         return redirect()->back()
             ->withInput($request->all())
@@ -51,6 +58,10 @@ class AuthController extends Controller
 
     public function register_view()
     {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
         return view('auth.register');
     }
 
@@ -68,14 +79,14 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'ac_type' => $ac_type,
+            'ac_type' => $ac_type->id,
         ]);
 
         if ($user) {
             event(new Registered($user));
-            // if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            //     return redirect()->route('home');
-            // }
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                return redirect()->route('home');
+            }
         }
     }
 
@@ -88,5 +99,24 @@ class AuthController extends Controller
 
             return redirect('/');
         }
+    }
+
+    public function send_verification()
+    {
+        Auth::user()->sendEmailVerificationNotification();
+
+        return back()->with('message', 'Verification link sent!');
+    }
+
+    public function handle_verification_request(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+
+        return redirect('/');
+    }
+
+    public function verification_view()
+    {
+        return view('auth.verify');
     }
 }

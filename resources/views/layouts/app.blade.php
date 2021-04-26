@@ -27,7 +27,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container-fluid px-0">
-                <a class="navbar-brand" href="{{ url('/') }}">
+                <a class="navbar-brand" href="{{ route('home') }}">
                     {{-- {{ config('app.name', 'Laravel') }} --}}
                     <img src="{{ asset('img/2.png')}}" height="25px" style="border-radius: 4px; box-shadow: 2px 2px 2px black;" alt="">
                 </a>
@@ -52,7 +52,7 @@
                                 <a class="nav-link" href="">Notes</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href=""></a>
+                                <a class="nav-link" href="">Task Lists</a>
                             </li>
                         @endguest
                     </ul>

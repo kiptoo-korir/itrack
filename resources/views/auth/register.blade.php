@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('css_scripts')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+@endsection
+
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -66,6 +70,9 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Register') }}
                                 </button>
+                            </div>
+                            <div class="col-md-2 mt-2">
+                                <i class="bi bi-eye-slash-fill"></i>
                             </div>
                         </div>
                     </form>
