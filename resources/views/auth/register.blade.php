@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@section('css_scripts')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
-@endsection
-
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -63,6 +59,9 @@
                             <div class="col-md-6">
                                 <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
                             </div>
+                            <div class="col-md-2 mt-2">
+                                <i id="show-pass" class="bi bi-eye-slash-fill" onclick="showPassword()"></i>
+                            </div>
                         </div>
 
                         <div class="form-group row mb-0">
@@ -71,9 +70,6 @@
                                     {{ __('Register') }}
                                 </button>
                             </div>
-                            <div class="col-md-2 mt-2">
-                                <i class="bi bi-eye-slash-fill"></i>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -81,4 +77,23 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('js-scripts')
+    <script>
+        function showPassword() {
+            var passwordInput = document.getElementById('password');
+            var passwordConfirm = document.getElementById('password-confirm');
+            var passStatus = document.getElementById('show-pass');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordConfirm.type = 'text';
+                passStatus.className = 'bi bi-eye-slash-fill';
+            } else {
+                passwordInput.type = 'password';
+                passwordConfirm.type = 'password';
+                passStatus.className = 'bi bi-eye-fill';
+            }
+        }
+    </script>
 @endsection
