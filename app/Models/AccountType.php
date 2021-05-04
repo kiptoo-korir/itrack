@@ -13,6 +13,6 @@ class AccountType extends Model
 
     public function users()
     {
-        return $this->hasMany('App\User', 'ac_type', 'id');
+        return $this->hasMany('App\Models\User', 'ac_type', 'id');
     }
 }

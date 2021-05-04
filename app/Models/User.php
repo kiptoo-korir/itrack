@@ -48,6 +48,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function ac_type()
     {
-        return $this->belongsTo('App\AccountType', 'ac_type', 'id');
+        return $this->belongsTo('App\Models\AccountType', 'ac_type', 'id');
+    }
+
+    public function access_token()
+    {
+        return $this->hasMany('App\Models\AccessToken', 'owner', 'id');
     }
 }

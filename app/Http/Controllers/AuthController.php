@@ -28,31 +28,33 @@ class AuthController extends Controller
     {
         // validation
         $request->validate([
-            'email' => 'required|string|email',
+            $this->username() => 'required|string|email',
             'password' => 'required|min:6|max:18|string',
         ]);
 
-        // if (method_exists($this, 'hasTooManyLoginAttempts')
-        //     && $this->hasTooManyLoginAttempts($request)) {
-        //     $this->fireLockoutEvent($request);
+        if (method_exists($this, 'hasTooManyLoginAttempts')
+            && $this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
 
-        //     return $this->sendLockoutResponse($request);
-        // }
+            return $this->sendLockoutResponse($request);
+        }
 
         $email = $request->email;
         $password = $request->password;
 
-        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+        if (Auth::attempt([$this->username() => $email, 'password' => $password])) {
             // redirect to the right route
             $request->session()->regenerate();
+            $this->log_signin_activity();
 
-            return redirect()->route('home');
+            return redirect()->intended('home');
         }
-        // $this->incrementLoginAttempts($request);
+
+        $this->incrementLoginAttempts($request);
 
         return redirect()->back()
             ->withInput($request->all())
-            ->withErrors(['error' => 'Please check your username / password.'])
+            ->withErrors(['email' => 'Please check the credentials you provided and try again.'])
             ;
     }
 
@@ -68,7 +70,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|unique:users,email|string',
+            $this->username() => 'required|email|unique:users,email|string',
             'password' => 'required|min:6|max:18|confirmed|string',
             'name' => 'required|string',
         ]);
@@ -77,14 +79,17 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            $this->username() => $request->email,
             'password' => Hash::make($request->password),
             'ac_type' => $ac_type->id,
         ]);
 
         if ($user) {
             event(new Registered($user));
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            if (Auth::attempt([$this->username() => $request->email, 'password' => $request->password])) {
+                $request->session()->regenerate();
+                $this->log_signin_activity();
+
                 return redirect()->route('home');
             }
         }
@@ -118,5 +123,23 @@ class AuthController extends Controller
     public function verification_view()
     {
         return view('auth.verify');
+    }
+
+    public function username()
+    {
+        return 'email';
+    }
+
+    private function log_signin_activity()
+    {
+        $user = Auth::user();
+        activity('log in')
+            ->causedBy($user)
+            ->withProperties([
+                'action' => 'Successful',
+                'user' => $user,
+            ])
+            ->log("user {$user->name} has signed in.")
+        ;
     }
 }

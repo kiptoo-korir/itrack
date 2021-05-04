@@ -69,7 +69,7 @@
             <div id="right_dropdown" class="d-flex order-1 order-md-last">
                 <div class="dropdown nav-item">
                     <div class="media align-items-center dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        @isset($user_data->profile)
+                        @isset($user_data->photo)
                         <img class="rounded-circle avatar" alt="user" 
                             src="https://picsum.photos/id/3/80/80" data-holder-rendered="true">
                         @else

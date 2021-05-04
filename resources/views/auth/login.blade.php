@@ -1,12 +1,35 @@
 @extends('layouts.app')
 
+@section('css_scripts')
+    <style>
+        .fixedButton {
+            position: fixed;
+            bottom: 0px;
+            right: 0px; 
+            padding: 20px;
+        }
+
+        .roundedFixedBtn{ 
+            height: 60px;
+            line-height: 80px;  
+            width: 60px;  
+            font-size: 2em;
+            font-weight: bold;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+        }  
+    </style>  
+@endsection
+
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">{{ __('Login') }}</div>
-
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
@@ -36,6 +59,10 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
+                            </div>
+
+                            <div class="col-md-2 mt-2">
+                                <i id="show-pass" class="bi bi-eye-slash-fill" onclick="showPassword()"></i>
                             </div>
                         </div>
 
@@ -70,4 +97,23 @@
         </div>
     </div>
 </div>
+<a class="fixedButton" href>
+    <div class="roundedFixedBtn"><i class="bi bi-earbuds"></i></div>
+</a> 
+@endsection
+
+@section('js_scripts')
+    <script>
+        function showPassword() {
+            var passwordInput = document.getElementById('password');
+            var passStatus = document.getElementById('show-pass');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passStatus.className = 'bi bi-eye-fill';
+            } else {
+                passwordInput.type = 'password';
+                passStatus.className = 'bi bi-eye-slash-fill';
+            }
+        }
+    </script>
 @endsection

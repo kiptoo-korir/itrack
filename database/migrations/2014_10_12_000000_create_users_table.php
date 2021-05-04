@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->bigInteger('ac_type');
             $table->rememberToken();
+            $table->dateTime('last_seen')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

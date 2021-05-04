@@ -24,6 +24,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/toast_spinner.css') }}">
     {{-- <link href="{{ URL::asset('css/app.css') }}" rel="stylesheet"> --}}
     <style>
         .avatar {
@@ -45,11 +46,15 @@
         @include('components.navbar')
 
         <main class="py-4 bg-light">
+            @include('components.spinner')
             @yield('content')
+            @yield('toasts')
+            @yield('modals')
         </main>
     </div>
 </body>
 <script src="{{ asset('js/jquery-3.6.0.js') }}"></script>
 <script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
-@yield('js-scripts')
+<script src="{{ asset('js/custom.js') }}"></script>
+@yield('js_scripts')
 </html>

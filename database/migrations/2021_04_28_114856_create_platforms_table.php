@@ -4,19 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccessTokensTable extends Migration
+class CreatePlatformsTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        Schema::create('access_tokens', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->bigInteger('owner');
-            $table->bigInteger('platform');
-            $table->text('access_token');
-            $table->boolean('verified')->nullable();
+        Schema::create('platforms', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('base_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +25,6 @@ class CreateAccessTokensTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('access_tokens');
+        Schema::dropIfExists('platforms');
     }
 }

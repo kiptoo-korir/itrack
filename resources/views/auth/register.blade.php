@@ -79,7 +79,7 @@
 </div>
 @endsection
 
-@section('js-scripts')
+@section('js_scripts')
     <script>
         function showPassword() {
             var passwordInput = document.getElementById('password');
