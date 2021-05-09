@@ -17,6 +17,7 @@ class CreateRepositoriesTable extends Migration
             $table->bigInteger('platform');
             $table->string('repository_id');
             $table->text('description');
+            $table->timestamp('date_created');
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();

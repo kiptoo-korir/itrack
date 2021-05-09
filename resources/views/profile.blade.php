@@ -91,14 +91,15 @@
                         <h6>Name: {{$user_data->name}}</h6>
                         <h6>Date Joined: {{$user_data->created_at}}</h6>
                     </div>
-                    <button class="btn btn-outline-primary" id="pan_btn" data-toggle="modal" data-target="#pan_modal">Add A Personal Access Token</button>
+                    {{-- data-toggle="modal" data-target="#pan_modal" --}}
+                    <a class="btn btn-outline-primary" id="pan_btn" href="{{$request}}"><i class="bi bi-github"></i> Add Access to Github</a>
                     <div class="horizontal-divider"></div>
                     <button class="btn btn-outline-primary" id="pass_btn" data-toggle="modal" data-target="#password_modal">Change Password</button>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6 col-12 mx-auto mt-2">
+            <div class="col-12 mx-auto mt-2">
                 <div class="table-responsive">
                     <!-- Recent Activity table -->
                     <h5 class="text-black-50 text-uppercase text-center mb-2">RECENT ACTIVITIES</h5>
@@ -114,7 +115,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-md-6 col-12 mx-auto mt-2">
+            {{-- <div class="col-md-6 col-12 mx-auto mt-2">
                 <div class="table-responsive">
                     <!-- Access Tokens table -->
                     <h5 class="text-black-50 text-uppercase text-center mb-2">ACCESS TOKENS</h5>
@@ -131,7 +132,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 @endsection

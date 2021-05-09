@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -20,6 +21,8 @@ class ProfileController extends Controller
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['platforms'] = Platform::all();
+        $client = env('GITHUB_CLIENT_ID');
+        $data['request'] = "https://github.com/login/oauth/authorize?client_id={$client}&scope=repo%20notifications%20user";
 
         return view('profile')->with($data);
     }
@@ -137,6 +140,42 @@ class ProfileController extends Controller
             ->rawColumns(['action', 'created_at', 'order_date'])
             ->make(true)
         ;
+    }
+
+    public function callback(Request $request)
+    {
+        $code = $_GET['code'];
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+        ])->post('https://github.com/login/oauth/access_token', [
+            'client_id' => env('GITHUB_CLIENT_ID'),
+            'client_secret' => env('GITHUB_SECRET'),
+            'code' => $code,
+        ]);
+
+        $body = json_decode($response->body());
+        $access_token = $body->access_token;
+        $token_type = $body->token_type;
+        $scope = $body->scope;
+
+        $user_id = Auth::id();
+        $token_record = [
+            'owner' => $user_id,
+            'platform' => 1,
+            'access_token' => Crypt::encrypt($access_token),
+            'scope' => $scope,
+            'type' => $token_type,
+            'verified' => true,
+        ];
+
+        if ($new = AccessToken::create($token_record)) {
+            AccessToken::where(['platform' => 1, 'owner' => $user_id])
+                ->whereNotIn('id', [$new->id])
+                ->delete()
+            ;
+
+            return redirect()->route('profile');
+        }
     }
 
     public function remove_token(Request $request)

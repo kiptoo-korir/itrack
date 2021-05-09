@@ -13,7 +13,7 @@ class AccessToken extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['owner', 'platform', 'access_token'];
+    protected $fillable = ['owner', 'platform', 'access_token', 'verified', 'scope', 'type'];
 
     public function user()
     {
