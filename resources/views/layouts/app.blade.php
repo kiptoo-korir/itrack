@@ -56,5 +56,6 @@
 <script src="{{ asset('js/jquery-3.6.0.js') }}"></script>
 <script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
 <script src="{{ asset('js/custom.js') }}"></script>
+<script src="{{ asset('js/app_echo.js')}}"></script>
 @yield('js_scripts')
 </html>

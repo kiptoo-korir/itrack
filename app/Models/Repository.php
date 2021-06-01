@@ -11,5 +11,5 @@ class Repository extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'owner', 'platform', 'repository_id', 'description'];
+    protected $fillable = ['name', 'fullname', 'owner', 'platform', 'repository_id', 'description', 'date_created_online', 'date_updated_online', 'date_pushed_online', 'issues_count'];
 }

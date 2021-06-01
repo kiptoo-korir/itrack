@@ -12,8 +12,9 @@ class RepositoryController extends Controller
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
 
-        // Validate whether token is valid before dispatching job
-        FetchRepositories::dispatch();
+        $user_id = Auth::id();
+        // TODO: Validate whether token is valid before dispatching job
+        FetchRepositories::dispatch($user_id);
 
         return view('repositories')->with($data);
     }

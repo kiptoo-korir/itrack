@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Platform;
+use App\Models\User;
 use Cache;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Auth;
@@ -11,12 +12,12 @@ use Illuminate\Support\Facades\Http;
 
 class TokenService
 {
-    public function github_token()
+    public function github_token($id)
     {
-        $user_id = Auth::id();
+        $user_id = isset($id) ? $id : Auth::id();
         $key = 'github-'.$user_id;
         $platform = Platform::where('name', 'Github')->select('id')->get()[0]->id;
-        $token = Cache::get($key, $this->get_token($platform));
+        $token = Cache::get($key, $this->get_token($platform, $user_id));
 
         if ('error-400' == $token) {
             // invalidate current token
@@ -27,14 +28,14 @@ class TokenService
         return unserialize($token);
     }
 
-    public function client()
+    public function client($user_id = null)
     {
-        return Http::withToken($this->github_token());
+        return Http::withToken($this->github_token($user_id));
     }
 
-    private function get_token($platform)
+    private function get_token($platform, $user_id)
     {
-        $user = Auth::user();
+        $user = User::findOrFail($user_id);
         $token_record = $user->access_token()->where(['platform' => $platform, 'verified' => true])->first();
         $token = $token_record->access_token;
 

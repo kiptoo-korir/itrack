@@ -12,7 +12,7 @@
             <ul class="navbar-nav mr-auto">
                 @auth
                     <li class="nav-item">
-                        <a class="nav-link" href="">Repositories</a>
+                        <a class="nav-link" href="{{ route('repositories') }}">Repositories</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="">Reminders</a>
