@@ -32,6 +32,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recent_activities', [App\Http\Controllers\ProfileController::class, 'recent_activity'])->name('recent_activity');
     Route::get('/token_list', [App\Http\Controllers\ProfileController::class, 'tokens_list'])->name('token_list');
     Route::post('/remove_token', [App\Http\Controllers\ProfileController::class, 'remove_token'])->name('delete_token');
+    Route::get('/task', [App\Http\Controllers\TaskController::class, 'task_view'])->name('task_view');
+    Route::get('/get_tasks', [App\Http\Controllers\TaskController::class, 'get_tasks'])->name('get_tasks');
+    Route::post('/add_task', [App\Http\Controllers\TaskController::class, 'create_task'])->name('add_task');
+    Route::post('/edit_task', [App\Http\Controllers\TaskController::class, 'edit_task'])->name('edit_task');
+    Route::post('/remove_task', [App\Http\Controllers\TaskController::class, 'delete_task'])->name('delete_task');
+    Route::get('/repositories', [App\Http\Controllers\RepositoryController::class, 'repositories_view'])->name('repositories');
 });
 
 // Email Verification Routes

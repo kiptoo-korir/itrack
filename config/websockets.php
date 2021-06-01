@@ -3,12 +3,9 @@
 use BeyondCode\LaravelWebSockets\Dashboard\Http\Middleware\Authorize;
 
 return [
-
-    /*
-     * Set a custom dashboard configuration
-     */
+    // Set a custom dashboard configuration
     'dashboard' => [
-        'port' => env('LARAVEL_WEBSOCKETS_PORT', 6001),
+        'port' => env('LARAVEL_WEBSOCKETS_PORT', 6002),
     ],
 
     /*
@@ -48,17 +45,12 @@ return [
      * Leave this empty if you want to accept requests from all hosts.
      */
     'allowed_origins' => [
-        //
     ],
 
-    /*
-     * The maximum request size in kilobytes that is allowed for an incoming WebSocket request.
-     */
+    // The maximum request size in kilobytes that is allowed for an incoming WebSocket request.
     'max_request_size_in_kb' => 250,
 
-    /*
-     * This path will be used to register the necessary routes for the package.
-     */
+    // This path will be used to register the necessary routes for the package.
     'path' => 'laravel-websockets',
 
     /*
@@ -81,15 +73,13 @@ return [
          */
         'model' => \BeyondCode\LaravelWebSockets\Statistics\Models\WebSocketsStatisticsEntry::class,
 
-        /**
+        /*
          * The Statistics Logger will, by default, handle the incoming statistics, store them
          * and then release them into the database on each interval defined below.
          */
         'logger' => BeyondCode\LaravelWebSockets\Statistics\Logger\HttpStatisticsLogger::class,
 
-        /*
-         * Here you can specify the interval in seconds at which statistics should be logged.
-         */
+        // Here you can specify the interval in seconds at which statistics should be logged.
         'interval_in_seconds' => 60,
 
         /*
@@ -124,9 +114,7 @@ return [
          */
         'local_pk' => env('LARAVEL_WEBSOCKETS_SSL_LOCAL_PK', null),
 
-        /*
-         * Passphrase for your local_cert file.
-         */
+        // Passphrase for your local_cert file.
         'passphrase' => env('LARAVEL_WEBSOCKETS_SSL_PASSPHRASE', null),
     ],
 

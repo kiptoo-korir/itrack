@@ -225,7 +225,7 @@
                                 <div class="row">
                                     <label class="col-md-4">Confirm New Password</label>
                                     <div class="col-md-6">
-                                        <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="fpass orm-control"
+                                        <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="pass form-control"
                                             required>
                                     </div>
                                     <div class="clearfix"></div>
@@ -404,7 +404,7 @@
                 pass.type = "text";
                 new_pass.type = "text";
                 new_confirm.type = "text";
-            } else {
+            } else if (pass.type == "text") {
                 pass.type = "password";
                 new_pass.type = "password";
                 new_confirm.type = "password";

@@ -31,11 +31,33 @@ class TestingController extends Controller
         // dd($request);
         // $response = Http::withToken('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')
         // ->get('https://api.github.com/user?perpage=1')
-        $response = $this->tok_service->client()
-            ->get('https://api.github.com/user/repos')
-        // ->get('https://api.github.com/repos/Brian-Nduhiu/Store/languages')
-        ;
-        dd(json_decode($response->body()));
+        // $response = $this->tok_service->client()
+        //     ->get('https://api.github.com/user/repos?sort=created')
+        // ;
+        // dd(json_decode($response->body()));
+        $response = Http::get('https://api.github.com/users/Liyengwas/repos?per_page=1');
+        $header = $response->headers()['Link'][0];
+        $start = strrpos($header, 'e=') + 2;
+        $end = strrpos($header, '>;');
+        $length = $end - $start;
+        $num = intval(substr($header, $start, $length));
+        dd($header, $start, $end, $num, $length);
+        dd($header);
+
+        // $url = 'https://api.github.com/users/repos?per_page=1';
+        // $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_URL, $url);
+        // // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Content-Type: application/json',
+        //     'Authorization: Bearer '.$this->tok_service->github_token(),
+        // ]);
+        // // dd('yes');
+
+        // $output = curl_exec($ch);
+        // curl_close($ch);
+        // dd($output);
         // $response = $this->tok_service->client()->get('https://api.github.com/user?perpage=1');
         // dd($response);
         // $user = Auth::user();
