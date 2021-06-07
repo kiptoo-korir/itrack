@@ -19,6 +19,7 @@ Route::post('/login', [App\Http\Controllers\AuthController::class, 'login'])->na
 Route::get('/register', [App\Http\Controllers\AuthController::class, 'register_view']);
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'])->name('register');
 Route::get('/test', [App\Http\Controllers\TestingController::class, 'test']);
+Route::get('/test_2', [App\Http\Controllers\TestingController::class, 'test_2']);
 Route::get('/github_callback', [App\Http\Controllers\ProfileController::class, 'callback']);
 
 // Only Authorised and Verified users

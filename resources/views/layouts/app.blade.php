@@ -27,16 +27,20 @@
     <link rel="stylesheet" href="{{ asset('css/toast_spinner.css') }}">
     {{-- <link href="{{ URL::asset('css/app.css') }}" rel="stylesheet"> --}}
     <style>
-        .avatar {
-            height: 40px;
-            width: 40px;
-        }
-
         .avatar-text {
             height: 40px;
             width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             color: #e9ecef;
             background-color: #075db8;
+            font-size: 20px;
+        }
+
+        .avatar {
+            height: 40px;
+            width: 40px;
         }
     </style>
     @yield('css_scripts')

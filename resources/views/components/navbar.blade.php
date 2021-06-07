@@ -70,12 +70,12 @@
                 <div class="dropdown nav-item">
                     <div class="media align-items-center dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                         @isset($user_data->photo)
-                        <img class="rounded-circle avatar" alt="user" 
-                            src="https://picsum.photos/id/3/80/80" data-holder-rendered="true">
+                            <img class="rounded-circle avatar" alt="user" 
+                                src="{{ url('storage/images/' . $user_data->photo) }}" data-holder-rendered="true">
                         @else
-                        <div class="avatar-text rounded-circle">
-                            <span style="color: #e9ecef;" class="nav-link text-center text-uppercase font-weight-bolder">{{$user_data->first_letter}}</span>
-                        </div>
+                            <div class="avatar-text rounded-circle mx-auto">
+                                <span style="color: #e9ecef;" class="text-center text-uppercase font-weight-bolder">{{$user_data->first_letter}}</span>
+                            </div>
                         @endisset
                         <div class="media-body d-none d-md-block ml-1">
                             <span class="nav-link px-0 pl-1">{{$user_data->name}}</span>
