@@ -52,7 +52,7 @@
         <main class="py-4 bg-light">
             @include('components.spinner')
             @yield('content')
-            @yield('toasts')
+            @include('components.toasts')
             @yield('modals')
         </main>
     </div>
@@ -61,5 +61,6 @@
 <script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
 <script src="{{ asset('js/custom.js') }}"></script>
 <script src="{{ asset('js/app_echo.js')}}"></script>
+<script src="{{ asset('js/toast.js')}}"></script>
 @yield('js_scripts')
 </html>

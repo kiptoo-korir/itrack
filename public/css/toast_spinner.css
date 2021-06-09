@@ -1,8 +1,12 @@
-.toast-notification {
+.toast-container {
   position: fixed;
   top: 3%;
   right: 3%;
   z-index: 1500;
+}
+
+.toast-notification {
+  margin-bottom: 0.75rem;
 }
 
 .toast-primary {

@@ -94,7 +94,3 @@
     </div>
 </div>
 @endsection
-
-@section('toasts')
-    @include('components.toasts')
-@endsection

@@ -38,10 +38,6 @@
 </div>
 @endsection
 
-@section('toasts')
-    @include('components.toasts')
-@endsection
-
 @section('modals')
 <div class="modal fade" id="task_modal" tabindex="-1" role="dialog" aria-labelledby="#task_btn" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -221,8 +217,7 @@
                 data: delete_record,
                 dataType: "json",
                 success: function (data) {
-                    $('#notifysuccess').find('.toast-body').html(data.success);
-                    $('#notifysuccess').toast('show');
+                    feedback(data.success, 'success');
                     hideSpinner();
                     $('#delete_btn').attr('disabled', true);
                     $('#task_list').DataTable().ajax.reload();
@@ -230,12 +225,10 @@
                 error: function (jqXhr, textStatus, errorThrown) {
                     var errors = JSON.parse(jqXhr.responseText);
                     if (jqXhr.status == 422) {
-                        $('#notifyerror').find('.toast-body').html(errors.errors.id);
-                        $('#notifyerror').toast('show');
+                        feedback(errors.errors.id, 'error');
                         hideSpinner();
                     } else if (jqXhr.status == 400) {
-                        $('#notifyerror').find('.toast-body').html(errors.error);
-                        $('#notifyerror').toast('show');
+                        feedback(errors.error, 'error');
                         hideSpinner();
                     }
                 }
@@ -274,20 +267,17 @@
                     contentType: "application/x-www-form-urlencoded",
                     data: formDetails,
                     success: function (data, textStatus, jQxhr) {
-                        $('#notifysuccess').find('.toast-body').html(data.success);
-                        $('#notifysuccess').toast('show');
+                        feedback(data.success, 'success');
                         hideSpinner();
                         $('#task_list').DataTable().ajax.reload();
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
                         var errors = JSON.parse(jqXhr.responseText);
                         if (jqXhr.status == 422) {
-                            $('#notifyerror').find('.toast-body').html(errors.errors.description || errors.title);
-                            $('#notifyerror').toast('show');
+                            feedback(errors.errors.description || errors.title, 'error');
                             hideSpinner();
                         } else if (jqXhr.status == 400) {
-                            $('#notifyerror').find('.toast-body').html(errors.error);
-                            $('#notifyerror').toast('show');
+                            feedback(errors.error, 'error');
                             hideSpinner();
                         }
                     }
@@ -314,20 +304,17 @@
                     contentType: "application/x-www-form-urlencoded",
                     data: formDetails,
                     success: function (data, textStatus, jQxhr) {
-                        $('#notifysuccess').find('.toast-body').html(data.success);
-                        $('#notifysuccess').toast('show');
+                        feedback(data.success, 'success');
                         hideSpinner();
                         $('#task_list').DataTable().ajax.reload();
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
                         var errors = JSON.parse(jqXhr.responseText);
                         if (jqXhr.status == 422) {
-                            $('#notifyerror').find('.toast-body').html(errors.errors.description || errors.title || errors.status);
-                            $('#notifyerror').toast('show');
+                            feedback(errors.errors.description || errors.title || errors.status, 'error');
                             hideSpinner();
                         } else if (jqXhr.status == 400) {
-                            $('#notifyerror').find('.toast-body').html(errors.error);
-                            $('#notifyerror').toast('show');
+                            feedback(errors.error, 'error');
                             hideSpinner();
                         }
                     }
