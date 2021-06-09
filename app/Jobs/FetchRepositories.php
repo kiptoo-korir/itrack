@@ -39,26 +39,61 @@ class FetchRepositories implements ShouldQueue
         $response = $this->tok_service->client($this->user)
             ->get('https://api.github.com/user/repos?sort=created')
         ;
-        $latest_date = Repository::select('date_created_online')->orderBy('date_created_online', 'desc')->limit(1)->get();
-        $repos = json_decode($response->body());
-        $bulk_insert = [];
-        foreach ($repos as $repo) {
-            $arr = [
-                'owner' => $this->user,
-                'platform' => 1,
-                'name' => $repo->name,
-                'fullname' => $repo->full_name,
-                'repository_id' => $repo->id,
-                'description' => $repo->description,
-                'date_created_online' => $repo->created_at,
-                'date_pushed_online' => $repo->pushed_at,
-                'date_updated_online' => $repo->updated_at,
-                'issues_count' => $repo->open_issues_count,
-            ];
 
-            array_push($bulk_insert, $arr);
+        $latest_date = Repository::where('owner', $this->user)
+            ->orderBy('date_created_online', 'desc')->limit(1)->pluck('date_created_online')->first();
+
+        $latest_updated = Repository::where('owner', $this->user)
+            ->orderBy('date_updated_online', 'desc')->limit(1)->pluck('date_updated_online')->first();
+
+        $count = Repository::where('owner', $this->user)->count();
+
+        $repos = json_decode($response->body());
+
+        $bulk_insert = [];
+        $bulk_update = [];
+
+        foreach ($repos as $repo) {
+            if ((isset($latest_date) && $repo->created_at > $latest_date) || 0 == $count) {
+                $arr = [
+                    'owner' => $this->user,
+                    'platform' => 1,
+                    'name' => $repo->name,
+                    'fullname' => $repo->full_name,
+                    'repository_id' => $repo->id,
+                    'description' => $repo->description,
+                    'date_created_online' => $repo->created_at,
+                    'date_pushed_online' => $repo->pushed_at,
+                    'date_updated_online' => $repo->updated_at,
+                    'issues_count' => $repo->open_issues_count,
+                ];
+                array_push($bulk_insert, $arr);
+            } elseif ($repo->updated_at > $latest_updated) {
+                $update_arr = [
+                    'name' => $repo->name,
+                    'fullname' => $repo->full_name,
+                    'repository_id' => $repo->id,
+                    'description' => $repo->description,
+                    'date_updated_online' => $repo->updated_at,
+                    'issues_count' => $repo->open_issues_count,
+                ];
+
+                array_push($bulk_update, $update_arr);
+            }
         }
-        RepositoriesFetched::dispatch($bulk_insert, $this->user);
+
+        if (!empty($bulk_update)) {
+            Repository::upsert(
+                $update_arr,
+                ['repository_id'],
+                ['issues_count', 'name', 'fullname', 'description', 'date_updated_online']
+            );
+        }
+
+        if (!empty($bulk_insert)) {
+            Repository::insert($bulk_insert);
+            RepositoriesFetched::dispatch($bulk_insert, $this->user);
+        }
     }
 
     protected function check_number()
