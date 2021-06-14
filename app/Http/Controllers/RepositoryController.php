@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\FetchRepositories;
+use App\Models\Repository;
 use Illuminate\Support\Facades\Auth;
 
 class RepositoryController extends Controller
@@ -15,6 +16,7 @@ class RepositoryController extends Controller
         $user_id = Auth::id();
         // TODO: Validate whether token is valid before dispatching job
         FetchRepositories::dispatch($user_id);
+        $data['repositories'] = Repository::select(['name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])->get();
 
         return view('repositories')->with($data);
     }

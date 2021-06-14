@@ -18,7 +18,7 @@
                         <a class="nav-link" href="">Reminders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Notes</a>
+                        <a class="nav-link" href="{{ route('notes_view') }}">Notes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('task_view') }}">Task Lists</a>

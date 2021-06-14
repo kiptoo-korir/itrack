@@ -20,6 +20,7 @@ Route::get('/register', [App\Http\Controllers\AuthController::class, 'register_v
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'])->name('register');
 Route::get('/test', [App\Http\Controllers\TestingController::class, 'test']);
 Route::get('/test_2', [App\Http\Controllers\TestingController::class, 'test_2']);
+Route::get('/test_3', [App\Http\Controllers\TestingController::class, 'fake_data']);
 Route::get('/github_callback', [App\Http\Controllers\ProfileController::class, 'callback']);
 
 // Only Authorised and Verified users
@@ -39,6 +40,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/edit_task', [App\Http\Controllers\TaskController::class, 'edit_task'])->name('edit_task');
     Route::post('/remove_task', [App\Http\Controllers\TaskController::class, 'delete_task'])->name('delete_task');
     Route::get('/repositories', [App\Http\Controllers\RepositoryController::class, 'repositories_view'])->name('repositories');
+    Route::get('/notes', [App\Http\Controllers\NotesController::class, 'notes_view'])->name('notes_view');
+    Route::post('/add_note', [App\Http\Controllers\NotesController::class, 'create_note'])->name('add_note');
+    Route::post('/edit_note', [App\Http\Controllers\NotesController::class, 'edit_note'])->name('edit_note');
+    Route::get('/get_note', [App\Http\Controllers\NotesController::class, 'get_specific_note'])->name('get_note');
+    Route::get('/get_all_notes', [App\Http\Controllers\NotesController::class, 'get_notes'])->name('get_all_notes');
+    Route::post('/delete_note', [App\Http\Controllers\NotesController::class, 'delete_note'])->name('delete_note');
 });
 
 // Email Verification Routes
