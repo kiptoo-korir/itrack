@@ -46,6 +46,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get_note', [App\Http\Controllers\NotesController::class, 'get_specific_note'])->name('get_note');
     Route::get('/get_all_notes', [App\Http\Controllers\NotesController::class, 'get_notes'])->name('get_all_notes');
     Route::post('/delete_note', [App\Http\Controllers\NotesController::class, 'delete_note'])->name('delete_note');
+    Route::get('/reminders', [App\Http\Controllers\RemindersController::class, 'reminders_view'])->name('reminders_view');
+    Route::post('/add_reminder', [App\Http\Controllers\RemindersController::class, 'create_reminder'])->name('add_reminder');
+    Route::get('/get_all_reminders', [App\Http\Controllers\RemindersController::class, 'get_reminders'])->name('get_all_reminders');
+    Route::get('/get_reminder', [App\Http\Controllers\RemindersController::class, 'get_specific_reminder'])->name('get_reminder');
+    Route::post('/edit_reminder', [App\Http\Controllers\RemindersController::class, 'edit_reminder'])->name('edit_reminder');
+    Route::post('/delete_reminder', [App\Http\Controllers\RemindersController::class, 'delete_reminder'])->name('delete_reminder');
+    Route::get('/repository/{id}', [App\Http\Controllers\RepositoryController::class, 'specific_repository'])->name('view_specific_repository');
 });
 
 // Email Verification Routes

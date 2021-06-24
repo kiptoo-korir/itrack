@@ -11,5 +11,5 @@ class Reminder extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['owner', 'repository', 'message', 'title', 'due_date'];
+    protected $fillable = ['owner', 'repository', 'message', 'title', 'due_date', 'type'];
 }

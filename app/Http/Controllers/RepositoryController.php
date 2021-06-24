@@ -20,4 +20,8 @@ class RepositoryController extends Controller
 
         return view('repositories')->with($data);
     }
+
+    public function specific_repository($id)
+    {
+    }
 }

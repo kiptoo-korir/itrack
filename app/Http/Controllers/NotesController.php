@@ -85,7 +85,6 @@ class NotesController extends Controller
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['repositories'] = Repository::select(['id', 'name'])
             ->where('owner', $data['user_data']->id)->get();
-        $data['notes'] = Note::where('owner', $data['user_data']->id)->orderByDesc('created_at')->get();
 
         return view('note')->with($data);
     }

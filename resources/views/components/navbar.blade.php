@@ -15,7 +15,7 @@
                         <a class="nav-link" href="{{ route('repositories') }}">Repositories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Reminders</a>
+                        <a class="nav-link" href="{{ route('reminders_view')}}">Reminders</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('notes_view') }}">Notes</a>

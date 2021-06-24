@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use App\Mail\TestMail;
 use App\Models\Note;
 use App\Models\Repository;
+use App\Models\User;
 use App\Services\TokenService;
 use Faker;
 use Illuminate\Support\Facades\Auth;
@@ -117,8 +119,27 @@ class TestingController extends Controller
 
     public function test_2()
     {
-        $count = Repository::where('owner', 1)->count();
-        dd($count);
+        // $count = Repository::where('owner', 1)->count();
+        // dd($count);
+        // $now = now();
+        // dd($now->setSeconds(0)->setMicroseconds(0));
+        $now = now()->setSeconds(0)->setMicroseconds(0);
+        $reminders = User::rightJoin('reminders as r', 'users.id', '=', 'r.owner')
+            ->leftJoin('repositories as repo', 'r.repository', '=', 'repo.id')
+            ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'repo.id as repo_id', 'repo.fullname')
+            ->selectRaw('to_char(r.due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
+            // ->where('r.due_date', '=', $now)
+            ->get()
+        ;
+
+        // dd($reminders);
+        if ($reminders->isNotEmpty()) {
+            foreach ($reminders as $reminder) {
+                return new App\Mail\ReminderMail($reminder);
+            }
+        }
+
+        dd('Haiko');
     }
 
     public function get_count()
@@ -135,6 +156,8 @@ class TestingController extends Controller
 
     public function fake_data()
     {
+        // dd(now());
+        dd(strtotime(now()));
         // $faker = Faker\Factory::create();
         // $arr = [];
 
