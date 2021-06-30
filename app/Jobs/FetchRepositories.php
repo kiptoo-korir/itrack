@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class FetchRepositories implements ShouldQueue
 {
@@ -42,6 +43,7 @@ class FetchRepositories implements ShouldQueue
 
         $latest_date = Repository::where('owner', $this->user)
             ->orderBy('date_created_online', 'desc')->limit(1)->pluck('date_created_online')->first();
+        $latest_date = strtotime($latest_date);
 
         $latest_updated = Repository::where('owner', $this->user)
             ->orderBy('date_updated_online', 'desc')->limit(1)->pluck('date_updated_online')->first();
@@ -54,25 +56,20 @@ class FetchRepositories implements ShouldQueue
         $bulk_update = [];
 
         foreach ($repos as $repo) {
-            if ((isset($latest_date) && $repo->created_at > $latest_date) || 0 == $count) {
-                $arr = [
-                    'owner' => $this->user,
-                    'platform' => 1,
-                    'name' => $repo->name,
-                    'fullname' => $repo->full_name,
-                    'repository_id' => $repo->id,
-                    'description' => $repo->description,
-                    'date_created_online' => $repo->created_at,
-                    'date_pushed_online' => $repo->pushed_at,
-                    'date_updated_online' => $repo->updated_at,
-                    'issues_count' => $repo->open_issues_count,
-                ];
+            $repo_created = strtotime($repo->created_at);
+            if (0 == $count) {
+                $arr = $this->create_arr($repo);
+                array_push($bulk_insert, $arr);
+            } elseif (isset($latest_date) && $repo_created > $latest_date) {
+                $arr = $this->create_arr($repo);
                 array_push($bulk_insert, $arr);
             } elseif ($repo->updated_at > $latest_updated) {
                 $update_arr = [
                     'name' => $repo->name,
                     'fullname' => $repo->full_name,
                     'repository_id' => $repo->id,
+                    // 'owner' => $this->user,
+                    // 'platform' => 1,
                     'description' => $repo->description,
                     'date_updated_online' => $repo->updated_at,
                     'issues_count' => $repo->open_issues_count,
@@ -82,18 +79,39 @@ class FetchRepositories implements ShouldQueue
             }
         }
 
-        if (!empty($bulk_update)) {
-            Repository::upsert(
-                $update_arr,
-                ['repository_id'],
-                ['issues_count', 'name', 'fullname', 'description', 'date_updated_online']
-            );
-        }
-
         if (!empty($bulk_insert)) {
-            Repository::insert($bulk_insert);
+            // Repository::insert($bulk_insert);
             RepositoriesFetched::dispatch($bulk_insert, $this->user);
         }
+
+        if (!empty($bulk_update)) {
+            // Repository::upsert(
+            //     $update_arr,
+            //     ['repository_id'],
+            //     ['issues_count', 'name', 'fullname', 'description', 'date_updated_online']
+            // );
+            foreach ($bulk_update as $update) {
+                DB::table('repositories')->where('repository_id', $update['repository_id'])
+                    ->update($update)
+                ;
+            }
+        }
+    }
+
+    protected function create_arr($repo): array
+    {
+        return [
+            'owner' => $this->user,
+            'platform' => 1,
+            'name' => $repo->name,
+            'fullname' => $repo->full_name,
+            'repository_id' => $repo->id,
+            'description' => $repo->description,
+            'date_created_online' => $repo->created_at,
+            'date_pushed_online' => $repo->pushed_at,
+            'date_updated_online' => $repo->updated_at,
+            'issues_count' => $repo->open_issues_count,
+        ];
     }
 
     protected function check_number()
