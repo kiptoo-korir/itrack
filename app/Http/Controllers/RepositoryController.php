@@ -23,5 +23,9 @@ class RepositoryController extends Controller
 
     public function specific_repository($id)
     {
+        $data['user_data'] = Auth::user();
+        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+
+        $data['repository'] = Repository::findOrFail($id);
     }
 }

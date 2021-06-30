@@ -123,23 +123,24 @@ class TestingController extends Controller
         // dd($count);
         // $now = now();
         // dd($now->setSeconds(0)->setMicroseconds(0));
-        $now = now()->setSeconds(0)->setMicroseconds(0);
-        $reminders = User::rightJoin('reminders as r', 'users.id', '=', 'r.owner')
-            ->leftJoin('repositories as repo', 'r.repository', '=', 'repo.id')
-            ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'repo.id as repo_id', 'repo.fullname')
-            ->selectRaw('to_char(r.due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
-            // ->where('r.due_date', '=', $now)
-            ->get()
-        ;
+        // $now = now()->setSeconds(0)->setMicroseconds(0);
+        // $reminders = User::rightJoin('reminders as r', 'users.id', '=', 'r.owner')
+        //     ->leftJoin('repositories as repo', 'r.repository', '=', 'repo.id')
+        //     ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'repo.id as repo_id', 'repo.fullname')
+        //     ->selectRaw('to_char(r.due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
+        //     // ->where('r.due_date', '=', $now)
+        //     ->get()
+        // ;
 
-        // dd($reminders);
-        if ($reminders->isNotEmpty()) {
-            foreach ($reminders as $reminder) {
-                return new App\Mail\ReminderMail($reminder);
-            }
-        }
+        // // dd($reminders);
+        // if ($reminders->isNotEmpty()) {
+        //     foreach ($reminders as $reminder) {
+        //         return new App\Mail\ReminderMail($reminder);
+        //     }
+        // }
 
-        dd('Haiko');
+        // dd('Haiko');
+        dd(strtotime('2020-09-16T07:01:51Z'), strtotime('2020-09-16 10:01:51+03'));
     }
 
     public function get_count()
