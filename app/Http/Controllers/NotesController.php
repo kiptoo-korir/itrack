@@ -37,7 +37,9 @@ class NotesController extends Controller
     public function get_notes()
     {
         $user_id = Auth::id();
-        $data = Note::where('owner', $user_id)->orderByDesc('created_at')->limit(50)->get();
+        $data = Note::leftJoin('repositories as repo', 'notes.repository', '=', 'repo.id')
+            ->select('notes.*', 'repo.name as repo_name')
+            ->where('notes.owner', $user_id)->orderByDesc('created_at')->limit(50)->get();
 
         return response()->json(['notes' => $data], 200);
     }
@@ -62,7 +64,12 @@ class NotesController extends Controller
             'type' => $type,
         ]);
 
-        return response()->json(['success' => 'Task updated successfully.'], 200);
+        $repo_name = null;
+        if ($task->repository) {
+            $repo_name = Repository::findOrFail($task->repository)->name;
+        }
+
+        return response()->json(['success' => 'Task updated successfully.', 'repo_name' => $repo_name], 200);
     }
 
     public function delete_note(Request $request)
