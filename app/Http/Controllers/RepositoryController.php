@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\FetchRepositories;
+use App\Jobs\FetchRepositoryIssues;
 use App\Models\Repository;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,7 @@ class RepositoryController extends Controller
     {
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
-
         $data['repository'] = Repository::findOrFail($id);
+        FetchRepositoryIssues::dispatch($data['repository']->repository_id, $data['user_data']->id);
     }
 }

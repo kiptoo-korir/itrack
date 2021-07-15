@@ -111,6 +111,8 @@ class FetchRepositories implements ShouldQueue
             'date_pushed_online' => $repo->pushed_at,
             'date_updated_online' => $repo->updated_at,
             'issues_count' => $repo->open_issues_count,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 
