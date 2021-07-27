@@ -25,7 +25,8 @@ class TestMail extends Mailable
      */
     public function build()
     {
-        return $this->from('admin@itrack.com')
-            ->view('emails.test');
+        return $this->from('admin@itrack.com', 'iTrack')
+            ->view('emails.test')
+        ;
     }
 }

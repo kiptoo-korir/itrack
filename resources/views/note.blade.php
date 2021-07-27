@@ -3,11 +3,11 @@
 @section('css_scripts')
     <style>
         /* .grid {
-                                                                display: grid;
-                                                                grid-gap: 10px;
-                                                                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                                                                grid-auto-rows: 200px;
-                                                            } */
+                display: grid;
+                grid-gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                grid-auto-rows: 200px;
+            } */
 
         .note {
             /* background-color: #ffffff; */

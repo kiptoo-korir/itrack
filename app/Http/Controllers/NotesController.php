@@ -28,7 +28,7 @@ class NotesController extends Controller
         ];
 
         if ($note = Note::create($note_record)) {
-            return response()->json(['success' => 'Task created successfully.', 'note' => $note], 200);
+            return response()->json(['success' => 'Note created successfully.', 'note' => $note], 200);
         }
 
         return response()->json(['error' => 'An error seems to have occurred, please try again.'], 400);

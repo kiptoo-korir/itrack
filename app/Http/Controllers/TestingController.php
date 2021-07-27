@@ -139,8 +139,7 @@ class TestingController extends Controller
         //     }
         // }
 
-        // dd('Haiko');
-        dd(strtotime('2020-09-16T07:01:51Z'), strtotime('2020-09-16 10:01:51+03'));
+        Mail::to('elijahkiptoo98@gmail.com')->send(new TestMail());
     }
 
     public function get_count()
