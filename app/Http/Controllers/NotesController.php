@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Note;
-use App\Models\Repository;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,13 +17,13 @@ class NotesController extends Controller
         ]);
 
         $user_id = Auth::id();
-        $repository = $request->repository;
-        $type = ($request->repository) ? 'SPECIFIC' : 'GENERAL';
+        $project = $request->project;
+        $type = ($request->project) ? 'SPECIFIC' : 'GENERAL';
         $note_record = [
             'owner' => $user_id,
             'title' => $request->title,
             'message' => $request->message,
-            'repository' => $repository,
+            'project' => $project,
             'type' => $type,
         ];
 
@@ -37,8 +37,8 @@ class NotesController extends Controller
     public function get_notes()
     {
         $user_id = Auth::id();
-        $data = Note::leftJoin('repositories as repo', 'notes.repository', '=', 'repo.id')
-            ->select('notes.*', 'repo.name as repo_name')
+        $data = Note::leftJoin('projects as prj', 'notes.project', '=', 'prj.id')
+            ->select('notes.*', 'prj.name as project_name')
             ->where('notes.owner', $user_id)->orderByDesc('created_at')->limit(50)->get();
 
         return response()->json(['notes' => $data], 200);
@@ -54,22 +54,22 @@ class NotesController extends Controller
 
         $note_id = $request->get('note_id');
         $task = Note::find($note_id);
-        $repository = ($request->repository) ?: null;
-        $type = ($request->repository) ? 'SPECIFIC' : 'GENERAL';
+        $project = ($request->project) ?: null;
+        $type = ($request->project) ? 'SPECIFIC' : 'GENERAL';
 
         $task->update([
             'title' => $request->title,
             'message' => $request->message,
-            'repository' => $repository,
+            'project' => $project,
             'type' => $type,
         ]);
 
-        $repo_name = null;
-        if ($task->repository) {
-            $repo_name = Repository::findOrFail($task->repository)->name;
+        $project_name = null;
+        if ($task->project) {
+            $project_name = Project::findOrFail($task->project)->name;
         }
 
-        return response()->json(['success' => 'Task updated successfully.', 'repo_name' => $repo_name], 200);
+        return response()->json(['success' => 'Note updated successfully.', 'project_name' => $project_name], 200);
     }
 
     public function delete_note(Request $request)
@@ -90,7 +90,7 @@ class NotesController extends Controller
     {
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
-        $data['repositories'] = Repository::select(['id', 'name'])
+        $data['projects'] = Project::select(['id', 'name'])
             ->where('owner', $data['user_data']->id)->get();
 
         return view('note')->with($data);

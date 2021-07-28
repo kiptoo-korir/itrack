@@ -4,9 +4,9 @@
     <style>
         .spin-wrapper {
             /* position: relative;
-                                                                                                                width: 100%;
-                                                                                                                height: 100px;
-                                                                                                                margin-top: 3px; */
+                                                                                                                                                                                                                                                                                        width: 100%;
+                                                                                                                                                                                                                                                                                        height: 100px;
+                                                                                                                                                                                                                                                                                        margin-top: 3px; */
             display: none;
             z-index: 1500;
         }
@@ -71,7 +71,16 @@
             }
         }
 
+        .bg-card {
+            transition: 0.3s;
+        }
+
+        .bg-card:hover {
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5) !important;
+        }
+
     </style>
+    <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
 @endsection
 
 @section('content')
@@ -84,7 +93,8 @@
             <input type="text" class="form-control" id="search" placeholder="Search for project..."
                 onkeyup="searchProjects()">
         </div>
-        <div class="card-columns mt-3" id="card-container">
+        <div class="row row-cols-1 row-cols-md-3" id="projects_container">
+
         </div>
     </div>
 @endsection
@@ -107,7 +117,7 @@
                             <div class="row">
                                 <label class="col-md-4">Project Name</label>
                                 <div class="col-md-6">
-                                    <input type="text" name="name" class="form-control" required>
+                                    <input type="text" name="name" class="form-control" id="project_name" required>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
@@ -116,7 +126,8 @@
                             <div class="row">
                                 <label class="col-md-4">Description</label>
                                 <div class="col-md-7">
-                                    <textarea name="description" rows="3" class="form-control" required></textarea>
+                                    <textarea name="description" rows="3" class="form-control" id="project_description"
+                                        required></textarea>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
@@ -125,7 +136,7 @@
                             <div class="row">
                                 <label class="col-md-4">Repository</label>
                                 <div class="col-md-7">
-                                    <select name="repository" class="form-control" id="">
+                                    <select name="repos" class="form-control" id="repositories_linked" multiple="multiple">
                                         @forelse ($repositories as $repo)
                                             <option value="{{ $repo->id }}">{{ $repo->name }} -
                                                 ({{ $repo->platform }})</option>
@@ -171,4 +182,72 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('js_scripts')
+<script src="{{ asset('js/bootstrap-multiselect.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('#repositories_linked').multiselect();
+    });
+    $('#project_form').on('submit', function(event) {
+        event.preventDefault();
+        var action_url = "{{ route('add_project') }}";
+        $.ajax({
+            url: action_url,
+            method: "POST",
+            data: {
+                'name': $('#project_name').val(),
+                'description': $('#project_description').val(),
+                'repositories': $('#repositories_linked').val(),
+                '_token': '{{ csrf_token() }}'
+            },
+            dataType: "json",
+            success: function(data) {
+                var project = data.project;
+                add_project_cards(project, null);
+                feedback(data.success, 'success');
+            },
+            error: function(jqXhr, textStatus, errorThrown) {
+                var errors = JSON.parse(jqXhr.responseText);
+                if (jqXhr.status == 422) {
+                    feedback(errors.errors.name, 'error');
+                    // hideSpinner();
+                } else if (jqXhr.status == 400) {
+                    feedback(errors.error, 'error');
+                    // hideSpinner();
+                }
+            }
+        });
+    });
+
+    function fetch_projects() {
+        var action_url = "{{ route('get_projects') }}";
+
+        $.ajax({
+            url: action_url,
+            method: "GET",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+            },
+        })
+    }
+
+    function add_project_cards(item, index) {
+        var description_class = (item.description) ? 'show' : 'hide';
+        var element = `
+            <div class="col mb-3">
+                <div class="card bg-card h-100">
+                    <div class="card-header">${item.name}</div>
+                    <div class="card-body">
+                        <p class="card-text ${description_class}">Description: ${item.description}</p>
+                        <p class="card-text">Created On: ${item.date_created_online}</p>
+                        <p class="card-text">Updated On: ${item.date_updated_online}</p>
+                    </div>
+                </div>
+            </div>`;
+        $('#projects_container').append(element);
+    }
+</script>
 @endsection

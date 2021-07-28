@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,14 +16,24 @@ class ProjectsController extends Controller
         ]);
 
         $user_id = Auth::id();
-        $insert_arr = [
+        $project_arr = [
             'name' => $request->name,
             'description' => $request->description,
             'owner' => $user_id,
-            'repository' => $request->repository,
         ];
 
-        if ($project = DB::table('projects')->insert($insert_arr)) {
+        if ($project = Project::create($project_arr)) {
+            $repos = $request->repositories;
+            $insert_arr = [];
+            foreach ($repos as $repo) {
+                array_push($insert_arr, [
+                    'project_id' => $project->id,
+                    'repository_id' => $repo,
+                    'owner' => $user_id,
+                ]);
+            }
+            DB::table('project_repository')->insert($insert_arr);
+
             return response()->json(['success' => 'Project created successfully.', 'project' => $project], 200);
         }
 

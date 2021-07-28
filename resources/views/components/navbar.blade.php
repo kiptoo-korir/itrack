@@ -14,6 +14,9 @@
             <ul class="navbar-nav mr-auto">
                 @auth
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('home') }}">Projects</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('repositories') }}">Repositories</a>
                     </li>
                     <li class="nav-item">
@@ -90,7 +93,7 @@
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right py-0 overflow-hidden">
                         <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>
                         <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                                document.getElementById('logout-form').submit();">
+                                                                    document.getElementById('logout-form').submit();">
                             {{ __('Logout') }}
                         </a>
 

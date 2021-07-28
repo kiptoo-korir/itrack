@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/edit_reminder', [App\Http\Controllers\RemindersController::class, 'edit_reminder'])->name('edit_reminder');
     Route::post('/delete_reminder', [App\Http\Controllers\RemindersController::class, 'delete_reminder'])->name('delete_reminder');
     Route::get('/repository/{id}', [App\Http\Controllers\RepositoryController::class, 'specific_repository'])->name('view_specific_repository');
+    Route::get('/get_projects', [App\Http\Controllers\ProjectsController::class, 'get_projects'])->name('get_projects');
+    Route::post('/add_project', [App\Http\Controllers\ProjectsController::class, 'create_project'])->name('add_project');
 });
 
 // Email Verification Routes

@@ -3,11 +3,11 @@
 @section('css_scripts')
     <style>
         /* .grid {
-                display: grid;
-                grid-gap: 10px;
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                grid-auto-rows: 200px;
-            } */
+                                        display: grid;
+                                        grid-gap: 10px;
+                                        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                                        grid-auto-rows: 200px;
+                                    } */
 
         .note {
             /* background-color: #ffffff; */
@@ -104,13 +104,13 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4">Repository</label>
+                                <label class="col-md-4">Project</label>
                                 <div class="col-md-7">
-                                    <select name="repository" class="form-control" id="">
-                                        @forelse ($repositories as $repo)
-                                            <option value="{{ $repo->id }}">{{ $repo->name }}</option>
+                                    <select name="project" class="form-control" id="">
+                                        @forelse ($projects as $project)
+                                            <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @empty
-                                            <option value="">No repositories within the platform.</option>
+                                            <option value="">No projects created within the platform.</option>
                                         @endforelse
                                     </select>
                                 </div>
@@ -186,13 +186,13 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4">Repository</label>
+                                <label class="col-md-4">Project</label>
                                 <div class="col-md-7">
-                                    <select name="repository" class="form-control" id="edit_repo">
-                                        @forelse ($repositories as $repo)
-                                            <option value="{{ $repo->id }}">{{ $repo->name }}</option>
+                                    <select name="project" class="form-control" id="edit_project">
+                                        @forelse ($projects as $project)
+                                            <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @empty
-                                            <option value="">No repositories within the platform.</option>
+                                            <option value="">No projects within the platform.</option>
                                         @endforelse
                                     </select>
                                 </div>
@@ -281,8 +281,8 @@
                     note.find('.note-text').html(message);
                     note.find('.note-header').html(title);
                     var b_id = `#badge_repo_${note_id}`;
-                    if (data.repo_name !== null) {
-                        $(b_id).html(data.repo_name);
+                    if (data.project_name !== null) {
+                        $(b_id).html(data.project_name);
                         $(b_id).removeClass('hide').addClass('show');
                     }
                 },
@@ -340,7 +340,7 @@
                     $('#edit_id').val(note.id);
                     $('#edit_title').val(note.title);
                     $('#edit_message').val(note.message);
-                    $('#edit_repo').val(note.repository);
+                    $('#edit_project').val(note.project);
                     $('#editModal').modal('show');
                 },
             });
