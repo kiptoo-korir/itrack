@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\ReminderMail;
+use App\Jobs\ReminderNotificationQueue;
 use App\Models\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 
 class ReminderCommand extends Command
 {
@@ -48,9 +47,7 @@ class ReminderCommand extends Command
         ;
 
         if ($reminders->isNotEmpty()) {
-            foreach ($reminders as $reminder) {
-                Mail::to($reminder->email)->send(new ReminderMail($reminder));
-            }
+            ReminderNotificationQueue::dispatch($reminders);
         }
     }
 }

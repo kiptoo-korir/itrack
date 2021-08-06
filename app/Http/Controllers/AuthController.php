@@ -47,7 +47,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $this->log_signin_activity();
 
-            return redirect()->intended('home');
+            return redirect()->intended();
         }
 
         $this->incrementLoginAttempts($request);
