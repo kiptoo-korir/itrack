@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -13,6 +14,7 @@ class TaskController extends Controller
     {
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('task')->with($data);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Note;
 use App\Models\Project;
+use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -92,6 +93,7 @@ class NotesController extends Controller
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['projects'] = Project::select(['id', 'name'])
             ->where('owner', $data['user_data']->id)->get();
+        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('note')->with($data);
     }

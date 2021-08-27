@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Reminder;
 use App\Models\Repository;
+use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
@@ -142,6 +143,7 @@ class RemindersController extends Controller
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['repositories'] = Repository::select(['id', 'name'])
             ->where('owner', $data['user_data']->id)->get();
+        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('reminder')->with($data);
     }

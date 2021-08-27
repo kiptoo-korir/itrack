@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AccessToken;
 use App\Models\Platform;
+use App\Services\UserDataService;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ class ProfileController extends Controller
         $data['platforms'] = Platform::all();
         $client = env('GITHUB_CLIENT_ID');
         $data['request'] = "https://github.com/login/oauth/authorize?client_id={$client}&scope=repo%20notifications%20user";
+        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('profile')->with($data);
     }

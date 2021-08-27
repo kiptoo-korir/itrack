@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\FetchRepositories;
 use App\Jobs\FetchRepositoryIssues;
 use App\Models\Repository;
+use App\Services\UserDataService;
 use Illuminate\Support\Facades\Auth;
 
 class RepositoryController extends Controller
@@ -18,6 +19,7 @@ class RepositoryController extends Controller
         // TODO: Validate whether token is valid before dispatching job
         FetchRepositories::dispatch($user_id);
         $data['repositories'] = Repository::select(['name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])->get();
+        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('repositories')->with($data);
     }
