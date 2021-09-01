@@ -18,7 +18,6 @@ class TokenService
         $key = 'github-'.$user_id;
         $platform = Platform::where('name', 'Github')->select('id')->get()[0]->id;
         $token = Cache::get($key, $this->get_token($platform, $user_id));
-        dd($token);
 
         if ('error-400' == $token) {
             // invalidate current token
