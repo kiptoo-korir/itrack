@@ -18,6 +18,7 @@ class TokenService
         $key = 'github-'.$user_id;
         $platform = Platform::where('name', 'Github')->select('id')->get()[0]->id;
         $token = Cache::get($key, $this->get_token($platform, $user_id));
+        dd($token);
 
         if ('error-400' == $token) {
             // invalidate current token
@@ -36,12 +37,17 @@ class TokenService
     private function get_token($platform, $user_id)
     {
         $user = User::findOrFail($user_id);
-        $token_record = $user->access_token()->where(['platform' => $platform, 'verified' => true])->first();
-        $token = $token_record->access_token;
+        $token_record = $user->access_token()->where(['platform' => $platform, 'verified' => true])
+            ->orderBy('created_at', 'desc')
+            ->first()
+        ;
 
         try {
-            $decrypted = isset($token) ? Crypt::decryptString($token) : '';
+            $decrypted = isset($token_record) ? Crypt::decryptString($token_record->access_token) : '';
         } catch (DecryptException $e) {
+            $token_record->verified = false;
+            $token_record->deleted_at = now();
+            $token_record->save();
             $decrypted = 'error-400';
         }
 
