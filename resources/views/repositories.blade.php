@@ -49,23 +49,20 @@
 @endsection
 
 @section('js_scripts')
-<script src="{{ asset('js/datatables.min.js') }}"></script>
-<script>
-    const user_id = {{ $user_data->id }};
-    console.log(user_id);
-    Echo.private(`user_repos.${user_id}`)
-        .listen('RepositoriesFetched', (res) => {
-            var repos = res.repos;
-            if (repos && repos.length) {
-                $('#alert_1').hide();
-                repos.forEach(add_new_repos);
-            }
-        });
+    <script src="{{ asset('js/datatables.min.js') }}"></script>
+    <script>
+        Echo.private(`user_repos.${userId}`)
+            .listen('RepositoriesFetched', (res) => {
+                var repos = res.repos;
+                if (repos && repos.length) {
+                    $('#alert_1').hide();
+                    repos.forEach(add_new_repos);
+                }
+            });
 
-    function add_new_repos(item, index) {
-        var element = `
-            <div class="col mb-3">
-                <div class="card bg-card text-white h-100">
+        function add_new_repos(item, index) {
+            let elementContent = `
+                <div class="card bg-card shadow h-100">
                     <div class="card-header">${item.name}</div>
                     <div class="card-body">
                         <p class="card-text">Description: ${item.description}</p>
@@ -73,9 +70,20 @@
                         <p class="card-text">Updated On: ${item.date_updated_online}</p>
                         <i class="bi bi-journal-x"></i><span> ${item.issues_count} Issues</span>
                     </div>
-                </div>
-            </div>`;
-        $('#repo_container').append(element);
-    }
-</script>
+                    <div class="card-footer">
+                        <a class="btn btn-primary btn-sm">Open</a>
+                    </div>
+                </div>`;
+            let newElement = document.createElement('div');
+            newElement.classList.add('col', 'mb-3');
+            newElement.innerHTML = elementContent;
+            document.getElementById('repo_container').appendChild(newElement);
+        }
+
+        function splitDate(actionDate) {
+            let newDate = new Date(actionDate);
+            let dateString = newDate.toISOString.split('T')[0];
+            // let timeString = 
+        }
+    </script>
 @endsection

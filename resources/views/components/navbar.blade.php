@@ -14,19 +14,19 @@
             <ul class="navbar-nav mr-auto">
                 @auth
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">Projects</a>
+                        <a class="nav-link text-dark" href="{{ route('home') }}">Projects</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('repositories') }}">Repositories</a>
+                        <a class="nav-link text-dark" href="{{ route('repositories') }}">Repositories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('reminders_view') }}">Reminders</a>
+                        <a class="nav-link text-dark" href="{{ route('reminders_view') }}">Reminders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('notes_view') }}">Notes</a>
+                        <a class="nav-link text-dark" href="{{ route('notes_view') }}">Notes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('task_view') }}">Task Lists</a>
+                        <a class="nav-link text-dark" href="{{ route('task_view') }}">Task Lists</a>
                     </li>
                 @endauth
             </ul>
@@ -52,24 +52,56 @@
         @auth
             <div id="notifications" class="d-flex order-0 order-md-last">
                 <div class="dropdown nav-item">
-                    <a class="nav-link" href="#" id="bell" role="button" style="color: #075db8" data-toggle="dropdown"
+                    <a class="nav-link notification-bell" href="#" id="bell" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         <div class="media align-items-center">
                             <div class="media-body">
                                 <i class="bi bi-bell-fill"></i>
-                                <span class="badge badge-md badge-circle badge-floating" id="notification_count"></span>
+                                <span class="" id="notification_count">{{ $notification_count }}</span>
                             </div>
                         </div>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right py-0 overflow-hidden not-dropdown">
+                    <div class="dropdown-menu dropdown-menu-right py-0 overflow-hidden not-dropdown">
                         <!-- List group -->
                         <div id="notification_list">
-
+                            <div class="list-group list-group-flush">
+                                <div>
+                                    <div class="align-items-center">
+                                        <div class="toast-body mx-2">
+                                            <h4 class="header-notification">Grew tired, check bugs</h4>
+                                            <p class="text-notification mb-0 truncate-fade">Just added an assessment.
+                                                But even moreso its to show that this is a vital reminder and you know si
+                                                mchezo baba.</p>
+                                            <div class="text-right text-notification"><a class="mark-as-read"
+                                                    href="javascript:void(0)"
+                                                    data-id="f2dcca9e-6f7b-4861-9d35-aca4b7477253">Mark as read</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                <div>
+                                    <div class="align-items-center">
+                                        <div class="toast-body mx-2">
+                                            <h4 class="header-notification">Lorem ipsum dolor sit</h4>
+                                            <p class="text-notification mb-0 truncate-fade">Imperdiet nulla malesuada
+                                                pellentesque elit eget gravida cum sociis natoque. Cursus turpis massa
+                                                tincidunt dui ut. Sit amet consectetur adipiscing elit. Habitant morbi
+                                                tristique senectus et netus et malesuada fames. Dignissim diam quis enim
+                                                lobortis. Elit ullamcorper dignissim cras tincidunt lobortis.</p>
+                                            <div class="text-right text-notification"><a class="mark-as-read"
+                                                    href="javascript:void(0)"
+                                                    data-id="f2dcca9e-6f7b-4861-9d35-aca4b7477253">Mark as read</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <a id="view_all" href="" class="dropdown-item text-center py-1" style="color: #075db8">View
-                            all</a>
                         <div id="no_notifications" aria-hidden="true" class="dropdown-item text-center py-1">No new
                             notifications</div>
+                        <a id="view_all" href="" class="dropdown-item text-center py-1"
+                            style="color: #075db8; font-size: 0.875rem">View
+                            all</a>
                     </div>
                 </div>
             </div>
@@ -92,8 +124,9 @@
                     </div>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right py-0 overflow-hidden">
                         <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>
-                        <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                                    document.getElementById('logout-form').submit();">
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                            onclick="event.preventDefault();
+                                                                                                                                                                                            document.getElementById('logout-form').submit();">
                             {{ __('Logout') }}
                         </a>
 

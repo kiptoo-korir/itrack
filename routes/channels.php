@@ -18,5 +18,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('user_repos.{id}', function ($user, $id) {
+    return (int) Request::user()->id === (int) $id;
+});
+
+Broadcast::channel('events', function () {
     return true;
 });

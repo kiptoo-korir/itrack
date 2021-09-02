@@ -64,6 +64,8 @@ class ReminderNotification extends Notification implements ShouldBroadcast
     {
         return [
             'reminder_details' => $this->reminder,
+            'notification_message' => $this->reminder->message,
+            'notification_title' => $this->reminder->title,
         ];
     }
 
@@ -73,7 +75,9 @@ class ReminderNotification extends Notification implements ShouldBroadcast
 
         return new BroadcastMessage([
             'reminder_id' => $this->reminder->id,
-            'reminder_count' => $count,
+            'notifications_count' => $count,
+            'title' => $this->reminder->title,
+            'message' => $this->reminder->message,
         ]);
     }
 }

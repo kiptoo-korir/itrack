@@ -21,6 +21,7 @@ Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'
 Route::get('/test', [App\Http\Controllers\TestingController::class, 'test']);
 Route::get('/test_2', [App\Http\Controllers\TestingController::class, 'test_2']);
 Route::get('/test_3', [App\Http\Controllers\TestingController::class, 'fake_data']);
+Route::get('/test_notify', [App\Http\Controllers\TestingController::class, 'notify']);
 Route::get('/github_callback', [App\Http\Controllers\ProfileController::class, 'callback']);
 
 // Only Authorised and Verified users
@@ -55,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/repository/{id}', [App\Http\Controllers\RepositoryController::class, 'specific_repository'])->name('view_specific_repository');
     Route::get('/get_projects', [App\Http\Controllers\ProjectsController::class, 'get_projects'])->name('get_projects');
     Route::post('/add_project', [App\Http\Controllers\ProjectsController::class, 'create_project'])->name('add_project');
+    Route::get('/get_recent_notifications', [App\Http\Controllers\HomeController::class, 'get_top_three_notifications'])->name('fetch_notifications');
 });
 
 // Email Verification Routes

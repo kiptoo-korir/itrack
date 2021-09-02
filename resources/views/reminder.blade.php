@@ -4,11 +4,11 @@
     <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
     <style>
         /* .grid {
-                                                                display: grid;
-                                                                grid-gap: 10px;
-                                                                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                                                                grid-auto-rows: 200px;
-                                                            } */
+                                                                            display: grid;
+                                                                            grid-gap: 10px;
+                                                                            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                                                                            grid-auto-rows: 200px;
+                                                                        } */
 
         .note {
             /* background-color: #ffffff; */
@@ -61,7 +61,6 @@
                         <th>Content</th>
                         <th>Date Due</th>
                         <th>Date Created</th>
-                        {{-- <th>Repository</th> --}}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -121,13 +120,14 @@
                         <input type="hidden" name="timezone" id="timezone">
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4">Repository</label>
+                                <label class="col-md-4">Project</label>
                                 <div class="col-md-7">
-                                    <select name="repository" class="form-control" id="">
-                                        @forelse ($repositories as $repo)
-                                            <option value="{{ $repo->id }}">{{ $repo->name }}</option>
+                                    <select name="project" class="form-control" id="">
+                                        <option value="">None selected</option>
+                                        @forelse ($projects as $project)
+                                            <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @empty
-                                            <option value="">No repositories within the platform.</option>
+                                            <option value="">No projects currently within the platform.</option>
                                         @endforelse
                                     </select>
                                 </div>
@@ -223,11 +223,12 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4">Repository</label>
+                                <label class="col-md-4">Project</label>
                                 <div class="col-md-7">
-                                    <select name="repository" class="form-control" id="edit_repo">
-                                        @forelse ($repositories as $repo)
-                                            <option value="{{ $repo->id }}">{{ $repo->name }}</option>
+                                    <select name="project" class="form-control" id="edit_repo">
+                                        <option value="">None selected</option>
+                                        @forelse ($projects as $project)
+                                            <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @empty
                                             <option value="">No repositories within the platform.</option>
                                         @endforelse
@@ -252,6 +253,14 @@
     <script src="{{ asset('js/datatables.min.js') }}"></script>
     <script>
         $(document).ready(function() {
+            fetch_reminders();
+        });
+
+        function fetch_reminders() {
+            if ($.fn.dataTable.isDataTable('#tbl_rem')) {
+                $('#tbl_rem').DataTable().destroy();
+            }
+
             $('#tbl_rem').DataTable({
                 processing: true,
                 serverSide: true,
@@ -301,7 +310,7 @@
                     }
                 ]
             });
-        });
+        }
 
         $('#reminder_form').on('submit', function(event) {
             event.preventDefault();
@@ -316,9 +325,8 @@
                 data: create_record,
                 dataType: "json",
                 success: function(data) {
-                    // var note = data.note;
-                    // appendNotes(note, null);
                     feedback(data.success, 'success');
+                    fetch_reminders();
                 },
                 error: function(jqXhr, textStatus, errorThrown) {
                     var errors = JSON.parse(jqXhr.responseText);
@@ -403,7 +411,7 @@
                     $('#edit_id').val(id);
                     $('#edit_title').val(reminder.title);
                     $('#edit_message').val(reminder.message);
-                    $('#edit_repo').val(reminder.repository);
+                    $('#edit_repo').val(reminder.project);
                     $('#edit_date').val(reminder.year);
                     $('#edit_time').val(reminder.time);
                     $('#editModal').modal('show');

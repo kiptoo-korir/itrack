@@ -1,116 +1,179 @@
 .toast-container {
-  position: fixed;
-  top: 3%;
-  right: 3%;
-  z-index: 1500;
+    position: fixed;
+    top: 3%;
+    right: 3%;
+    z-index: 1500;
 }
 
 .toast-notification {
-  margin-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .toast-primary {
-  color: #fff;
-  background-color: #007bff;
-  border-color: #007bff
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
 }
 
 .toast-success {
-  color: #fff;
-  background-color: #28a745;
-  border-color: #28a745
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
 }
 
 .toast-error {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
 
 .toast-warning {
-  color: #212529;
-  background-color: #ffc107;
-  border-color: #ffc107
+    color: #212529;
+    background-color: #ffc107;
+    border-color: #ffc107;
 }
 
 /* Custom Spinner */
 .background-spinner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: #343a40 !important;
-  opacity: 0.2;
-  display: none;
-  z-index: 1300;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #343a40 !important;
+    opacity: 0.2;
+    display: none;
+    z-index: 1300;
 }
 
 .spin-wrapper {
-  /* position: relative;
+    /* position: relative;
     width: 100%;
     height: 100px;
     margin-top: 3px; */
-  display: none;
-  z-index: 1500;
+    display: none;
+    z-index: 1500;
 }
 
 .spinner {
-  z-index: 1500;
-  position: absolute;
-  height: 80px;
-  width: 80px;
-  border: 7px solid transparent;
-  border-top-color: #075db8;
-  top: 50%;
-  left: 50%;
-  margin: -30px;
-  border-radius: 50%;
-  animation: spin 2s linear infinite;
+    z-index: 1500;
+    position: absolute;
+    height: 80px;
+    width: 80px;
+    border: 7px solid transparent;
+    border-top-color: #075db8;
+    top: 50%;
+    left: 50%;
+    margin: -30px;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
 }
 
 .spinner::before,
 .spinner::after {
-  content: '';
-  position: absolute;
-  border: 7px solid transparent;
-  border-radius: 50%;
+    content: "";
+    position: absolute;
+    border: 7px solid transparent;
+    border-radius: 50%;
 }
 
 .spinner::before {
-  border-top-color: #2A2C2B;
-  top: -15px;
-  left: -15px;
-  right: -15px;
-  bottom: -15px;
-  animation: spin 3s linear infinite;
+    border-top-color: #2a2c2b;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    animation: spin 3s linear infinite;
 }
 
 .spinner::after {
-  border-top-color: #D9CB9E;
-  top: 5px;
-  left: 5px;
-  right: 5px;
-  bottom: 5px;
-  animation: spin 4s linear infinite;
+    border-top-color: #d9cb9e;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    animation: spin 4s linear infinite;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
 
-  100% {
-    transform: rotate(360deg);
-  }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @-webkit-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
 
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+.notification-bell {
+    color: #075db8;
+}
+
+.notification-bell:hover {
+    color: hsl(211, 93%, 50%);
+}
+
+.dropdown-menu-lg {
+    min-width: 260px;
+    border-radius: 0.4375rem;
+}
+
+.text-notification {
+    font-size: 0.875rem !important;
+    font-weight: 300;
+    line-height: 1.7;
+}
+
+.header-notification {
+    font-size: 0.875rem !important;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.not-dropdown {
+    width: 16rem;
+}
+
+.truncate-fade {
+    position: relative;
+    overflow: hidden;
+    max-height: 5.1em; /* exactly three lines */
+    transition: max-height 0.2s ease-out;
+}
+
+.truncate-fade:hover {
+    max-height: 17em;
+    overflow: visible;
+    transition: max-height 0.3s ease-in;
+}
+
+.truncate-fade:after {
+    content: "";
+    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50%;
+    height: 1.7em;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 1) 50%
+    );
+}
+
+#notification_count {
+    text-align: center;
+    font-weight: 600;
+    margin-left: 0.1rem;
 }
