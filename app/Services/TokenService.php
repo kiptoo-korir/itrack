@@ -22,7 +22,9 @@ class TokenService
         if ('error-400' == $token) {
             // invalidate current token
         } elseif ('' == $token) {
-            // Cache::forget($key);
+            Cache::forget($key);
+
+            return '';
         }
 
         return unserialize($token);
