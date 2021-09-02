@@ -60,4 +60,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany('App\Models\Task', 'user_id', 'id');
     }
+
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'App.Models.User.'.$this->id;
+    }
 }

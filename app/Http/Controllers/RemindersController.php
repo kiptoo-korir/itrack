@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Models\Reminder;
-use App\Models\Repository;
 use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,13 +34,13 @@ class RemindersController extends Controller
         }
 
         $user_id = Auth::id();
-        $repository = $request->repository;
-        $type = ($request->repository) ? 'SPECIFIC' : 'GENERAL';
+        $project = $request->project;
+        $type = ($request->project) ? 'SPECIFIC' : 'GENERAL';
         $reminder_record = [
             'owner' => $user_id,
             'title' => $request->title,
             'message' => $request->message,
-            'repository' => $repository,
+            'project' => $project,
             'due_date' => $due_date,
             'type' => $type,
         ];
@@ -57,7 +57,7 @@ class RemindersController extends Controller
         $user_id = Auth::id();
         // Timezone set manually
         $data = Reminder::where('owner', $user_id)
-            ->select('id', 'title', 'message', 'repository', 'created_at as c_at', 'due_date as d_d')
+            ->select('id', 'title', 'message', 'project', 'created_at as c_at', 'due_date as d_d')
             ->selectRaw('to_char(due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
             ->selectRaw('to_char(created_at at time zone \'Africa/Nairobi\', \'Dy DD Mon, YYYY at HH:MI AM\') as created')
             ->orderByDesc('c_at')->get();
@@ -96,13 +96,13 @@ class RemindersController extends Controller
 
         $reminder_id = $request->get('reminder_id');
         $reminder = Reminder::find($reminder_id);
-        $repository = ($request->repository) ?: null;
-        $type = ($request->repository) ? 'SPECIFIC' : 'GENERAL';
+        $project = ($request->project) ?: null;
+        $type = ($request->project) ? 'SPECIFIC' : 'GENERAL';
 
         $reminder->update([
             'title' => $request->title,
             'message' => $request->message,
-            'repository' => $repository,
+            'project' => $project,
             'type' => $type,
             'due_date' => $due_date,
         ]);
@@ -128,7 +128,7 @@ class RemindersController extends Controller
     {
         $reminder_id = $request->reminder_id;
         $reminder = Reminder::where('id', $reminder_id)
-            ->select('title', 'repository', 'message')
+            ->select('title', 'project', 'message')
             ->selectRaw('to_char(due_date, \'YYYY-MM-DD\') as year')
             ->selectRaw('to_char(due_date, \'HH24:MI\') as time')
             ->get()
@@ -141,7 +141,7 @@ class RemindersController extends Controller
     {
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
-        $data['repositories'] = Repository::select(['id', 'name'])
+        $data['projects'] = Project::select(['id', 'name'])
             ->where('owner', $data['user_data']->id)->get();
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 
