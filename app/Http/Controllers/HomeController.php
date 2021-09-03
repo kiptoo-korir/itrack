@@ -39,7 +39,7 @@ class HomeController extends Controller
         $user_id = Auth::id();
         $notifications = DB::table('notifications')
             ->select('id', 'data', 'created_at')
-            ->where(['notifiable_id' => $user_id, 'notifiable_type' => 'App\User'])
+            ->where(['notifiable_id' => $user_id, 'notifiable_type' => 'App\Models\User'])
             ->whereNull('read_at')
             ->latest()
             ->limit(3)

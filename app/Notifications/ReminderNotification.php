@@ -63,9 +63,10 @@ class ReminderNotification extends Notification implements ShouldBroadcast
     public function toDatabase($notifiable)
     {
         return [
-            'reminder_details' => $this->reminder,
+            'details' => $this->reminder,
             'notification_message' => $this->reminder->message,
             'notification_title' => $this->reminder->title,
+            'notification_type' => 'reminder',
         ];
     }
 
@@ -76,8 +77,10 @@ class ReminderNotification extends Notification implements ShouldBroadcast
         return new BroadcastMessage([
             'reminder_id' => $this->reminder->id,
             'notifications_count' => $count,
-            'title' => $this->reminder->title,
-            'message' => $this->reminder->message,
+            'notification_title' => $this->reminder->title,
+            'notification_message' => $this->reminder->message,
+            'id' => $this->id,
+            'notification_type' => 'reminder',
         ]);
     }
 }

@@ -13,7 +13,7 @@ class UserDataService
 
         return DB::table('notifications')
             ->selectRaw('count(id)')
-            ->where(['notifiable_id' => $user_id, 'notifiable_type' => 'App\User'])
+            ->where(['notifiable_id' => $user_id, 'notifiable_type' => 'App\Models\User'])
             ->whereNull('read_at')
             ->first()->count
         ;
