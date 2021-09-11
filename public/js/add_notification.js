@@ -10,7 +10,7 @@ if (notification_count !== 0) {
 
 function fetch_top_three_notifications() {
     $.ajax({
-        url: "{{ route('fetch_notifications') }}",
+        url: notificationsRoute,
         method: "get",
         headers: {
             Accept: "application/json",

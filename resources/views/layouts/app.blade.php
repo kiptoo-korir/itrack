@@ -71,6 +71,7 @@
 <script>
     const userId = {{ $user_data->id }};
     const notification_count = {{ $notification_count }};
+    const notificationsRoute = "{{ route('fetch_notifications') }}";
 </script>
 @yield('js_scripts')
 <script src="{{ asset('js/add_notification.js') }}"></script>
