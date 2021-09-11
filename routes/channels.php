@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Repository;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -19,6 +20,10 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 Broadcast::channel('user_repos.{id}', function ($user, $id) {
     return (int) Request::user()->id === (int) $id;
+});
+
+Broadcast::channel('languages_in_repo.{repoId}', function ($user, $repoId) {
+    return (int) $user->id === (int) Repository::findOrFail($repoId)->owner;
 });
 
 Broadcast::channel('events', function () {
