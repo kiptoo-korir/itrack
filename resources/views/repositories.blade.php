@@ -33,7 +33,8 @@
                             <i class="bi bi-journal-x"></i><span> {{ $repo->issues_count }} Issues</span>
                         </div>
                         <div class="card-footer">
-                            <a class="btn btn-primary btn-sm">Open</a>
+                            <a class="btn btn-primary btn-sm"
+                                href="{{ route('view_specific_repository', $repo->id) }}">Open</a>
                         </div>
                     </div>
                 </div>
@@ -61,6 +62,7 @@
             });
 
         function add_new_repos(item, index) {
+            let repoRoute = "{{ route('view_specific_repository', '') }}" + `/${item.id}`;
             let elementContent = `
                 <div class="card bg-card shadow h-100">
                     <div class="card-header">${item.name}</div>
@@ -71,7 +73,7 @@
                         <i class="bi bi-journal-x"></i><span> ${item.issues_count} Issues</span>
                     </div>
                     <div class="card-footer">
-                        <a class="btn btn-primary btn-sm">Open</a>
+                        <a class="btn btn-primary btn-sm" href="${repoRoute}">Open</a>
                     </div>
                 </div>`;
             let newElement = document.createElement('div');
