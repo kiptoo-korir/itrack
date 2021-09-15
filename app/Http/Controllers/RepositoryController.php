@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\FetchIssuesInRepoQueue;
 use App\Jobs\FetchLanguagesInRepoQueue;
 use App\Jobs\FetchRepositories;
-use App\Jobs\FetchRepositoryIssues;
 use App\Models\Repository;
+use App\Models\RepositoryLanguage;
 use App\Services\UserDataService;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,14 +32,19 @@ class RepositoryController extends Controller
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['repository'] = Repository::findOrFail($id);
         $data['notification_count'] = UserDataService::fetch_notifications_count();
+        $data['languages'] = RepositoryLanguage::where('repository_id', $id)
+            ->pluck('value', 'name')
+        ;
 
         $repositoryFullname = $data['repository']->fullname;
         $repoId = $data['repository']->id;
         $userId = $data['user_data']->id;
 
-        FetchLanguagesInRepoQueue::dispatch($repositoryFullname, $userId, $repoId);
+        FetchLanguagesInRepoQueue::dispatch($repositoryFullname, $userId, $repoId)
+            ->delay(now()->addSeconds(5))
+        ;
+        FetchIssuesInRepoQueue::dispatch($repoId, $repositoryFullname, $userId);
 
         return view('specific_repository')->with($data);
-        // FetchRepositoryIssues::dispatch($data['repository']->repository_id, $data['user_data']->id);$repo->id
     }
 }
