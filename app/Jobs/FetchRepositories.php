@@ -68,8 +68,6 @@ class FetchRepositories implements ShouldQueue
                     'name' => $repo->name,
                     'fullname' => $repo->full_name,
                     'repository_id' => $repo->id,
-                    // 'owner' => $this->user,
-                    // 'platform' => 1,
                     'description' => $repo->description,
                     'date_updated_online' => $repo->updated_at,
                     'issues_count' => $repo->open_issues_count,
@@ -80,16 +78,11 @@ class FetchRepositories implements ShouldQueue
         }
 
         if (!empty($bulk_insert)) {
-            // Repository::insert($bulk_insert);
+            Repository::insert($bulk_insert);
             RepositoriesFetched::dispatch($bulk_insert, $this->user);
         }
 
         if (!empty($bulk_update)) {
-            // Repository::upsert(
-            //     $update_arr,
-            //     ['repository_id'],
-            //     ['issues_count', 'name', 'fullname', 'description', 'date_updated_online']
-            // );
             foreach ($bulk_update as $update) {
                 DB::table('repositories')->where('repository_id', $update['repository_id'])
                     ->update($update)
