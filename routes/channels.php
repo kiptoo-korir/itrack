@@ -26,6 +26,10 @@ Broadcast::channel('languages_in_repo.{repoId}', function ($user, $repoId) {
     return (int) $user->id === (int) Repository::findOrFail($repoId)->owner;
 });
 
+Broadcast::channel('issues-in-repo.{repoId}', function ($user, $repoId) {
+    return (int) $user->id === (int) Repository::findOrFail($repoId)->owner;
+});
+
 Broadcast::channel('events', function () {
     return true;
 });

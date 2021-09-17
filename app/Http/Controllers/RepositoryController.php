@@ -41,7 +41,7 @@ class RepositoryController extends Controller
         $userId = $data['user_data']->id;
 
         FetchLanguagesInRepoQueue::dispatch($repositoryFullname, $userId, $repoId)
-            ->delay(now()->addSeconds(5))
+            // ->delay(now()->addSeconds(5))
         ;
         FetchIssuesInRepoQueue::dispatch($repoId, $repositoryFullname, $userId);
 

@@ -52,9 +52,9 @@ class FetchIssuesInRepoQueue implements ShouldQueue
         $latestUpdated = Issue::where('owner', $this->userId)
             ->orderBy('date_updated_online', 'desc')
             ->limit(1)->pluck('date_updated_online')->first();
-        $latestUpdatedUnix = strtotime($latestDate);
+        $latestUpdatedUnix = strtotime($latestUpdated);
 
-        $count = Issue::where('owner', $this->userId)->count();
+        $count = Issue::where(['owner' => $this->userId, 'repository' => $this->repoId])->count();
 
         $bulkInsert = [];
         $bulkUpdate = [];
@@ -74,7 +74,7 @@ class FetchIssuesInRepoQueue implements ShouldQueue
                     'title' => $issue->title,
                     'body' => $issue->body,
                     'date_updated_online' => $issue->updated_at,
-                    'labels' => $issue->labels,
+                    'labels' => json_encode($issue->labels),
                     'date_closed_online' => $issue->closed_at,
                     'updated_at' => now(),
                 ];
@@ -85,7 +85,7 @@ class FetchIssuesInRepoQueue implements ShouldQueue
 
         if (!empty($bulkInsert)) {
             Issue::insert($bulkInsert);
-            FetchIssuesInRepoEvent::dispatch($bulkInsert, $this->repoId);
+            FetchIssuesInRepoEvent::dispatch($this->repoId, $bulkInsert);
         }
 
         if (!empty($bulkUpdate)) {
@@ -108,7 +108,7 @@ class FetchIssuesInRepoQueue implements ShouldQueue
             'body' => $issue->body,
             'date_created_online' => $issue->created_at,
             'date_updated_online' => $issue->updated_at,
-            'labels' => $issue->labels,
+            'labels' => json_encode($issue->labels),
             'date_closed_online' => $issue->closed_at,
             'created_at' => now(),
             'updated_at' => now(),
