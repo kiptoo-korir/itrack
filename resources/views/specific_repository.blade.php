@@ -71,13 +71,13 @@
                 <div class="card" id="languages-card">
                     <div class="card-body">
                         <h6>LANGUAGES</h6>
-                        <span class="languages">
+                        <span class="languages" id="languages-slider">
                             @foreach ($languages as $key => $lang)
                                 <span class="languages-slider" id="lang-{{ $key }}">
                                 </span>
                             @endforeach
                         </span>
-                        <ul class="list-style-none lang-list">
+                        <ul class="list-style-none lang-list" id="languages-list">
                             @foreach ($languages as $key => $lang)
                                 <li class="lang-list-item">
                                     <span class="lang-circle" id="circle-{{ $key }}">
@@ -92,7 +92,24 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12"></div>
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tbl-issues">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -104,9 +121,31 @@
 @section('js_scripts')
     <script src="{{ asset('js/datatables.min.js') }}"></script>
     <script>
+        function calculateTotalValue(languageObject) {
+            return (Object.values(languageObject)).reduce(reducer);
+        }
+
         let repositoryId = {{ $repository->id }};
+        let languagesObject = {!! json_encode($languages->toArray(), JSON_HEX_TAG) !!};
+        let languagesArr = Object.entries(languagesObject);
+        const reducer = (previousValue, currentValue) => previousValue + currentValue;
+        let total = (languagesArr.length > 0) ? calculateTotalValue(languagesObject) : 0;
+        let colours = ['cadetblue', 'tomato', 'darkgoldenrod', 'plum', 'olive', 'peachpuff', 'darkred', 'salmon', 'teal',
+            'chocolate'
+        ];
+
         Echo.private(`languages_in_repo.${repositoryId}`)
             .listen('FetchLanguagesInRepo', (response) => {
+                let languages = response.languages;
+                let languagesArr = Object.entries(languages);
+                let total = calculateTotalValue(languages);
+                if (languagesArr.length > 0) {
+                    setupLanguagesCard(languagesArr, total);
+                }
+            });
+
+        Echo.private(`issues-in-repo.${repositoryId}`)
+            .listen('FetchIssuesInRepoEvent', (response) => {
                 // let languages = response.languages;
                 console.log(response);
                 // if (repos && repos.length) {
@@ -116,26 +155,6 @@
             });
     </script>
     <script>
-        let languagesObject = {!! json_encode($languages->toArray(), JSON_HEX_TAG) !!};
-        let languagesArr = Object.entries(languagesObject);
-        const reducer = (previousValue, currentValue) => previousValue + currentValue;
-        let total = (languagesArr.length > 0) ? (Object.values(languagesObject)).reduce(reducer) : 0;
-        let colours = ['cadetblue', 'tomato', 'darkgoldenrod', 'plum', 'olive', 'peachpuff', 'darkred', 'salmon', 'teal',
-            'chocolate'
-        ];
-
-        function getRandomNumber(limit) {
-            return Math.floor(Math.random() * limit);
-        };
-
-        function getRandomColor() {
-            const h = getRandomNumber(360);
-            const s = getRandomNumber(100);
-            const l = getRandomNumber(100);
-
-            return `hsl(${h}deg, ${s}%, ${l}%)`;
-        };
-
         function styleLanguagesComponent(languages, totalValue) {
             let i = parseInt(Math.random() * 10);
             totalValue = parseInt(totalValue);
@@ -153,6 +172,34 @@
             });
 
             document.getElementById('languages-card').style.filter = 'blur(0)';
+        }
+
+        function clearLanguagesComponent() {
+            document.getElementById('languages-slider').innerHTML = '';
+            document.getElementById('languages-list').innerHTML = '';
+            document.getElementById('languages-card').style.filter = 'blur(3px)';
+        }
+
+        function setupLanguagesCard(languages, totalValue) {
+            clearLanguagesComponent();
+            let sliderElement = '';
+            let listElement = '';
+            languages.forEach((language) => {
+                // console.log(language);
+                sliderElement += `<span class="languages-slider" id="lang-${language[0]}"></span>`;
+                listElement += `
+                <li class="lang-list-item">
+                    <span class="lang-circle" id="circle-${language[0]}">
+                    </span>
+                    <span>
+                        ${language[0]}
+                    </span>
+                    <span class="text-muted percentage" id="percentage-${language[0]}"></span>
+                </li>`;
+            });
+            document.getElementById('languages-slider').innerHTML = sliderElement;
+            document.getElementById('languages-list').innerHTML = listElement;
+            styleLanguagesComponent(languages, totalValue);
         }
 
         (languagesArr.length > 0) && styleLanguagesComponent(languagesArr, total);
