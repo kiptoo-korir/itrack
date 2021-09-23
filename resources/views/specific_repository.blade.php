@@ -66,9 +66,16 @@
         }
 
         .issue {
-            border-left: 5px solid #075db8;
             padding: 0.5rem 0.5rem;
             border-bottom: 1px solid #d9d6d6;
+        }
+
+        .issue-closed {
+            border-left: 5px solid #075db8;
+        }
+
+        .issue-open {
+            border-left: 5px solid #b80728;
         }
 
         .issue-title {
@@ -81,6 +88,21 @@
             color: hsl(0, 0%, 25%);
             padding: 0.15rem 0;
             margin: 0;
+        }
+
+        .inverted {
+            filter: saturate(0) grayscale(1) brightness(.7) contrast(1000%) invert(1);
+        }
+
+        .issue-badge {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: .15rem .45rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-style: normal;
+            margin-left: 0.5rem;
         }
 
     </style>
@@ -123,7 +145,23 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 pt-5">
+            <div class="col-12 mt-4 mb-3">
+                <hr>
+            </div>
+            <div class="col-12 pt-4">
+                <p class="text-center font-weight-bold pb-3">
+                    ISSUES IN REPOSITORY
+                </p>
+                <div class="form-group">
+                    <div class="col-12 col-lg-4 col-md-6">
+                        <label for="">Repository State</label>
+                        <select name="" id="state-select" class="form-control">
+                            <option value="" selected>All</option>
+                            <option value="open">Open</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped" id="tbl-issues">
                         <thead>
@@ -193,18 +231,29 @@
                 labels
             } = issue;
 
-            console.log(labels);
-            dateFormatted = new Date(dateCreated.slice(0, -3));
-            monthString = months[dateFormatted.getMonth()];
-            dateString = `${dateFormatted.getDate()} ${monthString}, ${dateFormatted.getFullYear()}`;
+            badgesElement = '';
+            labels.forEach((label) => {
+                let color = (label.color) ?? '#075db8';
+                badgesElement += `
+                    <div class="issue-badge" style="background-color: #${color}">
+                        <span class="inverted" style="color: #${color}">${label.name}</span>
+                    </div>
+                `;
+            });
+
+            let dateFormatted = new Date(dateCreated.slice(0, -3));
+            let monthString = months[dateFormatted.getMonth()];
+            let dateString = `${dateFormatted.getDate()} ${monthString}, ${dateFormatted.getFullYear()}`;
+            let stateClassSelector = (state === 'open') ? 'issue-open' : 'issue-closed';
 
             element = `
-                <div class="issue">
+                <div class="issue ${stateClassSelector}">
                     <div class="d-inline">
                         <span class="issue-title">${title}</span>
+                        ${badgesElement}
                     </div>    
                     <p class="issue-body">${body}</p>    
-                    <p class="issue-body">Opened ${dateString}</p>    
+                    <p class="issue-body">Opened <b>${dateString}</b></p>    
                 </div>
             `;
             return element;
@@ -263,6 +312,11 @@
             fetchIssuesTable();
         });
 
+        $('#state-select').on('change', () => {
+            let state = $('#state-select').val();
+            $('#tbl-issues').DataTable().column(1).search(state).draw();
+        });
+
         function fetchIssuesTable() {
             if ($.fn.dataTable.isDataTable('#tbl-issues')) {
                 $('#tbl-issues').DataTable().destroy();
@@ -277,13 +331,20 @@
                 columns: [{
                     data: 'id',
                     name: 'id'
-                }, ],
+                }, {
+                    data: 'state',
+                    name: 'state'
+                }],
                 columnDefs: [{
                     targets: 0,
                     render: function(data, type, row) {
                         const element = renderTableCard(row);
                         return element;
                     }
+                }, {
+                    targets: 1,
+                    visible: false,
+                    searchable: true
                 }]
             });
         }
