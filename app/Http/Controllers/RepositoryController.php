@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Jobs\FetchIssuesInRepoQueue;
 use App\Jobs\FetchLanguagesInRepoQueue;
 use App\Jobs\FetchRepositories;
+use App\Models\Issue;
 use App\Models\Repository;
 use App\Models\RepositoryLanguage;
 use App\Services\UserDataService;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class RepositoryController extends Controller
 {
@@ -35,6 +37,7 @@ class RepositoryController extends Controller
         $data['languages'] = RepositoryLanguage::where('repository_id', $id)
             ->pluck('value', 'name')
         ;
+        $data['issuesUrl'] = route('fetch_issues_in_repo', $id);
 
         $repositoryFullname = $data['repository']->fullname;
         $repoId = $data['repository']->id;
@@ -46,5 +49,18 @@ class RepositoryController extends Controller
         FetchIssuesInRepoQueue::dispatch($repoId, $repositoryFullname, $userId);
 
         return view('specific_repository')->with($data);
+    }
+
+    public function fetch_issues_in_repository($repositoryId)
+    {
+        $issues = Issue::where('repository', $repositoryId)->get();
+
+        return DataTables::of($issues)
+            ->addColumn('labels', function ($issueData) {
+                return json_decode($issueData->labels);
+            })
+            ->rawColumns(['labels'])
+            ->make(true)
+        ;
     }
 }

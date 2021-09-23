@@ -52,6 +52,37 @@
             margin-left: 10px;
         }
 
+        #tbl-issues thead {
+            display: none;
+        }
+
+        #tbl-issues td {
+            border-style: none;
+            background-color: white !important;
+        }
+
+        #tbl-issues {
+            border-style: none;
+        }
+
+        .issue {
+            border-left: 5px solid #075db8;
+            padding: 0.5rem 0.5rem;
+            border-bottom: 1px solid #d9d6d6;
+        }
+
+        .issue-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .issue-body {
+            font-size: 0.97rem;
+            color: hsl(0, 0%, 25%);
+            padding: 0.15rem 0;
+            margin: 0;
+        }
+
     </style>
 @endsection
 
@@ -92,16 +123,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12">
+            <div class="col-12 pt-5">
                 <div class="table-responsive">
                     <table class="table table-striped" id="tbl-issues">
                         <thead>
                             <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -129,10 +155,14 @@
         let languagesObject = {!! json_encode($languages->toArray(), JSON_HEX_TAG) !!};
         let languagesArr = Object.entries(languagesObject);
         const reducer = (previousValue, currentValue) => previousValue + currentValue;
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+            'November', 'December'
+        ];
         let total = (languagesArr.length > 0) ? calculateTotalValue(languagesObject) : 0;
         let colours = ['cadetblue', 'tomato', 'darkgoldenrod', 'plum', 'olive', 'peachpuff', 'darkred', 'salmon', 'teal',
             'chocolate'
         ];
+        const issuesUrl = "{{ $issuesUrl }}";
 
         Echo.private(`languages_in_repo.${repositoryId}`)
             .listen('FetchLanguagesInRepo', (response) => {
@@ -153,6 +183,32 @@
                 //     repos.forEach(add_new_repos);
                 // }
             });
+
+        function renderTableCard(issue) {
+            const {
+                state,
+                title,
+                body,
+                date_created_online: dateCreated,
+                labels
+            } = issue;
+
+            console.log(labels);
+            dateFormatted = new Date(dateCreated.slice(0, -3));
+            monthString = months[dateFormatted.getMonth()];
+            dateString = `${dateFormatted.getDate()} ${monthString}, ${dateFormatted.getFullYear()}`;
+
+            element = `
+                <div class="issue">
+                    <div class="d-inline">
+                        <span class="issue-title">${title}</span>
+                    </div>    
+                    <p class="issue-body">${body}</p>    
+                    <p class="issue-body">Opened ${dateString}</p>    
+                </div>
+            `;
+            return element;
+        }
     </script>
     <script>
         function styleLanguagesComponent(languages, totalValue) {
@@ -185,7 +241,6 @@
             let sliderElement = '';
             let listElement = '';
             languages.forEach((language) => {
-                // console.log(language);
                 sliderElement += `<span class="languages-slider" id="lang-${language[0]}"></span>`;
                 listElement += `
                 <li class="lang-list-item">
@@ -203,5 +258,34 @@
         }
 
         (languagesArr.length > 0) && styleLanguagesComponent(languagesArr, total);
+
+        $(document).ready(() => {
+            fetchIssuesTable();
+        });
+
+        function fetchIssuesTable() {
+            if ($.fn.dataTable.isDataTable('#tbl-issues')) {
+                $('#tbl-issues').DataTable().destroy();
+            }
+
+            $('#tbl-issues').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: issuesUrl
+                },
+                columns: [{
+                    data: 'id',
+                    name: 'id'
+                }, ],
+                columnDefs: [{
+                    targets: 0,
+                    render: function(data, type, row) {
+                        const element = renderTableCard(row);
+                        return element;
+                    }
+                }]
+            });
+        }
     </script>
 @endsection

@@ -28,7 +28,7 @@
             overflow: hidden;
         }
 
-        div.profile-container > div {
+        div.profile-container>div {
             width: 100%;
             height: 100%;
             transition: background-size 4s ease;
@@ -36,7 +36,7 @@
             background-position: center center;
         }
 
-        div.profile-container:hover > div {
+        div.profile-container:hover>div {
             background-size: 120%;
         }
 
@@ -54,6 +54,7 @@
         .text-custom:hover {
             color: rgba(0, 0, 0, 0.7);
         }
+
     </style>
 @endsection
 
@@ -64,13 +65,15 @@
                 <div class="row">
                     <div class="col-12">
                         @isset($user_data->photo)
-                            <div class="profile-container mx-auto">   
+                            <div class="profile-container mx-auto">
                                 <div class="rounded-circle profile" alt="user" id="profile-pic"
-                                    style="background-image: url('{{ url('storage/images/' . $user_data->photo) }}')" data-holder-rendered="true"></div>
+                                    style="background-image: url('{{ url('storage/images/' . $user_data->photo) }}')"
+                                    data-holder-rendered="true"></div>
                             </div>
                         @else
                             <div class="profile-text rounded-circle mx-auto">
-                                <span style="color: #e9ecef;" class="text-center text-uppercase font-weight-bolder">{{$user_data->first_letter}}</span>
+                                <span style="color: #e9ecef;"
+                                    class="text-center text-uppercase font-weight-bolder">{{ $user_data->first_letter }}</span>
                             </div>
                         @endisset
                     </div>
@@ -88,13 +91,15 @@
             <div class="col-md-6 col-12">
                 <div class="ml-auto">
                     <div id="details">
-                        <h6>Name: {{$user_data->name}}</h6>
-                        <h6>Date Joined: {{$user_data->created_at}}</h6>
+                        <h6>Name: {{ $user_data->name }}</h6>
+                        <h6>Date Joined: {{ $user_data->created_at }}</h6>
                     </div>
                     {{-- data-toggle="modal" data-target="#pan_modal" --}}
-                    <a class="btn btn-outline-primary" id="pan_btn" href="{{$request}}"><i class="bi bi-github"></i> Add Access to Github</a>
+                    <a class="btn btn-outline-primary" id="pan_btn" href="{{ $request }}"><i
+                            class="bi bi-github"></i> Add Access to Github</a>
                     <div class="horizontal-divider"></div>
-                    <button class="btn btn-outline-primary" id="pass_btn" data-toggle="modal" data-target="#password_modal">Change Password</button>
+                    <button class="btn btn-outline-primary" id="pass_btn" data-toggle="modal"
+                        data-target="#password_modal">Change Password</button>
                 </div>
             </div>
         </div>
@@ -105,10 +110,10 @@
                     <h5 class="text-black-50 text-uppercase text-center mb-2">RECENT ACTIVITIES</h5>
                     <table class="table dt-responsive nowrap" id="recent_activity">
                         <thead class="thead-light">
-                        <tr>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Time</th>
-                        </tr>
+                            <tr>
+                                <th scope="col">Activity</th>
+                                <th scope="col">Time</th>
+                            </tr>
                         </thead>
                         <tbody>
                         </tbody>
@@ -138,8 +143,7 @@
 @endsection
 
 @section('modals')
-    <div class="modal fade" id="pan_modal" tabindex="-1" role="dialog" aria-labelledby="pan_btn"
-        aria-hidden="true">
+    <div class="modal fade" id="pan_modal" tabindex="-1" role="dialog" aria-labelledby="pan_btn" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -157,7 +161,7 @@
                                 <div class="col-md-6">
                                     <select name="platform" id="platform_list" class="form-control" required>
                                         @forelse($platforms as $platform)
-                                            <option value="{{$platform->id}}">{{$platform->name}}</option>
+                                            <option value="{{ $platform->id }}">{{ $platform->name }}</option>
                                         @empty
                                             <option value="">No platforms are listed yet.</option>
                                         @endforelse
@@ -203,7 +207,8 @@
                                 <div class="row">
                                     <label class="col-md-4">Current Password</label>
                                     <div class="col-md-6">
-                                        <input type="password" name="password" id="current_password" class="pass form-control" required>
+                                        <input type="password" name="password" id="current_password"
+                                            class="pass form-control" required>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>
@@ -212,7 +217,8 @@
                                 <div class="row">
                                     <label class="col-md-4">New Password</label>
                                     <div class="col-md-6">
-                                        <input type="password" name="new_password"  id="new_password" class="pass form-control" required>
+                                        <input type="password" name="new_password" id="new_password"
+                                            class="pass form-control" required>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>
@@ -221,8 +227,8 @@
                                 <div class="row">
                                     <label class="col-md-4">Confirm New Password</label>
                                     <div class="col-md-6">
-                                        <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="pass form-control"
-                                            required>
+                                        <input type="password" name="new_password_confirmation"
+                                            id="new_password_confirmation" class="pass form-control" required>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>
@@ -230,8 +236,9 @@
                             <div class="form-group row">
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="check_pass" id="check_pass" onclick="showPassword()">
-    
+                                        <input class="form-check-input" type="checkbox" name="check_pass" id="check_pass"
+                                            onclick="showPassword()">
+
                                         <label class="form-check-label" for="check_pass">
                                             Show Password
                                         </label>
@@ -264,7 +271,7 @@
                     <p id="delete_title"></p>
                 </div>
                 <div class="modal-footer">
-                    <form class="" id="removeModal" action="" method="post">
+                    <form class="" id=" removeModal" action="" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" id="token_id" name="token_id" value="">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -279,8 +286,9 @@
 @section('js_scripts')
     <script src="{{ asset('js/datatables.min.js') }}"></script>
     <script>
-        (function ($) {
+        (function($) {
             var createForm = $('#profile_form');
+
             function processForm(e) {
                 var record = new FormData(createForm[0]);
 
@@ -288,16 +296,16 @@
                     headers: {
                         "Accept": "application/json",
                     },
-                    url: "{{ route('profile_pic')}}",
+                    url: "{{ route('profile_pic') }}",
                     type: 'post',
                     data: record,
                     processData: false,
                     contentType: false,
                     cache: false,
-                    success: function (data) {
+                    success: function(data) {
                         $('#profile-pic').css('background-color', 'url("' + data.img + '")');
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         if (xhr.status == 422) {
                             var errors = JSON.parse(xhr.responseText);
                             feedback(errors.message, 'error');
@@ -312,7 +320,7 @@
             createForm.submit(processForm);
         })(jQuery);
 
-        (function ($) {
+        (function($) {
             var passForm = $('#pass_form');
 
             function processPassForm(e) {
@@ -326,11 +334,11 @@
                     type: 'post',
                     contentType: 'application/x-www-form-urlencoded',
                     data: formDetails,
-                    success: function (data, textStatus, jQxhr) {
+                    success: function(data, textStatus, jQxhr) {
                         feedback(data.success, 'success');
                         hideSpinner();
                     },
-                    error: function (jqXhr, textStatus, errorThrown) {
+                    error: function(jqXhr, textStatus, errorThrown) {
                         var errors = JSON.parse(jqXhr.responseText);
                         if (jqXhr.status == 422) {
                             feedback(errors.errors.new_password || errors.errors.password, 'error';)
@@ -348,7 +356,7 @@
             passForm.submit(processPassForm);
         })(jQuery);
 
-        (function ($) {
+        (function($) {
             var pan_form = $('#pan_form');
 
             function processPanForm(e) {
@@ -362,12 +370,12 @@
                     type: "post",
                     contentType: "application/x-www-form-urlencoded",
                     data: formDetails,
-                    success: function (data, textStatus, jQxhr) {
+                    success: function(data, textStatus, jQxhr) {
                         feedback(data.success, 'success');
                         hideSpinner();
                         $('#access_tokens').DataTable().ajax.reload();
                     },
-                    error: function (jqXhr, textStatus, errorThrown) {
+                    error: function(jqXhr, textStatus, errorThrown) {
                         var errors = JSON.parse(jqXhr.responseText);
                         if (jqXhr.status == 422) {
                             feedback(errors.errors.platform || errors.access_token, 'error');
@@ -400,7 +408,7 @@
             }
         }
 
-        $(document).on('click', '.delete', function () {
+        $(document).on('click', '.delete', function() {
             var token_id = $(this).attr('data-id');
             $('#token_id').val(token_id);
             $('#delete_title').html('Are you sure you want to remove this access token?');
@@ -408,23 +416,23 @@
             $('#deleteModal').modal('show');
         });
 
-        $('#removeModal').on('submit', function (event) {
+        $('#removeModal').on('submit', function(event) {
             event.preventDefault();
             var deleteForm = $('#removeModal').closest('form');
             var record = deleteForm.serialize();
-            var action_url = "{{ route('delete_token')}}";
+            var action_url = "{{ route('delete_token') }}";
             $.ajax({
                 url: action_url,
                 method: "POST",
                 data: $(this).serialize(),
                 dataType: "json",
-                success: function (data) {
+                success: function(data) {
                     feedback(data.success, 'success');
                     hideSpinner();
                     $('#delete_btn').attr('disabled', true);
                     $('#access_tokens').DataTable().ajax.reload();
                 },
-                error: function (jqXhr, textStatus, errorThrown) {
+                error: function(jqXhr, textStatus, errorThrown) {
                     var errors = JSON.parse(jqXhr.responseText);
                     if (jqXhr.status == 422) {
                         feedback(errors.errors.id, 'error');
@@ -437,15 +445,14 @@
             });
         });
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#recent_activity').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
                     url: "{{ route('recent_activity') }}"
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'log_name',
                         name: 'log_name'
                     },
@@ -454,14 +461,12 @@
                         name: 'order_date'
                     },
                 ],
-                columnDefs: [
-                    {
-                        targets: 1,
-                        render: function (data, type, row) {
-                            return `${row.created_at}`;
-                        }
+                columnDefs: [{
+                    targets: 1,
+                    render: function(data, type, row) {
+                        return `${row.created_at}`;
                     }
-                ]
+                }]
             });
             $('#access_tokens').DataTable({
                 processing: true,
@@ -469,8 +474,7 @@
                 ajax: {
                     url: "{{ route('token_list') }}"
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'deleted_at',
                         name: 'deleted_at'
                     },
@@ -487,12 +491,11 @@
                         name: 'action'
                     },
                 ],
-                columnDefs: [
-                    {
+                columnDefs: [{
                         targets: 0,
                         searchable: false,
                         orderable: false,
-                        render: function (data, type, row) {
+                        render: function(data, type, row) {
                             if (data) {
                                 return `<i class="bi bi-exclamation-circle-fill" style="color: #dc3545"></i>`
                             } else {
@@ -502,7 +505,7 @@
                     },
                     {
                         targets: 3,
-                        createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        createdCell: function(cell, cellData, rowData, rowIndex, colIndex) {
                             if (rowData.deleted_at) {
                                 $(cell).find("button").attr('disabled', true);
                             }
@@ -510,7 +513,7 @@
                     },
                     {
                         targets: 2,
-                        render: function (data, type, row) {
+                        render: function(data, type, row) {
                             return `${row.created_at}`;
                         }
                     }

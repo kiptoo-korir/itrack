@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get_projects', [App\Http\Controllers\ProjectsController::class, 'get_projects'])->name('get_projects');
     Route::post('/add_project', [App\Http\Controllers\ProjectsController::class, 'create_project'])->name('add_project');
     Route::get('/get_recent_notifications', [App\Http\Controllers\HomeController::class, 'get_top_three_notifications'])->name('fetch_notifications');
+    Route::get('/repository/{id}/issues', [App\Http\Controllers\RepositoryController::class, 'fetch_issues_in_repository'])->name('fetch_issues_in_repo');
 });
 
 // Email Verification Routes
