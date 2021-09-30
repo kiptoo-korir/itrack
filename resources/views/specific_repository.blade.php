@@ -105,6 +105,41 @@
             margin-left: 0.5rem;
         }
 
+        .align-self-custom {
+            align-self: center;
+        }
+
+        .justify-content-custom {
+            justify-content: center;
+            height: 100%;
+        }
+
+        .issue-button-component {
+            width: 100%;
+        }
+
+        .issue-filter-component {
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .align-self-custom {
+                align-self: end;
+            }
+
+            .justify-content-custom {
+                justify-content: end;
+            }
+
+            .issue-button-component {
+                width: 60%;
+            }
+
+            .issue-filter-component {
+                width: 40%;
+            }
+        }
+
     </style>
 @endsection
 
@@ -153,13 +188,24 @@
                     ISSUES IN REPOSITORY
                 </p>
                 <div class="form-group">
-                    <div class="col-12 col-lg-4 col-md-6">
-                        <label for="">Repository State</label>
-                        <select name="" id="state-select" class="form-control">
-                            <option value="" selected>All</option>
-                            <option value="open">Open</option>
-                            <option value="closed">Closed</option>
-                        </select>
+                    <div class="d-flex flex-row-reverse px-5 flex-wrap">
+                        <div class="issue-button-component">
+                            <div class="d-flex justify-content-custom">
+                                <div class="align-self-custom">
+                                    <button class="btn btn-primary" id="new-issue-btn" data-toggle="modal"
+                                        data-target="#issue-modal">Add
+                                        Issue</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="issue-filter-component">
+                            <label for="">Issue State Filter</label>
+                            <select name="" id="state-select" class="form-control">
+                                <option value="" selected>All</option>
+                                <option value="open">Open</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -169,7 +215,6 @@
                             </tr>
                         </thead>
                         <tbody>
-
                         </tbody>
                     </table>
                 </div>
@@ -179,7 +224,47 @@
 @endsection
 
 @section('modals')
-
+    <div class="modal fade" id="issue-modal" tabindex="-1" role="dialog" aria-labelledby="#new-issue-btn"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Create New Issue</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" class="form-groups" method="POST" id="issue-form">
+                    <div class="modal-body">
+                        @csrf
+                        <input type="hidden" name="repositoryId" value="{{ $repository->id }}">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Issue Title</label>
+                                <div class="col-md-6">
+                                    <input type="text" name="title" class="form-control" id="title" required>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Issue Body</label>
+                                <div class="col-md-7">
+                                    <textarea name="body" rows="3" class="form-control" id="body" required></textarea>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js_scripts')
@@ -192,6 +277,7 @@
         let repositoryId = {{ $repository->id }};
         let languagesObject = {!! json_encode($languages->toArray(), JSON_HEX_TAG) !!};
         let languagesArr = Object.entries(languagesObject);
+        const errorArray = [null, undefined, ''];
         const reducer = (previousValue, currentValue) => previousValue + currentValue;
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
             'November', 'December'
@@ -214,12 +300,7 @@
 
         Echo.private(`issues-in-repo.${repositoryId}`)
             .listen('FetchIssuesInRepoEvent', (response) => {
-                // let languages = response.languages;
                 console.log(response);
-                // if (repos && repos.length) {
-                //     $('#alert_1').hide();
-                //     repos.forEach(add_new_repos);
-                // }
             });
 
         function renderTableCard(issue) {
@@ -232,14 +313,19 @@
             } = issue;
 
             badgesElement = '';
-            labels.forEach((label) => {
-                let color = (label.color) ?? '#075db8';
-                badgesElement += `
+
+            if (errorArray.includes(labels)) {
+
+            } else {
+                labels.forEach((label) => {
+                    let color = (label.color) ?? '#075db8';
+                    badgesElement += `
                     <div class="issue-badge" style="background-color: #${color}">
                         <span class="inverted" style="color: #${color}">${label.name}</span>
                     </div>
                 `;
-            });
+                });
+            }
 
             let dateFormatted = new Date(dateCreated.slice(0, -3));
             let monthString = months[dateFormatted.getMonth()];
@@ -348,5 +434,31 @@
                 }]
             });
         }
+
+        $('#issue-form').on('submit', (e) => {
+            e.preventDefault();
+            let formDetails = $('#issue-form').serialize();
+            $.ajax({
+                headers: {
+                    "Accept": "application/json"
+                },
+                url: "{{ route('add_new_issue') }}",
+                type: 'post',
+                contentType: 'application/x-www-form-urlencoded',
+                data: formDetails,
+                success: function(data, textStatus, jQxhr) {
+                    fetchIssuesTable();
+                    feedback(data.message, 'success');
+                },
+                error: function(jqXhr, textStatus, errorThrown) {
+                    var errors = JSON.parse(jqXhr.responseText);
+                    if (jqXhr.status == 422) {
+                        feedback(errors.errors.title || errors.errors.body, 'error');
+                    } else if (jqXhr.status == 400) {
+                        feedback(errors.message, 'error');
+                    }
+                }
+            });
+        });
     </script>
 @endsection

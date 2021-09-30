@@ -341,7 +341,7 @@
                     error: function(jqXhr, textStatus, errorThrown) {
                         var errors = JSON.parse(jqXhr.responseText);
                         if (jqXhr.status == 422) {
-                            feedback(errors.errors.new_password || errors.errors.password, 'error';)
+                            feedback(errors.errors.new_password || errors.errors.password, 'error');
                             hideSpinner();
                         } else if (jqXhr.status == 400) {
                             feedback(errors.error, 'error');
