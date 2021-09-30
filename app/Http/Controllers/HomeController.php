@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\UserDataService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,32 @@ class HomeController extends Controller
             ->leftJoin('platforms as ptf', 'repos.platform', '=', 'ptf.id')
             ->select(['repos.id', 'repos.name', 'ptf.name as platform'])
             ->where('owner', $data['user_data']->id)->get();
+        $projects = collect(DB::select(DB::raw('
+            with project_info AS
+            (SELECT proj.*, repos.name as repository_name
+            FROM projects as proj
+            LEFT JOIN project_repository as pivot ON proj.id = pivot.project_id
+            LEFT JOIN repositories as repos ON pivot.repository_id = repos.id
+            WHERE proj.owner = :id
+            )
+
+            SELECT distinct id, name, description,
+            to_char(created_at, \'Dy, DD Mon YYYY\') as created_at, 
+            (SELECT jsonb_agg (repo_info) as repositories FROM 
+            (
+            SELECT repository_name FROM project_info b
+            WHERE a.id = b.id
+            ) repo_info)
+            FROM project_info a
+        '), [
+            'id' => $data['user_data']->id,
+        ]));
+        $projectsProcessed = $projects->map(function ($project) {
+            $project->repositories = json_decode($project->repositories);
+
+            return $project;
+        });
+        $data['projects'] = $projectsProcessed;
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('home')->with($data);
@@ -47,5 +74,17 @@ class HomeController extends Controller
         ;
 
         return response()->json(['notifications' => $notifications], 200);
+    }
+
+    public function markNotificationAsRead($notificationId)
+    {
+        $notification = DB::table('notifications')->where('id', $notificationId)
+            ->update([
+                'read_at' => now(),
+            ])
+        ;
+        $notificationCount = User::findOrFail(Auth::id())->unreadNotifications->where('type', '=', 'App\Notifications\ReminderNotification')->count();
+
+        return response()->json(['message' => 'Notification marked as read.', 'notificationCount' => $notificationCount], 200);
     }
 }

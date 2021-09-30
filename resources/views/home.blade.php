@@ -2,81 +2,60 @@
 
 @section('css_scripts')
     <style>
-        .spin-wrapper {
-            /* position: relative;
-                                                                                                                                                                                                                                                                                        width: 100%;
-                                                                                                                                                                                                                                                                                        height: 100px;
-                                                                                                                                                                                                                                                                                        margin-top: 3px; */
-            display: none;
-            z-index: 1500;
-        }
-
-        .spinner {
-            z-index: 1500;
-            position: absolute;
-            height: 80px;
-            width: 80px;
-            border: 5px solid transparent;
-            border-top-color: #075db8;
-            top: 50%;
-            left: 50%;
-            margin: -30px;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-
-        .spinner::before,
-        .spinner::after {
-            content: '';
-            position: absolute;
-            border: 4px solid transparent;
-            border-radius: 50%;
-        }
-
-        .spinner::before {
-            border-top-color: #454545;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            animation: spin 3s linear infinite;
-        }
-
-        .spinner::after {
-            border-top-color: #b3c5d8;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            animation: spin 4s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        @-webkit-keyframes spin {
-            0% {
-                -webkit-transform: rotate(0deg);
-            }
-
-            100% {
-                -webkit-transform: rotate(360deg);
-            }
-        }
-
         .bg-card {
             transition: 0.3s;
         }
 
         .bg-card:hover {
             box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .note {
+            /* background-color: #ffffff; */
+            /* margin: 10px; */
+            /* width: 300px; */
+            /* box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); */
+            transition: 0.3s;
+            /* border-radius: 5px; 5px rounded corners */
+            /* margin-bottom: 20px; */
+        }
+
+        /* On mouse-over, add a deeper shadow */
+        .note:hover {
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5) !important;
+        }
+
+        /* Add some padding inside the card container */
+        .content {
+            padding: 2px 16px;
+        }
+
+        .note-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            display: flex;
+            justify-content: left;
+            font-weight: 600;
+            padding: 0.1rem;
+        }
+
+        .note-text {
+            padding: 0.1rem;
+        }
+
+        .show {
+            display: '';
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .text-navy {
+            color: #202A44;
+        }
+
+        .text-smaller {
+            font-size: 90%;
         }
 
     </style>
@@ -93,8 +72,35 @@
             <input type="text" class="form-control" id="search" placeholder="Search for project..."
                 onkeyup="searchProjects()">
         </div>
-        <div class="row row-cols-1 row-cols-md-3" id="projects_container">
-
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" id="projects_container">
+            @foreach ($projects as $project)
+                <div class="col" id="project-{{ $project->id }}">
+                    <div class="card m-3">
+                        <div onclick="showEditModal({{ $project->id }})" class="content">
+                            <div class="note-header" id="project-title-{{ $project->id }}">
+                                {{ $project->name }}
+                            </div>
+                            <div class="note-text">
+                                <span class="text-smaller text-navy">Description</span>
+                                <p id="project-description-{{ $project->id }}">{{ $project->description }}</p>
+                                <span class="text-smaller text-navy">Created on {{ $project->created_at }}</span>
+                            </div>
+                            <div class="text-right">
+                                @foreach ($project->repositories as $repo)
+                                    <span class="badge badge-info ${el_class}" style="font-size: 85%">
+                                        {{ $repo->repository_name }}</span>
+                                @endforeach
+                            </div>
+                            <div class="pt-2 mb-2 text-right">
+                                <button class="btn btn-sm btn-outline-danger">Edit</button>
+                                <a class="btn btn-sm btn-outline-primary"
+                                    href="{{ route('view_specific_project', $project->id) }}">View
+                                    Project</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 @endsection
@@ -136,7 +142,8 @@
                             <div class="row">
                                 <label class="col-md-4">Repository</label>
                                 <div class="col-md-7">
-                                    <select name="repos" class="form-control" id="repositories_linked" multiple="multiple">
+                                    <select name="repos" class="form-control" id="repositories_linked"
+                                        multiple="multiple">
                                         @forelse ($repositories as $repo)
                                             <option value="{{ $repo->id }}">{{ $repo->name }} -
                                                 ({{ $repo->platform }})</option>
@@ -172,7 +179,7 @@
                     <p id="delete_title">Are you sure you want to remove this project?</p>
                 </div>
                 <div class="modal-footer">
-                    <form class="" id="remove_form" action="" method="post">
+                    <form class="" id=" remove_form" action="" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" id="delete_id" name="project_id" value="">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -185,58 +192,58 @@
 @endsection
 
 @section('js_scripts')
-<script src="{{ asset('js/bootstrap-multiselect.min.js') }}"></script>
-<script>
-    $(document).ready(function() {
-        $('#repositories_linked').multiselect();
-    });
-    $('#project_form').on('submit', function(event) {
-        event.preventDefault();
-        var action_url = "{{ route('add_project') }}";
-        $.ajax({
-            url: action_url,
-            method: "POST",
-            data: {
-                'name': $('#project_name').val(),
-                'description': $('#project_description').val(),
-                'repositories': $('#repositories_linked').val(),
-                '_token': '{{ csrf_token() }}'
-            },
-            dataType: "json",
-            success: function(data) {
-                var project = data.project;
-                add_project_cards(project, null);
-                feedback(data.success, 'success');
-            },
-            error: function(jqXhr, textStatus, errorThrown) {
-                var errors = JSON.parse(jqXhr.responseText);
-                if (jqXhr.status == 422) {
-                    feedback(errors.errors.name, 'error');
-                    // hideSpinner();
-                } else if (jqXhr.status == 400) {
-                    feedback(errors.error, 'error');
-                    // hideSpinner();
-                }
-            }
+    <script src="{{ asset('js/bootstrap-multiselect.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#repositories_linked').multiselect();
         });
-    });
+        $('#project_form').on('submit', function(event) {
+            event.preventDefault();
+            var action_url = "{{ route('add_project') }}";
+            $.ajax({
+                url: action_url,
+                method: "POST",
+                data: {
+                    'name': $('#project_name').val(),
+                    'description': $('#project_description').val(),
+                    'repositories': $('#repositories_linked').val(),
+                    '_token': '{{ csrf_token() }}'
+                },
+                dataType: "json",
+                success: function(data) {
+                    var project = data.project;
+                    add_project_cards(project, null);
+                    feedback(data.success, 'success');
+                },
+                error: function(jqXhr, textStatus, errorThrown) {
+                    var errors = JSON.parse(jqXhr.responseText);
+                    if (jqXhr.status == 422) {
+                        feedback(errors.errors.name, 'error');
+                        // hideSpinner();
+                    } else if (jqXhr.status == 400) {
+                        feedback(errors.error, 'error');
+                        // hideSpinner();
+                    }
+                }
+            });
+        });
 
-    function fetch_projects() {
-        var action_url = "{{ route('get_projects') }}";
+        function fetch_projects() {
+            var action_url = "{{ route('get_projects') }}";
 
-        $.ajax({
-            url: action_url,
-            method: "GET",
-            dataType: "json",
-            success: function(data) {
-                console.log(data);
-            },
-        })
-    }
+            $.ajax({
+                url: action_url,
+                method: "GET",
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                },
+            })
+        }
 
-    function add_project_cards(item, index) {
-        var description_class = (item.description) ? 'show' : 'hide';
-        var element = `
+        function add_project_cards(item, index) {
+            var description_class = (item.description) ? 'show' : 'hide';
+            var element = `
             <div class="col mb-3">
                 <div class="card bg-card h-100">
                     <div class="card-header">${item.name}</div>
@@ -247,7 +254,26 @@
                     </div>
                 </div>
             </div>`;
-        $('#projects_container').append(element);
-    }
-</script>
+            $('#projects_container').append(element);
+        }
+
+        function searchProjects() {
+            const searchString = $('#search').val();
+            const projectCards = document.getElementById('projects_container').children;
+            const length = projectCards.length;
+
+            for (let index = 0; index < length; index++) {
+                const projectCard = projectCards[index];
+                const cardId = projectCard.getAttribute('id');
+                const idArray = cardId.split('-') ?? [];
+                const id = idArray[1];
+                const text = $(`#project-title-${id}, #project-description-${id}`).text();
+                if (text.toUpperCase().indexOf(searchString.toUpperCase()) > -1) {
+                    $(projectCard).show();
+                } else {
+                    $(projectCard).hide();
+                }
+            }
+        }
+    </script>
 @endsection

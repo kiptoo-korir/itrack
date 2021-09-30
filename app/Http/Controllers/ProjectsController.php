@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Note;
 use App\Models\Project;
+use App\Models\Reminder;
+use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,5 +54,17 @@ class ProjectsController extends Controller
         }
 
         return response()->json(['error' => 'An error seems to have occurred, please try again.'], 400);
+    }
+
+    public function specificProject($projectId)
+    {
+        $data['user_data'] = Auth::user();
+        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+        $data['projectInfo'] = Project::findOrFail($projectId);
+        $data['notification_count'] = UserDataService::fetch_notifications_count();
+        $data['notes'] = Note::where('project', $projectId)->get();
+        $data['reminder'] = Reminder::where('project', $projectId)->get();
+
+        return view('project')->with($data);
     }
 }
