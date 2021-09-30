@@ -1,12 +1,15 @@
 const notificationContainer = document.getElementById("notification_list");
-if (notification_count !== 0) {
-    fetch_top_three_notifications();
-    $("#notification_list").show();
-    $("#no_notifications").hide();
-} else {
-    $("#notification_list").show();
-    $("#no_notifications").hide();
+function checkNotificationCount(count) {
+    if (count !== 0) {
+        fetch_top_three_notifications();
+        $("#notification_list").show();
+        $("#no_notifications").hide();
+    } else {
+        $("#notification_list").hide();
+        $("#no_notifications").show();
+    }
 }
+checkNotificationCount(notification_count);
 
 function fetch_top_three_notifications() {
     $.ajax({
@@ -44,7 +47,7 @@ Echo.private(`App.Models.User.${userId}`).notification((notification) => {
 
 function add_incoming_notification(notification) {
     let elementContent = `
-        <div>
+        <div">
             <div class="align-items-center">
                 <div class="toast-body mx-2">
                     <h4 class="header-notification">${notification.notification_title}</h4>
@@ -78,6 +81,29 @@ function add_incoming_notification(notification) {
 }
 
 function markAsRead(notificationId) {
-    console.log(notificationId);
-    console.log(document.getElementById(`not-${notificationId}`));
+    const url = markAsReadUrl + "/" + notificationId;
+    $.ajax({
+        url: url,
+        method: "get",
+        headers: {
+            Accept: "application/json",
+        },
+        success: function (data, textStatus, jQxhr) {
+            const notification = document.getElementById(
+                `not-${notificationId}`
+            );
+            notification.remove();
+            let { notificationCount } = data;
+            document.getElementById("notification_count").textContent =
+                notificationCount;
+            if (notificationCount !== 0) {
+                $("#notification_list").show();
+                $("#no_notifications").hide();
+            } else {
+                $("#notification_list").hide();
+                $("#no_notifications").show();
+            }
+        },
+        error: function (jqXhr, textStatus, errorThrown) {},
+    });
 }
