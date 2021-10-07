@@ -93,7 +93,7 @@
                             </div>
                             <div class="pt-2 mb-2 text-right">
                                 <button class="btn btn-sm btn-outline-danger">Edit</button>
-                                <a class="btn btn-sm btn-outline-primary"
+                                <a class="btn btn-sm btn-outline-dark"
                                     href="{{ route('view_specific_project', $project->id) }}">View
                                     Project</a>
                             </div>
