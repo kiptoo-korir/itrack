@@ -72,6 +72,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/project/{id}', [ProjectsController::class, 'specificProject'])->name('view_specific_project');
     Route::get('/mark_as_read/{id}', [HomeController::class, 'markNotificationAsRead'])->name('mark_as_read');
     Route::get('/project/{id}/notes', [NotesController::class, 'getNotesSpecificProject'])->name('get_notes_specific_project');
+    Route::get('/project/{id}/repositories', [RepositoryController::class, 'getRepositoriesSpecificProject'])->name('get_repos_specific_project');
+    Route::get('/project/{id}/linked_repositories', [ProjectsController::class, 'getLinkedRepositories'])->name('get_linked_repos_array');
 });
 
 // Email Verification Routes

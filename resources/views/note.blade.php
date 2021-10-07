@@ -2,21 +2,8 @@
 
 @section('css_scripts')
     <style>
-        /* .grid {
-                                        display: grid;
-                                        grid-gap: 10px;
-                                        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                                        grid-auto-rows: 200px;
-                                    } */
-
         .note {
-            /* background-color: #ffffff; */
-            /* margin: 10px; */
-            /* width: 300px; */
-            /* box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); */
             transition: 0.3s;
-            /* border-radius: 5px; 5px rounded corners */
-            /* margin-bottom: 20px; */
         }
 
         /* On mouse-over, add a deeper shadow */
@@ -141,7 +128,7 @@
                     <p id="delete_title">Are you sure you want to remove this note?</p>
                 </div>
                 <div class="modal-footer">
-                    <form class="" id="remove_form" action="" method="post">
+                    <form class="" id=" remove_form" action="" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" id="delete_id" name="note_id" value="">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -211,28 +198,7 @@
 @endsection
 
 @section('js_scripts')
-    <script src="https://cdn.jsdelivr.net/npm/macy@2"></script>
     <script>
-        // var macyInstance = Macy({
-        //     container: '.grid',
-        //     margin: {
-        //         x: 10,
-        //         y: 16,
-        //     },
-        //     columns: 4,
-        //     breakAt: {
-        //         576: {
-        //             columns: 1
-        //         },
-        //         768: {
-        //             columns: 2
-        //         },
-        //         992: {
-        //             columns: 3
-        //         }
-        //     }
-        // });    
-
         $('#note_form').on('submit', function(event) {
             event.preventDefault();
             var createForm = $('#note_form').closest('form');

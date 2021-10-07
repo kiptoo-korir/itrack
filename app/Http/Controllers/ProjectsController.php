@@ -64,7 +64,21 @@ class ProjectsController extends Controller
         $data['notification_count'] = UserDataService::fetch_notifications_count();
         $data['notes'] = Note::where('project', $projectId)->get();
         $data['reminder'] = Reminder::where('project', $projectId)->get();
+        $data['repositories'] = DB::table('repositories', 'repos')
+            ->leftJoin('platforms as ptf', 'repos.platform', '=', 'ptf.id')
+            ->select(['repos.id', 'repos.name', 'ptf.name as platform'])
+            ->where('owner', $data['user_data']->id)->get();
 
         return view('project')->with($data);
+    }
+
+    public function getLinkedRepositories($projectId)
+    {
+        $linkedRepositories = DB::table('project_repository')
+            ->where('project_id', $projectId)
+            ->pluck('repository_id')
+        ;
+
+        return response()->json(['linkedRepos' => $linkedRepositories], 200);
     }
 }

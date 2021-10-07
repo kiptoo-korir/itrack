@@ -63,4 +63,16 @@ class RepositoryController extends Controller
             ->make(true)
         ;
     }
+
+    public function getRepositoriesSpecificProject($projectId)
+    {
+        $userId = Auth::id();
+        $repositories = Repository::leftJoin('project_repository as project_repo', 'repositories.id', '=', 'project_repo.repository_id')
+            ->select('repositories.*')
+            ->where(['project_repo.owner' => $userId, 'project_repo.project_id' => $projectId])
+            ->get()
+        ;
+
+        return response()->json(['repositories' => $repositories], 200);
+    }
 }
