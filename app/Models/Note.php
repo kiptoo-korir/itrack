@@ -11,5 +11,5 @@ class Note extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['owner', 'repository', 'message', 'title', 'type'];
+    protected $fillable = ['owner', 'project', 'message', 'title', 'type'];
 }
