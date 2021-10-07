@@ -111,7 +111,6 @@ class NotesController extends Controller
         $userId = Auth::id();
         $notes = Note::where(['owner' => $userId, 'project' => $projectId])
             ->orderByDesc('created_at')->limit(50)->get();
-        dd($notes);
 
         return response()->json(['notes' => $notes], 200);
     }
