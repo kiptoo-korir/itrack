@@ -55,7 +55,7 @@ class NotesController extends Controller
 
         $note_id = $request->get('note_id');
         $task = Note::find($note_id);
-        $project = ($request->project) ?: null;
+        $project = $request->project ?? null;
         $type = ($request->project) ? 'SPECIFIC' : 'GENERAL';
 
         $task->update([
@@ -104,5 +104,15 @@ class NotesController extends Controller
         $note = Note::find($note_id);
 
         return response()->json(['note' => $note], 200);
+    }
+
+    public function getNotesSpecificProject($projectId)
+    {
+        $userId = Auth::id();
+        $notes = Note::where(['owner' => $userId, 'project' => $projectId])
+            ->orderByDesc('created_at')->limit(50)->get();
+        dd($notes);
+
+        return response()->json(['notes' => $notes], 200);
     }
 }
