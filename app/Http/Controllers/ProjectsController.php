@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use App\Models\Project;
 use App\Models\Reminder;
+use App\Services\ProjectRepositoryLinkingService;
 use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -80,5 +81,35 @@ class ProjectsController extends Controller
         ;
 
         return response()->json(['linkedRepos' => $linkedRepositories], 200);
+    }
+
+    public function changeLinkedRepositories(Request $request)
+    {
+        $request->validate([
+            'projectId' => 'required|integer|exists:projects,id',
+            'repositories' => 'required|array',
+        ]);
+
+        $projectId = $request->projectId;
+        $repositoriesList = $request->repositories;
+
+        $repositoriesLinked = DB::table('project_repository')
+            ->where('project_id', $projectId)
+            ->pluck('repository_id')
+            ->toArray()
+        ;
+
+        $newRepositories = array_diff($repositoriesList, $repositoriesLinked);
+        $repositoriesToUnlink = array_diff($repositoriesLinked, $repositoriesList);
+
+        $linkingService = new ProjectRepositoryLinkingService();
+        $linkingResult = $linkingService->linkNewRepositories($newRepositories, $projectId);
+        $unlinkingResult = $linkingService->unlinkRepositories($repositoriesToUnlink, $projectId);
+
+        if (!$linkingResult || !$unlinkingResult) {
+            return response()->json(['message' => 'Something seems to have gone wrong, please contact admin and try again.'], 400);
+        }
+
+        return response()->json(['message' => 'Changes made successfully.'], 200);
     }
 }

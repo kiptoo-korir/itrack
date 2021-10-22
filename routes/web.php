@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/project/{id}/notes', [NotesController::class, 'getNotesSpecificProject'])->name('get_notes_specific_project');
     Route::get('/project/{id}/repositories', [RepositoryController::class, 'getRepositoriesSpecificProject'])->name('get_repos_specific_project');
     Route::get('/project/{id}/linked_repositories', [ProjectsController::class, 'getLinkedRepositories'])->name('get_linked_repos_array');
+    Route::post('/change_linked_repositories', [ProjectsController::class, 'changeLinkedRepositories'])->name('change_linked_repos');
 });
 
 // Email Verification Routes

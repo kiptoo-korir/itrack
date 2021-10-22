@@ -236,7 +236,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Link More Repositories</h5>
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Link/Unlink Repositories</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -244,6 +244,7 @@
                 <form action="" class="form-groups" method="POST" id="link-form">
                     <div class="modal-body">
                         @csrf
+                        <input type="hidden" name="projectId" value="{{ $projectInfo->id }}">
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-md-3">Repository</label>
@@ -470,6 +471,7 @@
                 method: "GET",
                 dataType: "json",
                 success: function(data) {
+                    document.getElementById('repo_container').innerHTML = '';
                     var repositories = data.repositories;
                     repositories.forEach(appendRepos);
                 },
@@ -512,5 +514,34 @@
             });
             $('#link-modal').modal('show');
         }
+
+        $('#link-form').on('submit', (e) => {
+            e.preventDefault();
+            const linkedForm = $('#link-form');
+            const linkedRepositories = $('#link-form').serialize();
+            const postUrl = "{{ route('change_linked_repos') }}";
+            $.ajax({
+                url: postUrl,
+                method: "POST",
+                data: {
+                    'repositories': $('#repositories_linked').val(),
+                    '_token': '{{ csrf_token() }}',
+                    'projectId': projectId
+                },
+                dataType: "json",
+                success: function(data) {
+                    feedback(data.message, 'success');
+                    fetchRepositories();
+                },
+                error: function(jqXhr, textStatus, errorThrown) {
+                    var errors = JSON.parse(jqXhr.responseText);
+                    if (jqXhr.status == 422) {
+                        feedback(errors.errors.projectId || errors.errors.repos, 'error');
+                    } else if (jqXhr.status == 400) {
+                        feedback(errors.error, 'error');
+                    }
+                }
+            });
+        });
     </script>
 @endsection
