@@ -66,8 +66,13 @@
             color: #202A44;
         }
 
+        #tbl_rem {
+            width: 100% !important;
+        }
+
     </style>
     <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
 @endsection
 
 @section('content')
@@ -116,13 +121,38 @@
                 <div class="card-columns mt-3" id="card-container">
                 </div>
             </div>
-            <div class="tab-pane fade" id="pills-reminders" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+            {{-- Reminders Tab Pane --}}
+            <div class="tab-pane fade" id="pills-reminders" role="tabpanel" aria-labelledby="pills-contact-tab">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <h4 class="text-black-50 mr-auto">Reminders</h4>
+                        <button class="btn btn-outline-primary ml-auto" data-toggle="modal" id="rem_btn"
+                            data-target="#reminder_modal">Add
+                            New Reminder</button>
+                    </div>
+                    <div class="table-responsive mt-2">
+                        <table class="table" id="tbl_rem">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Content</th>
+                                    <th>Date Due</th>
+                                    <th>Date Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
 @endsection
 
 @section('modals')
+    {{-- Add note modal --}}
     <div class="modal fade" id="note_modal" tabindex="-1" role="dialog" aria-labelledby="#note_btn" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -163,12 +193,12 @@
             </div>
         </div>
     </div>
-    {{-- Delete modal --}}
+    {{-- Delete note modal --}}
     <div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-labelledby="removeBtn" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Delete Confirmation</h5>
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Delete Reminder</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -188,7 +218,7 @@
             </div>
         </div>
     </div>
-    {{-- Edit Modal --}}
+    {{-- Edit Note Modal --}}
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="#edit_btn" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -271,15 +301,165 @@
             </div>
         </div>
     </div>
+    {{-- Add new reminder modal --}}
+    <div class="modal fade" id="reminder_modal" tabindex="-1" role="dialog" aria-labelledby="#rem_btn"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Add Reminder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" class="form-groups" method="POST" id="reminder_form">
+                    <div class="modal-body">
+                        <input type="hidden" name="project" value="{{ $projectInfo->id }}">
+                        @csrf
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Title</label>
+                                <div class="col-md-6">
+                                    <input type="text" name="title" class="form-control" required>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Reminder Content</label>
+                                <div class="col-md-7">
+                                    <textarea name="message" rows="6" class="form-control" required></textarea>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Date</label>
+                                <div class="col-md-4">
+                                    <input type="date" name="due_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Time</label>
+                                <div class="col-md-4">
+                                    <input type="time" name="due_time" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="timezone" id="timezone">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- Edit Reminder Modal --}}
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="#edit_btn" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Edit Reminder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" class="form-groups" method="POST" id="edit_reminder_form">
+                    <div class="modal-body">
+                        @csrf
+                        <input type="hidden" name="reminder_id" id="edit_id">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Title</label>
+                                <div class="col-md-6">
+                                    <input type="text" name="title" id="edit_title" class="form-control" required>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Message</label>
+                                <div class="col-md-7">
+                                    <textarea name="message" id="edit_message" rows="6" class="form-control"
+                                        required></textarea>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12">
+                                    <p class="mb-0 text-muted" style="font-size: 0.9rem">Date is in the format MM-DD-YYYY
+                                    </p>
+                                </div>
+                                <label class="col-md-4">Date</label>
+                                <div class="col-md-4">
+                                    <input type="date" name="due_date" class="form-control" id="edit_date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4">Time</label>
+                                <div class="col-md-4">
+                                    <input type="time" name="due_time" class="form-control" id="edit_time">
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="project" id="edit_project">
+                        <input type="hidden" name="timezone" id="edit_timezone">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- Delete Reminder Modal --}}
+    <div class="modal fade" id="remove-reminder-modal" tabindex="-1" role="dialog" aria-labelledby="removeBtn"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="remove-reminder-title">Delete Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this reminder?</p>
+                </div>
+                <div class="modal-footer">
+                    <form class="" id="remove-reminder-form" action="" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" id="delete-reminder-id" name="reminder_id" value="">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" id="delete-reminder-btn" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js_scripts')
     <script src="{{ asset('js/bootstrap-multiselect.min.js') }}"></script>
+    <script src="{{ asset('js/datatables.min.js') }}"></script>
     {{-- General Scripts --}}
     <script>
         $(document).ready(function() {
             fetchNotes();
             fetchRepositories();
+            fetchReminders();
             $('#repositories_linked').multiselect();
         });
         const projectId = {{ $projectInfo->id }};
@@ -539,6 +719,149 @@
                         feedback(errors.errors.projectId || errors.errors.repos, 'error');
                     } else if (jqXhr.status == 400) {
                         feedback(errors.error, 'error');
+                    }
+                }
+            });
+        });
+    </script>
+
+    {{-- Reminders Scripts --}}
+    <script>
+        function fetchReminders() {
+            const remindersRoute = "{{ route('get_linked_reminders', $projectInfo->id) }}";
+            if ($.fn.dataTable.isDataTable('#tbl_rem')) {
+                $('#tbl_rem').DataTable().destroy();
+            }
+
+            $('#tbl_rem').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: remindersRoute
+                },
+                columns: [{
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'message',
+                        name: 'message'
+                    },
+                    {
+                        data: 'order_due',
+                        name: 'order_due'
+                    },
+                    {
+                        data: 'order_created',
+                        name: 'order_created'
+                    },
+                    {
+                        data: 'id',
+                        name: 'id'
+                    }
+                ],
+                columnDefs: [{
+                        targets: 2,
+                        render: function(data, type, row) {
+                            return `${row.due_date}`;
+                        }
+                    },
+                    {
+                        targets: 3,
+                        render: function(data, type, row) {
+                            return `${row.created}`;
+                        }
+                    },
+                    {
+                        targets: 4,
+                        render: function(data, type, row) {
+                            return `<button type = "button" name="remove" onclick="showEditModal(${data})" class="delete btn btn-info btn-sm mb-1">Edit</button> | 
+                        <button type = "button" name="remove" data-toggle="modal" data-target="#remove-reminder-modal" data-id="${data}" class="delete btn btn-danger btn-sm mb-1">Delete</button>
+                        `
+                        }
+                    }
+                ]
+            });
+        }
+
+        $('#reminder_form').on('submit', function(event) {
+            event.preventDefault();
+            var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            $('#timezone').val(tz);
+            var createForm = $('#reminder_form').closest('form');
+            var create_record = createForm.serialize();
+            var action_url = "{{ route('add_reminder') }}";
+            $.ajax({
+                url: action_url,
+                method: "POST",
+                data: create_record,
+                dataType: "json",
+                success: function(data) {
+                    feedback(data.success, 'success');
+                    fetchReminders();
+                },
+                error: function(jqXhr, textStatus, errorThrown) {
+                    var errors = JSON.parse(jqXhr.responseText);
+                    if (jqXhr.status == 422) {
+                        feedback(errors.errors.title || errors.errors.message || errors.error
+                            .due_date || errors.error.due_time || errors.error.reminder_id, 'error');
+                    } else if (jqXhr.status == 400) {
+                        feedback(errors.error, 'error');
+                    }
+                }
+            });
+        });
+
+        function showEditModal(id) {
+            $.ajax({
+                url: "{{ route('get_reminder') }}",
+                data: {
+                    reminder_id: id
+                },
+                method: "get",
+                success: function(data) {
+                    var reminder = data.reminder;
+                    $('#edit_id').val(id);
+                    $('#edit_title').val(reminder.title);
+                    $('#edit_message').val(reminder.message);
+                    $('#edit_project').val(reminder.project);
+                    $('#edit_date').val(reminder.year);
+                    $('#edit_time').val(reminder.time);
+                    $('#editModal').modal('show');
+                },
+            });
+        }
+
+        $('#remove-reminder-modal').on('show.bs.modal', function(e) {
+            $('#delete-reminder-btn').attr('disabled', false);
+            var button = e.relatedTarget;
+            var reminder_id = $(button).data('id');
+            $('#delete-reminder-id').val(reminder_id);
+        });
+
+        $('#remove-reminder-form').on('submit', function(event) {
+            event.preventDefault();
+            var deleteForm = $('#remove-reminder-form').closest('form');
+            var delete_record = deleteForm.serialize();
+            var action_url = "{{ route('delete_reminder') }}";
+            $.ajax({
+                url: action_url,
+                method: "POST",
+                data: delete_record,
+                dataType: "json",
+                success: function(data) {
+                    feedback(data.success, 'success');
+                    $('#delete-reminder-btn').attr('disabled', true);
+                    fetchReminders();
+                },
+                error: function(jqXhr, textStatus, errorThrown) {
+                    var errors = JSON.parse(jqXhr.responseText);
+                    if (jqXhr.status == 422) {
+                        feedback(errors.errors.reminder_id, 'error');
+                        // hideSpinner();
+                    } else if (jqXhr.status == 400) {
+                        feedback(errors.error, 'error');
+                        // hideSpinner();
                     }
                 }
             });

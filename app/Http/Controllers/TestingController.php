@@ -6,6 +6,7 @@ use App;
 use App\Mail\TestMail;
 use App\Models\Note;
 use App\Models\Repository;
+use App\Models\RepositoryLanguage;
 use App\Models\User;
 use App\Services\TokenService;
 use Faker;
@@ -41,6 +42,7 @@ class TestingController extends Controller
             ->get('https://api.github.com/user/repos?sort=created')
         ;
         $repos = json_decode($response);
+        dd($response);
 
         $bulk_insert = [];
         $bulk_update = [];
@@ -170,5 +172,30 @@ class TestingController extends Controller
         // }
 
         // dd('Yes');
+    }
+
+    public function notify()
+    {
+        $languagesInStore = RepositoryLanguage::where('repository_id', 43)
+            ->pluck('value', 'name')->toArray()
+            ;
+
+        dd($languagesInStore);
+        $arr = [
+            'PHP' => 87738,
+            'HTML' => 5789,
+            'Vue' => 552,
+        ];
+
+        $newarr = [
+            'PHP' => 84738,
+            'HTML' => 5789,
+            'Vue' => 552,
+            'CSS' => 332,
+        ];
+
+        $langsAlreadyExisting = array_intersect_key($newarr, $arr);
+        $editedLanguages = array_diff($langsAlreadyExisting, $arr);
+        dd($langsAlreadyExisting, $editedLanguages);
     }
 }

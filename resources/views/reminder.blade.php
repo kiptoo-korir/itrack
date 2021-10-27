@@ -3,13 +3,6 @@
 @section('css_scripts')
     <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
     <style>
-        /* .grid {
-                                                                            display: grid;
-                                                                            grid-gap: 10px;
-                                                                            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                                                                            grid-auto-rows: 200px;
-                                                                        } */
-
         .note {
             /* background-color: #ffffff; */
             /* margin: 10px; */
@@ -71,7 +64,8 @@
 @endsection
 
 @section('modals')
-    <div class="modal fade" id="reminder_modal" tabindex="-1" role="dialog" aria-labelledby="#rem_btn" aria-hidden="true">
+    <div class="modal fade" id="reminder_modal" tabindex="-1" role="dialog" aria-labelledby="#rem_btn"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -225,7 +219,7 @@
                             <div class="row">
                                 <label class="col-md-4">Project</label>
                                 <div class="col-md-7">
-                                    <select name="project" class="form-control" id="edit_repo">
+                                    <select name="project" class="form-control" id="edit_project">
                                         <option value="">None selected</option>
                                         @forelse ($projects as $project)
                                             <option value="{{ $project->id }}">{{ $project->name }}</option>
@@ -411,7 +405,7 @@
                     $('#edit_id').val(id);
                     $('#edit_title').val(reminder.title);
                     $('#edit_message').val(reminder.message);
-                    $('#edit_repo').val(reminder.project);
+                    $('#edit_project').val(reminder.project);
                     $('#edit_date').val(reminder.year);
                     $('#edit_time').val(reminder.time);
                     $('#editModal').modal('show');
@@ -425,67 +419,5 @@
             var reminder_id = $(button).data('id');
             $('#delete_id').val(reminder_id);
         });
-
-        // function fetchNotes () {
-        //     $.ajax({
-        //         url: "{{ route('get_all_notes') }}",
-        //         method: "GET",
-        //         dataType: "json",
-        //         success: function (data) {
-        //             var notes = data.notes;
-        //             // console.log(notes);
-        //             notes.forEach(appendNotes);
-        //             // macyInstance.recalculate();
-        //             // macyInstance.reInit();
-        //         },
-        //     })
-        // }
-
-        // function appendNotes (item, index) {
-        //     var element = `
-    //         <div class="card shadow note" id="note-${item.id}">
-    //             <div onclick="showEditModal(${item.id})" class="content">
-    //                 <div class="note-header">
-    //                     ${item.title}
-    //                 </div>
-    //                 <div class="note-text">
-    //                     ${item.message}
-    //                 </div>
-    //             </div>
-    //             <div class="dropdown dropleft">
-    //                 <span class="float-right" id="dropdown-${item.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    //                     <i class="bi bi-three-dots-vertical"></i>
-    //                 </span>
-    //                 <div class="dropdown-menu" aria-labelledby="dropdown-${item.id}">
-    //                     <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-id="${item.id}" data-target="#removeModal">Delete</a>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     `;
-        //     $('.card-columns').append(element);
-        // }
-
-        // $(document).ready(function () {
-        //     fetchNotes();
-        // });
-
-        // function searchNotes () {
-        //     var text = $('#search').val().toUpperCase();
-        //     var notes = document.getElementById('card-container').children;
-
-        //     for (i = 0;i < notes.length; i++) {
-        //         var content = notes[i].children[0];
-        //         var title = content.children[0].textContent || content.children[0].innerText;
-        //         var message = content.children[1].textContent || content.children[1].innerText;
-
-        //         if (title || message) {
-        //             if (title.toUpperCase().indexOf(text) > -1 || message.toUpperCase().indexOf(text) > -1) {
-        //                 $(notes[i]).show();
-        //             } else {
-        //                 $(notes[i]).hide();
-        //             }
-        //         }
-        //     }
-        // }
     </script>
 @endsection

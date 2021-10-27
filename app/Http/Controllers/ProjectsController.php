@@ -10,6 +10,7 @@ use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProjectsController extends Controller
 {
@@ -111,5 +112,27 @@ class ProjectsController extends Controller
         }
 
         return response()->json(['message' => 'Changes made successfully.'], 200);
+    }
+
+    public function getLinkedReminders($projectId)
+    {
+        $user_id = Auth::id();
+        // Timezone set manually
+        $data = Reminder::where(['owner' => $user_id, 'project' => $projectId])
+            ->select('id', 'title', 'message', 'project', 'created_at as c_at', 'due_date as d_d')
+            ->selectRaw('to_char(due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
+            ->selectRaw('to_char(created_at at time zone \'Africa/Nairobi\', \'Dy DD Mon, YYYY at HH:MI AM\') as created')
+            ->orderByDesc('c_at')->get();
+
+        return DataTables::of($data)
+            ->addColumn('order_created', function ($row) {
+                return strtotime($row->c_at);
+            })
+            ->addColumn('order_due', function ($row) {
+                return strtotime($row->d_d);
+            })
+            ->rawColumns(['order_date', 'order_created'])
+            ->make(true)
+        ;
     }
 }
