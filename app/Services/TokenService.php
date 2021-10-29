@@ -6,6 +6,7 @@ use App\Models\Platform;
 use App\Models\User;
 use Cache;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
@@ -30,7 +31,7 @@ class TokenService
         return unserialize($token);
     }
 
-    public function client($user_id = null)
+    public function client(int $user_id = null): PendingRequest
     {
         return Http::withToken($this->github_token($user_id));
     }
