@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\RepositoriesFetched;
 use App\Models\Repository;
+use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,6 +41,10 @@ class FetchRepositories implements ShouldQueue
         $response = $this->tok_service->client($this->user)
             ->get('https://api.github.com/user/repos?sort=created')
         ;
+
+        $statusCode = $response->status();
+        $invalidTokenService = new InvalidTokenService();
+        $invalidTokenService->responseHandler($statusCode);
 
         $latest_date = Repository::where('owner', $this->user)
             ->orderBy('date_created_online', 'desc')->limit(1)->pluck('date_created_online')->first();

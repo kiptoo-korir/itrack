@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\FetchIssuesInRepoEvent;
 use App\Models\Issue;
+use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,6 +43,11 @@ class FetchIssuesInRepoQueue implements ShouldQueue
         $response = $this->tokenService->client($this->userId)
             ->get('https://api.github.com/repos/'.$this->repoFullname.'/issues')
         ;
+
+        $statusCode = $response->status();
+        $invalidTokenService = new InvalidTokenService();
+        $invalidTokenService->responseHandler($statusCode);
+
         $issuesInRepository = json_decode($response->body());
 
         $latestDate = Issue::where('owner', $this->userId)

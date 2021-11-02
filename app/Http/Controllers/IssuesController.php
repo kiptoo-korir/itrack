@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Issue;
 use App\Models\Repository;
+use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +12,12 @@ use Illuminate\Support\Facades\Auth;
 class IssuesController extends Controller
 {
     protected $tokenService;
+    protected $invalidTokenService;
 
-    public function __construct(TokenService $tokenService)
+    public function __construct(TokenService $tokenService, InvalidTokenService $invalidTokenService)
     {
         $this->tokenService = $tokenService;
+        $this->invalidTokenService = $invalidTokenService;
     }
 
     public function createIssue(Request $request)
@@ -43,7 +46,10 @@ class IssuesController extends Controller
         $response = $httpClient->post($issuesPostUrl, $issuesData);
         $responseBody = json_decode($response->body());
 
-        if (201 === $response->status()) {
+        $statusCode = $response->status();
+        $this->invalidTokenService->responseHandler($statusCode);
+
+        if (201 === $statusCode) {
             $newIssueDetails = [
                 'title' => $title,
                 'body' => $body,
