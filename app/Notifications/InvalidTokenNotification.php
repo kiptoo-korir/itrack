@@ -11,14 +11,12 @@ use Illuminate\Notifications\Notification;
 class InvalidTokenNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
-    protected NotificationService $notificationService;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(NotificationService $notificationService)
+    public function __construct()
     {
-        $this->notificationService = $notificationService;
     }
 
     /**
@@ -50,7 +48,8 @@ class InvalidTokenNotification extends Notification implements ShouldBroadcast
 
     public function toBroadcast($notifiable): BroadcastMessage
     {
-        $count = $this->notificationService->getNotificationCount($notifiable->id);
+        $notificationService = new NotificationService();
+        $count = $notificationService->getNotificationCount($notifiable->id);
 
         return new BroadcastMessage([
             'notifications_count' => $count,
