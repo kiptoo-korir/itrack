@@ -56,6 +56,7 @@
         @include('components.navbar')
 
         <main class="py-4 bg-light">
+            @includeWhen($isTokenValid, 'components.no-token-cta')
             @include('components.spinner')
             @yield('content')
             @include('components.toasts')
