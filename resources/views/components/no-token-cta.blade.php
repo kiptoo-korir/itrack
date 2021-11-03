@@ -5,6 +5,6 @@
         @else
             Your access token to github is not setup. Please set it up
         @endif
-        <a href="{{ route('profile') }}">here</a>
+        <a href="{{ $githubOauthUrl }}">here</a>
     </div>
 </div>
