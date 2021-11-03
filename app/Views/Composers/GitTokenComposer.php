@@ -19,9 +19,15 @@ class GitTokenComposer
     public function compose(View $view)
     {
         $userId = Auth::id();
+        $client = env('GITHUB_CLIENT_ID');
         $isTokenValid = $this->userDataService->checkGithubTokenStatus($userId);
         $previousTokens = $this->userDataService->checkForPreviousTokens($userId);
+        $githubOauthUrl = "https://github.com/login/oauth/authorize?client_id={$client}&scope=repo%20notifications%20user";
 
-        $view->with(['isTokenValid' => $isTokenValid, 'previousTokens' => $previousTokens]);
+        $view->with([
+            'isTokenValid' => $isTokenValid,
+            'previousTokens' => $previousTokens,
+            'githubOauthUrl' => $githubOauthUrl,
+        ]);
     }
 }
