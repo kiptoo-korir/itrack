@@ -95,7 +95,7 @@
                         <h6>Date Joined: {{ $user_data->created_at }}</h6>
                     </div>
                     {{-- data-toggle="modal" data-target="#pan_modal" --}}
-                    <a class="btn btn-outline-primary" id="pan_btn" href="{{ $request }}"><i
+                    <a class="btn btn-outline-primary" id="pan_btn" href="{{ $githubOauthUrl }}"><i
                             class="bi bi-github"></i> Add Access to Github</a>
                     <div class="horizontal-divider"></div>
                     <button class="btn btn-outline-primary" id="pass_btn" data-toggle="modal"

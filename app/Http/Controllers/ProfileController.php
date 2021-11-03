@@ -22,8 +22,6 @@ class ProfileController extends Controller
         $data['user_data'] = Auth::user();
         $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['platforms'] = Platform::all();
-        $client = env('GITHUB_CLIENT_ID');
-        $data['request'] = "https://github.com/login/oauth/authorize?client_id={$client}&scope=repo%20notifications%20user";
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('profile')->with($data);
