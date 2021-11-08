@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\RepositoriesFetched;
 use App\Models\Repository;
+use App\Services\ApiCallsService;
 use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Illuminate\Bus\Queueable;
@@ -19,7 +20,7 @@ class FetchRepositories implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
     use SerializesModels;
-    protected $tok_service;
+    protected $tokenService;
     protected $user;
 
     /**
@@ -29,7 +30,7 @@ class FetchRepositories implements ShouldQueue
      */
     public function __construct(int $user_id)
     {
-        $this->tok_service = new TokenService();
+        $this->tokenService = new TokenService();
         $this->user = $user_id;
     }
 
@@ -38,13 +39,16 @@ class FetchRepositories implements ShouldQueue
      */
     public function handle()
     {
-        $response = $this->tok_service->client($this->user)
-            ->get('https://api.github.com/user/repos?sort=created')
-        ;
+        $url = 'https://api.github.com/user/repos?sort=created&page=1&per_page=50';
 
-        $statusCode = $response->status();
         $invalidTokenService = new InvalidTokenService();
-        $invalidTokenService->responseHandler($statusCode);
+        $apiService = (new ApiCallsService($this->tokenService, $invalidTokenService));
+
+        $repos = $apiService->githubCallsHandler($url, $this->user);
+
+        if (0 === count($repos)) {
+            return;
+        }
 
         $latest_date = Repository::where('owner', $this->user)
             ->orderBy('date_created_online', 'desc')->limit(1)->pluck('date_created_online')->first();
@@ -54,8 +58,6 @@ class FetchRepositories implements ShouldQueue
             ->orderBy('date_updated_online', 'desc')->limit(1)->pluck('date_updated_online')->first();
 
         $count = Repository::where('owner', $this->user)->count();
-
-        $repos = json_decode($response->body());
 
         $bulk_insert = [];
         $bulk_update = [];

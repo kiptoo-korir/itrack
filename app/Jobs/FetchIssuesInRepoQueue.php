@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\FetchIssuesInRepoEvent;
 use App\Models\Issue;
+use App\Services\ApiCallsService;
 use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Illuminate\Bus\Queueable;
@@ -40,15 +41,16 @@ class FetchIssuesInRepoQueue implements ShouldQueue
      */
     public function handle()
     {
-        $response = $this->tokenService->client($this->userId)
-            ->get('https://api.github.com/repos/'.$this->repoFullname.'/issues')
-        ;
+        $url = 'https://api.github.com/repos/'.$this->repoFullname.'/issues?sort=created&page=1&per_page=50';
 
-        $statusCode = $response->status();
         $invalidTokenService = new InvalidTokenService();
-        $invalidTokenService->responseHandler($statusCode);
+        $apiService = (new ApiCallsService($this->tokenService, $invalidTokenService));
 
-        $issuesInRepository = json_decode($response->body());
+        $issuesInRepository = $apiService->githubCallsHandler($url, $this->userId);
+
+        if (0 === count($issuesInRepository)) {
+            return;
+        }
 
         $latestDate = Issue::where('owner', $this->userId)
             ->orderBy('date_created_online', 'desc')

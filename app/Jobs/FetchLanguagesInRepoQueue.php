@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Events\FetchLanguagesInRepo;
 use App\Models\Repository;
 use App\Models\RepositoryLanguage;
+use App\Services\ApiCallsService;
 use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Illuminate\Bus\Queueable;
@@ -42,15 +43,16 @@ class FetchLanguagesInRepoQueue implements ShouldQueue
     public function handle()
     {
         $repository = Repository::findOrFail($this->repoId);
-        $response = $this->tokenService->client($this->userId)
-            ->get('https://api.github.com/repos/'.$repository->fullname.'/languages')
-        ;
+        $url = 'https://api.github.com/repos/'.$repository->fullname.'/languages';
 
-        $statusCode = $response->status();
         $invalidTokenService = new InvalidTokenService();
-        $invalidTokenService->responseHandler($statusCode);
+        $apiService = (new ApiCallsService($this->tokenService, $invalidTokenService));
+        $languagesInRepo = $apiService->githubCallsHandler($url, $this->userId);
 
-        $languagesInRepo = (array) json_decode($response->body());
+        if (0 === count($languagesInRepo)) {
+            return;
+        }
+
         if (count($languagesInRepo) > 0) {
             FetchLanguagesInRepo::dispatch($this->repoId, $languagesInRepo);
 
