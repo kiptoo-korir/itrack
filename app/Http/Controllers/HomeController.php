@@ -83,7 +83,7 @@ class HomeController extends Controller
                 'read_at' => now(),
             ])
         ;
-        $notificationCount = User::findOrFail(Auth::id())->unreadNotifications->where('type', '=', 'App\Notifications\ReminderNotification')->count();
+        $notificationCount = User::findOrFail(Auth::id())->unreadNotifications->count();
 
         return response()->json(['message' => 'Notification marked as read.', 'notificationCount' => $notificationCount], 200);
     }
