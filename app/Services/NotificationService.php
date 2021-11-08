@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Notifications\InvalidTokenNotification;
 
 class NotificationService
 {
@@ -11,5 +12,11 @@ class NotificationService
         return User::findOrFail($userId)->unreadNotifications
             ->count()
         ;
+    }
+
+    public function notifyOfInvalidToken(int $userId): void
+    {
+        $user = User::findOrFail($userId);
+        $user->notify(new InvalidTokenNotification());
     }
 }
