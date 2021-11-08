@@ -31,15 +31,17 @@ class ApiCallsService
         $resources = json_decode($response->body());
         $linkHeader = $response->headers()['Link'] ?? null;
 
-        $linksArray = ($linkHeader[0]) ? $this->parseLinkHeader($linkHeader[0]) : [];
+        $linksArray = isset($linkHeader) ? $this->parseLinkHeader($linkHeader[0]) : [];
 
-        if (isset($linkHeader[0]) && !isset($linksArray['next']) && !isset($linksArray['last'])) {
-            return $resources;
+        if ((0 === count($linksArray)) || (!isset($linksArray['next']) && !isset($linksArray['last']))) {
+            return $this->typeConverter($resources);
         }
 
         $moreResources = $this->githubCallsHandler($linksArray['next'], $userId);
 
-        return array_merge($resources, $moreResources);
+        $mergedArray = array_merge($resources, $moreResources);
+
+        return $this->typeConverter($mergedArray);
     }
 
     protected function parseLinkHeader(string $header): array
@@ -65,7 +67,12 @@ class ApiCallsService
         return $links;
     }
 
-    // protected function checkForToken () {
-    //     $tokenStatus = (new UserDataService())->checkGithubTokenStatus();
-    // }
+    protected function typeConverter(mixed $input): array
+    {
+        if ('array' === gettype($input)) {
+            return $input;
+        }
+
+        return (array) $input;
+    }
 }
