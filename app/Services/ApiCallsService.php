@@ -20,13 +20,24 @@ class ApiCallsService
     {
         $tokenStatus = (new UserDataService())->checkGithubTokenStatus($userId);
 
+        // Early return when user doesn't have a valid token
         if (!$tokenStatus) {
-            dd('No token');
+            (new NotificationService())->notifyOfInvalidToken($userId);
+
+            return [];
         }
 
         $client = $this->tokenService->client($userId);
 
         $response = $client->get($url);
+
+        $statusCode = $response->status();
+        $this->invalidTokenService->responseHandler($statusCode);
+
+        // Early return for errorneous response
+        if ($this->checkForError($statusCode)) {
+            return [];
+        }
 
         $resources = json_decode($response->body());
         $linkHeader = $response->headers()['Link'] ?? null;
@@ -74,5 +85,12 @@ class ApiCallsService
         }
 
         return (array) $input;
+    }
+
+    protected function checkForError(int $statusCode): bool
+    {
+        $errorCodes = [500, 400, 403, 404];
+
+        return in_array($statusCode, $errorCodes);
     }
 }
