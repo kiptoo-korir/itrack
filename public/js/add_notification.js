@@ -28,8 +28,11 @@ function fetch_top_three_notifications() {
                         id: notification.id,
                         notification_title: data.notification_title,
                         notification_message: data.notification_message,
+                        action_link: data.action_link,
                     };
                     add_incoming_notification(processedNotification);
+                    $("#notification_list").show();
+                    $("#no_notifications").hide();
                 });
             }
         },
@@ -39,6 +42,8 @@ function fetch_top_three_notifications() {
 
 Echo.private(`App.Models.User.${userId}`).notification((notification) => {
     add_incoming_notification(notification);
+    $("#notification_list").show();
+    $("#no_notifications").hide();
     feedback(
         `New notification on ${notification.notification_type}`,
         "warning"
@@ -46,12 +51,15 @@ Echo.private(`App.Models.User.${userId}`).notification((notification) => {
 });
 
 function add_incoming_notification(notification) {
+    const actionLink = notification.action_link
+        ? ` <a href="${notification.action_link}">link</a>`
+        : "";
     let elementContent = `
         <div">
             <div class="align-items-center">
                 <div class="toast-body mx-2">
                     <h4 class="header-notification">${notification.notification_title}</h4>
-                    <p class="text-notification mb-0 truncate-fade">${notification.notification_message}</p>
+                    <p class="text-notification mb-0 truncate-fade">${notification.notification_message}${actionLink}</p>
                     <div class="text-right text-notification"><a class="mark-as-read"
                             href="javascript:void(0)"
                             onclick="markAsRead('${notification.id}')">Mark as read</a></div>
