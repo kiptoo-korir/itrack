@@ -22,7 +22,10 @@ class RepositoryController extends Controller
         $user_id = Auth::id();
         // TODO: Validate whether token is valid before dispatching job
         FetchRepositories::dispatch($user_id);
-        $data['repositories'] = Repository::select(['id', 'name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])->get();
+        $data['repositories'] = Repository::select(['id', 'name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])
+            ->selectRaw('to_char(date_updated_online, \'Dy, DD Mon YYYY HH:MI:SS TZ \') as date_updated_online, to_char(date_created_online, \'Dy, DD Mon YYYY HH:MI:SS TZ \') as date_created_online')
+            ->get()
+        ;
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('repositories')->with($data);
