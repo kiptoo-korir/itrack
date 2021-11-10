@@ -63,13 +63,21 @@
 
         function add_new_repos(item, index) {
             let repoRoute = "{{ route('view_specific_repository', '') }}" + `/${item.id}`;
+            const {
+                date_created_online: created,
+                date_updated_online: updated
+            } = item;
+
+            const createdDate = new Date(created);
+            const updatedDate = new Date(updated);
+
             let elementContent = `
                 <div class="card bg-card shadow h-100">
                     <div class="card-header">${item.name}</div>
                     <div class="card-body">
                         <p class="card-text">Description: ${item.description}</p>
-                        <p class="card-text">Created On: ${item.date_created_online}</p>
-                        <p class="card-text">Updated On: ${item.date_updated_online}</p>
+                        <p class="card-text">Created On: ${createdDate.toUTCString()}</p>
+                        <p class="card-text">Updated On: ${updatedDate.toUTCString()}</p>
                         <i class="bi bi-journal-x"></i><span> ${item.issues_count} Issues</span>
                     </div>
                     <div class="card-footer">
