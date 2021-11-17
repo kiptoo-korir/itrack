@@ -65,6 +65,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
+            <h4 class="text-black-50 mr-auto">Projects</h4>
             <button class="btn btn-outline-primary ml-auto" data-toggle="modal" id="project_btn"
                 data-target="#project_modal">Create New Project</button>
         </div>
