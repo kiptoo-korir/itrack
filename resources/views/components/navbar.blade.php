@@ -14,19 +14,24 @@
             <ul class="navbar-nav mr-auto">
                 @auth
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('home') }}">Projects</a>
+                        <a class="nav-link text-dark {{ request()->is('/') ? 'active-link' : '' }}"
+                            href="{{ route('home') }}">Projects</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('repositories') }}">Repositories</a>
+                        <a class="nav-link text-dark {{ request()->is('repositories') ? 'active-link' : '' }}"
+                            href="{{ route('repositories') }}">Repositories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('reminders_view') }}">Reminders</a>
+                        <a class="nav-link text-dark {{ request()->is('reminders') ? 'active-link' : '' }}"
+                            href="{{ route('reminders_view') }}">Reminders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('notes_view') }}">Notes</a>
+                        <a class="nav-link text-dark {{ request()->is('notes') ? 'active-link' : '' }}"
+                            href="{{ route('notes_view') }}">Notes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('task_view') }}">Task Lists</a>
+                        <a class="nav-link text-dark {{ request()->is('task') ? 'active-link' : '' }}"
+                            href="{{ route('task_view') }}">Task Lists</a>
                     </li>
                 @endauth
             </ul>
@@ -95,7 +100,7 @@
                         <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
-                                                                                                                                                                                                document.getElementById('logout-form').submit();">
+                                                                                                                                                                                                                    document.getElementById('logout-form').submit();">
                             {{ __('Logout') }}
                         </a>
 

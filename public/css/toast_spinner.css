@@ -177,3 +177,12 @@
     font-weight: 600;
     margin-left: 0.1rem;
 }
+
+.active-link {
+    color: #920594 !important;
+    font-weight: 600;
+}
+
+.navbar a.nav-link:hover {
+    color: #075db8 !important;
+}
