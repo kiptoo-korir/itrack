@@ -14,11 +14,11 @@
             <ul class="navbar-nav mr-auto">
                 @auth
                     <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('/') ? 'active-link' : '' }}"
+                        <a class="nav-link text-dark {{ request()->is('/') || request()->is('project*') ? 'active-link' : '' }}"
                             href="{{ route('home') }}">Projects</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('repositories') ? 'active-link' : '' }}"
+                        <a class="nav-link text-dark {{ request()->is('repositor*') ? 'active-link' : '' }}"
                             href="{{ route('repositories') }}">Repositories</a>
                     </li>
                     <li class="nav-item">
@@ -100,7 +100,7 @@
                         <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
-                                                                                                                                                                                                                    document.getElementById('logout-form').submit();">
+                                                                                                                                                                                                                                document.getElementById('logout-form').submit();">
                             {{ __('Logout') }}
                         </a>
 
