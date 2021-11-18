@@ -76,6 +76,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/project/{id}/linked_repositories', [ProjectsController::class, 'getLinkedRepositories'])->name('get_linked_repos_array');
     Route::get('/project/{id}/reminders', [ProjectsController::class, 'getLinkedReminders'])->name('get_linked_reminders');
     Route::post('/change_linked_repositories', [ProjectsController::class, 'changeLinkedRepositories'])->name('change_linked_repos');
+    Route::post('/update-project', [ProjectsController::class, 'updateProject'])->name('update-project');
+    Route::get('/edit-project/{id}', [ProjectsController::class, 'editProject'])->name('edit-project');
+    Route::post('/delete-project', [ProjectsController::class, 'remove_project'])->name('delete-project');
 });
 
 // Email Verification Routes
