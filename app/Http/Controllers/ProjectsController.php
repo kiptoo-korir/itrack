@@ -48,10 +48,12 @@ class ProjectsController extends Controller
     public function remove_project(Request $request)
     {
         $request->validate([
-            'project_id' => 'required',
+            'projectId' => 'required|exists:projects,id',
         ]);
 
-        if (DB::table('projects')->where('id', $request->project_id)->delete()) {
+        if (DB::table('projects')->where('id', $request->projectId)->delete()) {
+            DB::table('project_repository')->where('project_id', $request->projectId)->delete();
+
             return response()->json(['success' => 'Project has been removed successfully.'], 200);
         }
 
@@ -76,10 +78,7 @@ class ProjectsController extends Controller
 
     public function getLinkedRepositories($projectId)
     {
-        $linkedRepositories = DB::table('project_repository')
-            ->where('project_id', $projectId)
-            ->pluck('repository_id')
-        ;
+        $linkedRepositories = $this->fetchLinkedRepositories($projectId);
 
         return response()->json(['linkedRepos' => $linkedRepositories], 200);
     }
@@ -133,6 +132,59 @@ class ProjectsController extends Controller
             })
             ->rawColumns(['order_date', 'order_created'])
             ->make(true)
+        ;
+    }
+
+    public function editProject($projectId)
+    {
+        $project = Project::findOrFail($projectId);
+        $linkedRepositories = $this->fetchLinkedRepositories($projectId);
+
+        return response()->json(['project' => $project, 'linkedRepositories' => $linkedRepositories], 200);
+    }
+
+    public function updateProject(Request $request)
+    {
+        $request->validate([
+            'projectId' => 'required|integer|exists:projects,id',
+        ]);
+
+        $project = Project::findOrFail($request->projectId);
+        $project->name = $request->name;
+        $project->description = $request->description;
+
+        if ($project->save()) {
+            $repositoriesList = $request->repositories;
+
+            $repositoriesLinked = $this->fetchLinkedRepositories($request->projectId);
+
+            $newRepositories = array_diff($repositoriesList, $repositoriesLinked);
+            $repositoriesToUnlink = array_diff($repositoriesLinked, $repositoriesList);
+
+            $linkingService = new ProjectRepositoryLinkingService();
+            $linkingResult = $linkingService->linkNewRepositories($newRepositories, $request->projectId);
+            $unlinkingResult = $linkingService->unlinkRepositories($repositoriesToUnlink, $request->projectId);
+
+            if (!$linkingResult || !$unlinkingResult) {
+                return response()->json(['message' => 'Something seems to have gone wrong, please contact admin and try again.'], 400);
+            }
+
+            $linkedRepoNames = DB::table('repositories')
+                ->whereIn('id', $repositoriesList)
+                ->pluck('name')
+                ->toArray()
+            ;
+
+            return response()->json(['message' => 'Project updated successfully.', 'linkedRepoNames' => $linkedRepoNames], 200);
+        }
+    }
+
+    protected function fetchLinkedRepositories(int $projectId): array
+    {
+        return DB::table('project_repository')
+            ->where('project_id', $projectId)
+            ->pluck('repository_id')
+            ->toArray()
         ;
     }
 }
