@@ -89,10 +89,9 @@ class NotesController extends Controller
 
     public function notes_view()
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+        $userId = Auth::id();
         $data['projects'] = Project::select(['id', 'name'])
-            ->where('owner', $data['user_data']->id)->get();
+            ->where('owner', $userId)->get();
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('note')->with($data);

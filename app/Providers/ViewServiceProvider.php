@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Views\Composers\GitTokenComposer;
+use App\Views\Composers\UserDataComposer;
 use Illuminate\Support\ServiceProvider;
 
 class ViewServiceProvider extends ServiceProvider
@@ -21,5 +22,6 @@ class ViewServiceProvider extends ServiceProvider
     {
         $gitTokenComposerViews = ['home', 'profile', 'reminder', 'project', 'note', 'task', 'repositories', 'specific_repository'];
         view()->composer($gitTokenComposerViews, GitTokenComposer::class);
+        view()->composer($gitTokenComposerViews, UserDataComposer::class);
     }
 }

@@ -62,8 +62,7 @@ class ProjectsController extends Controller
 
     public function specificProject($projectId)
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+        $userId = Auth::id();
         $data['projectInfo'] = Project::findOrFail($projectId);
         $data['notification_count'] = UserDataService::fetch_notifications_count();
         $data['notes'] = Note::where('project', $projectId)->get();
@@ -71,7 +70,7 @@ class ProjectsController extends Controller
         $data['repositories'] = DB::table('repositories', 'repos')
             ->leftJoin('platforms as ptf', 'repos.platform', '=', 'ptf.id')
             ->select(['repos.id', 'repos.name', 'ptf.name as platform'])
-            ->where('owner', $data['user_data']->id)->get();
+            ->where('owner', $userId)->get();
 
         return view('project')->with($data);
     }

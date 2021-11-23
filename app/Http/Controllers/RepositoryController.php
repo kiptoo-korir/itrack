@@ -16,12 +16,9 @@ class RepositoryController extends Controller
 {
     public function repositories_view()
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+        $userId = Auth::id();
 
-        $user_id = Auth::id();
-        // TODO: Validate whether token is valid before dispatching job
-        FetchRepositories::dispatch($user_id);
+        FetchRepositories::dispatch($userId);
         $data['repositories'] = Repository::select(['id', 'name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])
             ->selectRaw('to_char(date_updated_online, \'Dy Mon DD YYYY\') as date_updated_online, to_char(date_created_online, \'Dy Mon DD YYYY\') as date_created_online')
             ->get()
@@ -33,8 +30,6 @@ class RepositoryController extends Controller
 
     public function specific_repository($id)
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['repository'] = Repository::findOrFail($id);
         $data['notification_count'] = UserDataService::fetch_notifications_count();
         $data['languages'] = RepositoryLanguage::where('repository_id', $id)
@@ -44,7 +39,7 @@ class RepositoryController extends Controller
 
         $repositoryFullname = $data['repository']->fullname;
         $repoId = $data['repository']->id;
-        $userId = $data['user_data']->id;
+        $userId = Auth::id();
 
         FetchLanguagesInRepoQueue::dispatch($repositoryFullname, $userId, $repoId)
             // ->delay(now()->addSeconds(5))

@@ -12,8 +12,6 @@ class TaskController extends Controller
 {
     public function task_view()
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('task')->with($data);

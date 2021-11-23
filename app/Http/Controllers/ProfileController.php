@@ -19,8 +19,6 @@ class ProfileController extends Controller
 {
     public function profile()
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
         $data['platforms'] = Platform::all();
         $data['notification_count'] = UserDataService::fetch_notifications_count();
 

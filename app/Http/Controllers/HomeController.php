@@ -24,12 +24,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $data['user_data'] = Auth::user();
-        $data['user_data']->first_letter = substr($data['user_data']->name, 0, 1);
+        $userId = Auth::id();
+
         $data['repositories'] = DB::table('repositories', 'repos')
             ->leftJoin('platforms as ptf', 'repos.platform', '=', 'ptf.id')
             ->select(['repos.id', 'repos.name', 'ptf.name as platform'])
-            ->where('owner', $data['user_data']->id)->get();
+            ->where('owner', $userId)->get();
         $projects = collect(DB::select(DB::raw('
             with project_info AS
             (SELECT proj.*, repos.name as repository_name
@@ -48,7 +48,7 @@ class HomeController extends Controller
             ) repo_info)
             FROM project_info a
         '), [
-            'id' => $data['user_data']->id,
+            'id' => $userId,
         ]));
         $projectsProcessed = $projects->map(function ($project) {
             $project->repositories = json_decode($project->repositories);
