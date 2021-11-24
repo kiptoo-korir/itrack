@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Services\UserDataService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -56,7 +55,6 @@ class HomeController extends Controller
             return $project;
         });
         $data['projects'] = $projectsProcessed;
-        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('home')->with($data);
     }

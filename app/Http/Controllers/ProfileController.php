@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AccessToken;
 use App\Models\Platform;
-use App\Services\UserDataService;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +19,6 @@ class ProfileController extends Controller
     public function profile()
     {
         $data['platforms'] = Platform::all();
-        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('profile')->with($data);
     }

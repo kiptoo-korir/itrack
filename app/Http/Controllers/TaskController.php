@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -12,9 +11,7 @@ class TaskController extends Controller
 {
     public function task_view()
     {
-        $data['notification_count'] = UserDataService::fetch_notifications_count();
-
-        return view('task')->with($data);
+        return view('task');
     }
 
     public function create_task(Request $request)

@@ -21,9 +21,11 @@ class UserDataComposer
         $userData = Auth::user();
         $firstLetter = substr($userData->name, 0, 1);
         $userData->first_letter = $firstLetter;
+        $notificationCount = $this->userDataService->fetch_notifications_count();
 
         $view->with([
             'user_data' => $userData,
+            'notification_count' => $notificationCount,
         ]);
     }
 }

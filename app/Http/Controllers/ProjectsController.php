@@ -6,7 +6,6 @@ use App\Models\Note;
 use App\Models\Project;
 use App\Models\Reminder;
 use App\Services\ProjectRepositoryLinkingService;
-use App\Services\UserDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +63,6 @@ class ProjectsController extends Controller
     {
         $userId = Auth::id();
         $data['projectInfo'] = Project::findOrFail($projectId);
-        $data['notification_count'] = UserDataService::fetch_notifications_count();
         $data['notes'] = Note::where('project', $projectId)->get();
         $data['reminder'] = Reminder::where('project', $projectId)->get();
         $data['repositories'] = DB::table('repositories', 'repos')

@@ -8,7 +8,6 @@ use App\Jobs\FetchRepositories;
 use App\Models\Issue;
 use App\Models\Repository;
 use App\Models\RepositoryLanguage;
-use App\Services\UserDataService;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -23,7 +22,6 @@ class RepositoryController extends Controller
             ->selectRaw('to_char(date_updated_online, \'Dy Mon DD YYYY\') as date_updated_online, to_char(date_created_online, \'Dy Mon DD YYYY\') as date_created_online')
             ->get()
         ;
-        $data['notification_count'] = UserDataService::fetch_notifications_count();
 
         return view('repositories')->with($data);
     }
@@ -31,7 +29,6 @@ class RepositoryController extends Controller
     public function specific_repository($id)
     {
         $data['repository'] = Repository::findOrFail($id);
-        $data['notification_count'] = UserDataService::fetch_notifications_count();
         $data['languages'] = RepositoryLanguage::where('repository_id', $id)
             ->pluck('value', 'name')
         ;
@@ -42,7 +39,6 @@ class RepositoryController extends Controller
         $userId = Auth::id();
 
         FetchLanguagesInRepoQueue::dispatch($repositoryFullname, $userId, $repoId)
-            // ->delay(now()->addSeconds(5))
         ;
         FetchIssuesInRepoQueue::dispatch($repoId, $repositoryFullname, $userId);
 
