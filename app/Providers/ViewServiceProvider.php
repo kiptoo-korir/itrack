@@ -20,7 +20,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $gitTokenComposerViews = ['home', 'profile', 'reminder', 'project', 'note', 'task', 'repositories', 'specific_repository'];
+        $gitTokenComposerViews = ['home', 'profile', 'reminder', 'project', 'note', 'task', 'repositories', 'specific_repository', 'all-notifications'];
         view()->composer($gitTokenComposerViews, GitTokenComposer::class);
         view()->composer($gitTokenComposerViews, UserDataComposer::class);
     }
