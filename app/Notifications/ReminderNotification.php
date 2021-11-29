@@ -2,11 +2,11 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
+use App\Mail\ReminderMail;
+use App\Services\NotificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ReminderNotification extends Notification implements ShouldBroadcast
@@ -34,7 +34,7 @@ class ReminderNotification extends Notification implements ShouldBroadcast
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast', 'mail'];
     }
 
     /**
@@ -46,10 +46,8 @@ class ReminderNotification extends Notification implements ShouldBroadcast
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage())
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!')
+        return (new ReminderMail($this->reminder))
+            ->to($notifiable->email)
         ;
     }
 
@@ -67,20 +65,23 @@ class ReminderNotification extends Notification implements ShouldBroadcast
             'notification_message' => $this->reminder->message,
             'notification_title' => $this->reminder->title,
             'notification_type' => 'reminder',
+            'action_link' => "{{ route('view_specific_project', {$this->reminder->project_id})}}",
         ];
     }
 
     public function toBroadcast($notifiable): BroadcastMessage
     {
-        $count = User::findOrFail($this->reminder->owner)->unreadNotifications->where('type', '=', 'App\Notifications\ReminderNotification')->count();
+        $notificationService = new NotificationService();
+        $count = $notificationService->getNotificationCount($notifiable->id);
 
         return new BroadcastMessage([
-            'reminder_id' => $this->reminder->id,
+            'reminder_id' => $this->reminder->reminder_id,
             'notifications_count' => $count,
             'notification_title' => $this->reminder->title,
             'notification_message' => $this->reminder->message,
             'id' => $this->id,
             'notification_type' => 'reminder',
+            'action_link' => "{{ route('view_specific_project', {$this->reminder->project_id})}}",
         ]);
     }
 }

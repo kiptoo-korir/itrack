@@ -2,13 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Mail\ReminderMail;
+use App\Models\User;
+use App\Notifications\ReminderNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 
 class ReminderNotificationQueue implements ShouldQueue
 {
@@ -35,7 +35,8 @@ class ReminderNotificationQueue implements ShouldQueue
     public function handle()
     {
         foreach ($this->reminders as $reminder) {
-            Mail::to($reminder->email)->send(new ReminderMail($reminder));
+            $user = User::findOrFail($reminder->user_id);
+            $user->notify(new ReminderNotification($reminder));
         }
     }
 }

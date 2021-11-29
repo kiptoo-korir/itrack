@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Jobs\ReminderNotificationQueue;
-use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ReminderCommand extends Command
 {
@@ -39,9 +39,9 @@ class ReminderCommand extends Command
     {
         $now = now()->setSeconds(0)->setMicroseconds(0);
 
-        $reminders = User::rightJoin('reminders as r', 'users.id', '=', 'r.owner')
+        $reminders = DB::table('users')->rightJoin('reminders as r', 'users.id', '=', 'r.owner')
             ->leftJoin('projects as p', 'r.project', '=', 'p.id')
-            ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'p.id as project_id', 'p.name as project_name')
+            ->select('users.name', 'users.id as user_id', 'users.email', 'r.id as reminder_id', 'r.title', 'r.message', 'p.id as project_id', 'p.name as project_name')
             ->selectRaw('to_char(r.due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
             ->where('r.due_date', '=', $now)
             ->whereNull('r.deleted_at')
