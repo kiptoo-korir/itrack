@@ -73,7 +73,7 @@
                         </div>
                         <div id="no_notifications" aria-hidden="true" class="dropdown-item text-center py-1">No new
                             notifications</div>
-                        <a id="view_all" href="" class="dropdown-item text-center py-1"
+                        <a id="view_all" href="{{ route('notifications-view') }}" class="dropdown-item text-center py-1"
                             style="color: #075db8; font-size: 0.875rem">View
                             all</a>
                     </div>
@@ -100,7 +100,7 @@
                         <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
-                                                                                                                                                                                                                                document.getElementById('logout-form').submit();">
+                                                                                                                                                                                                                                    document.getElementById('logout-form').submit();">
                             {{ __('Logout') }}
                         </a>
 
