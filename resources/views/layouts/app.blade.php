@@ -47,15 +47,19 @@
             width: 40px;
         }
 
+        #app {
+            min-height: 100vh;
+        }
+
     </style>
     @yield('css_scripts')
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" class="bg-light">
         @include('components.navbar')
 
-        <main class="py-4 bg-light">
+        <main class="py-4">
             @includeWhen(!$isTokenValid, 'components.no-token-cta')
             @include('components.spinner')
             @yield('content')
