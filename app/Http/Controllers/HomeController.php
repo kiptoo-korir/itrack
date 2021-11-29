@@ -39,16 +39,18 @@ class HomeController extends Controller
             )
 
             SELECT distinct id, name, description,
-            to_char(created_at, \'Dy, DD Mon YYYY\') as created_at, 
+            to_char(created_at, \'Dy DD Mon YYYY\') as created_at, created_at as created_at_original,
             (SELECT jsonb_agg (repo_info) as repositories FROM 
             (
             SELECT repository_name FROM project_info b
             WHERE a.id = b.id
             ) repo_info)
             FROM project_info a
+            ORDER BY created_at_original DESC
         '), [
             'id' => $userId,
         ]));
+
         $projectsProcessed = $projects->map(function ($project) {
             $project->repositories = json_decode($project->repositories);
 
