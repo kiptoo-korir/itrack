@@ -8,6 +8,9 @@ use App\Models\Note;
 use App\Models\Repository;
 use App\Models\RepositoryLanguage;
 use App\Models\User;
+use App\Notifications\InvalidTokenNotification;
+use App\Services\ApiCallsService;
+use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Faker;
 use Illuminate\Support\Facades\Auth;
@@ -19,10 +22,12 @@ class TestingController extends Controller
 {
     protected $client;
     protected $tok_service;
+    protected $invalidTokenService;
 
-    public function __construct(TokenService $tokenService)
+    public function __construct(TokenService $tokenService, InvalidTokenService $invalidTokenService)
     {
         $this->tok_service = $tokenService;
+        $this->invalidTokenService = $invalidTokenService;
         // $this->client = $this->tok_service->client();
     }
 
@@ -38,11 +43,27 @@ class TestingController extends Controller
         // $response = Http::withToken('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')
         // ->get('https://api.github.com/user?perpage=1')
         // dd(strtotime('2020-09-16T07:01:51Z'), strtotime('2020-09-16 10:01:51+03'), strtotime('2020-09-16 07:01:51'));
-        $response = $this->tok_service->client()
-            ->get('https://api.github.com/user/repos?sort=created')
-        ;
-        $repos = json_decode($response);
-        dd($response);
+
+        // https://api.github.com/user/repos?sort=created&page=1&per_page=2
+        // https://api.github.com/user/repos?sort=created&page=2&per_page=2
+        // https://api.github.com/user/repos?sort=created&page=3&per_page=2
+        // $response = $this->tok_service->client(4)
+        //     ->get('https://api.github.com/user/repos?sort=created&page=7&per_page=2')
+        // ;
+        // $repos = json_decode($response);
+        // $linkHeader = $response->headers()['Link'];
+
+        $user = User::findOrFail(4);
+        $user->notify(new InvalidTokenNotification());
+        dd('Yes');
+        $apiService = new ApiCallsService($this->tok_service, $this->invalidTokenService);
+
+        $repos = $apiService->githubCallsHandler('https://api.github.com/repos/kiptoo-korir/laravel_sms_tryout/languages', 4);
+
+        dd($repos);
+
+        $arr = $this->recursivePaginatorHandler('https://api.github.com/user/repos?sort=created&page=1&per_page=2', 4);
+        dd($arr);
 
         $bulk_insert = [];
         $bulk_update = [];
@@ -197,5 +218,68 @@ class TestingController extends Controller
         $langsAlreadyExisting = array_intersect_key($newarr, $arr);
         $editedLanguages = array_diff($langsAlreadyExisting, $arr);
         dd($langsAlreadyExisting, $editedLanguages);
+    }
+
+    public function parseLinkHeader(string $header): array
+    {
+        if (0 == strlen($header)) {
+            throw new \Exception('input must not be of zero length');
+        }
+
+        $parts = explode(',', $header);
+        $links = [];
+
+        foreach ($parts as $p) {
+            $section = explode(';', $p);
+
+            if (2 != count($section)) {
+                throw new \Exception("section could not be split on ';'");
+            }
+            $url = trim(preg_replace('/<(.*)>/', '$1', $section[0]));
+            $name = trim(preg_replace('/rel="(.*)"/', '$1', $section[1]));
+            $links[$name] = $url;
+        }
+
+        return $links;
+    }
+
+    public function recursivePaginatorHandler(string $url, int $userId): array
+    {
+        $response = $this->tok_service->client($userId)
+            ->get($url)
+        ;
+
+        $repos = json_decode($response);
+
+        $linkHeader = $response->headers()['Link'] ?? null;
+
+        $linksArray = ($linkHeader[0]) ? $this->parseLinkHeader($linkHeader[0]) : [];
+        if (isset($linkHeader[0]) && !isset($linksArray['next']) && !isset($linksArray['last'])) {
+            return $repos;
+        }
+
+        $moreRepos = $this->recursivePaginatorHandler($linksArray['next'], $userId);
+
+        return array_merge($repos, $moreRepos);
+    }
+
+    public function printer(array $arr)
+    {
+        dd($arr);
+    }
+
+    public function showEmailView()
+    {
+        $reminder = User::rightJoin('reminders as r', 'users.id', '=', 'r.owner')
+            ->leftJoin('projects as p', 'r.project', '=', 'p.id')
+            ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'p.id as project_id', 'p.name as project_name')
+            ->selectRaw('to_char(r.due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
+            // ->where('r.due_date', '=', $now)
+            ->whereNull('r.deleted_at')
+            ->first()
+        ;
+        // dd($reminder);
+
+        return new App\Mail\ReminderMail($reminder);
     }
 }
