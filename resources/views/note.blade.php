@@ -334,32 +334,32 @@
         }
 
         function appendNotes(item, index) {
-            var el_class = (item.repo_name) ? "show" : "hide";
-            var element = `
-            <div class="card shadow note" id="note-${item.id}">
-                <div onclick="showEditModal(${item.id})" class="content">
-                    <div class="note-header">
-                        ${item.title}
+            const el_class = (item.repo_name) ? "show" : "hide";
+            const element = `
+                <div class="card shadow note" id="note-${item.id}">
+                    <div onclick="showEditModal(${item.id})" class="content">
+                        <div class="note-header">
+                            ${item.title}
+                        </div>
+                        <div class="note-text">
+                            ${item.message}
+                        </div>
+                        <div class="text-right">
+                            <span class="badge badge-info ${el_class}" style="font-size: 85%" id="badge_repo_${item.id}">
+                                ${item.repo_name}</span>
+                        </div>
                     </div>
-                    <div class="note-text">
-                        ${item.message}
-                    </div>
-                    <div class="text-right">
-                        <span class="badge badge-info ${el_class}" style="font-size: 85%" id="badge_repo_${item.id}">
-                            ${item.repo_name}</span>
+                    <div class="dropdown dropleft">
+                        <span class="float-right" id="dropdown-${item.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </span>
+                        <div class="dropdown-menu" aria-labelledby="dropdown-${item.id}">
+                            <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-id="${item.id}" data-target="#removeModal">Delete</a>
+                        </div>
                     </div>
                 </div>
-                <div class="dropdown dropleft">
-                    <span class="float-right" id="dropdown-${item.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </span>
-                    <div class="dropdown-menu" aria-labelledby="dropdown-${item.id}">
-                        <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-id="${item.id}" data-target="#removeModal">Delete</a>
-                    </div>
-                </div>
-            </div>
-        `;
-            $('.card-columns').append(element);
+            `;
+            $('#card-container').append(element);
         }
 
         $(document).ready(function() {
