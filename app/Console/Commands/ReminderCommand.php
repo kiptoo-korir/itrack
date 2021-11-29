@@ -38,11 +38,13 @@ class ReminderCommand extends Command
     public function handle()
     {
         $now = now()->setSeconds(0)->setMicroseconds(0);
+
         $reminders = User::rightJoin('reminders as r', 'users.id', '=', 'r.owner')
-            ->leftJoin('repositories as repo', 'r.repository', '=', 'repo.id')
-            ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'repo.id as repo_id', 'repo.fullname')
+            ->leftJoin('projects as p', 'r.project', '=', 'p.id')
+            ->select('users.name', 'users.id', 'users.email', 'r.title', 'r.message', 'p.id as project_id', 'p.name as project_name')
             ->selectRaw('to_char(r.due_date, \'Dy DD Mon, YYYY at HH:MI AM \') as due_date')
             ->where('r.due_date', '=', $now)
+            ->whereNull('r.deleted_at')
             ->get()
         ;
 

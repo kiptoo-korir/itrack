@@ -2,23 +2,22 @@
 
 {{-- Greeting --}}
 # Hello, {{$reminder->name}}
-You set a reminder to check on:
+You set a reminder on the project <b>{{$reminder->project_name}}</b> to check on:
 <br>
 <h2>{{$reminder->title}}</h2>
-{{$reminder->message}}
-<br>
+<p>{{$reminder->message}}</p>
 
 @component('mail::panel')
-Reminder was set for {{$reminder->due_date}}
+<p>Reminder was set for {{$reminder->due_date}}</p>
 @endcomponent
 
-@isset($reminder->repo_id)
-@component('mail::button', ['url' => route('view_specific_repository', $reminder->repo_id)])
-Go To Itrack
+@isset($reminder->project_id)
+@component('mail::button', ['url' => route('view_specific_project', $reminder->project_id)])
+View Project On iTrack
 @endcomponent
-@component('mail::button', ['url' => 'https://github.com/' . $reminder->fullname])
+{{-- @component('mail::button', ['url' => 'https://github.com/' . $reminder->fullname])
 Access Repository On Github
-@endcomponent
+@endcomponent --}}
 @endisset
 
 @lang('Regards'),<br>
