@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IssuesController;
 use App\Http\Controllers\NotesController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\RemindersController;
@@ -32,6 +33,7 @@ Route::get('/test', [TestingController::class, 'test']);
 Route::get('/test_2', [TestingController::class, 'test_2']);
 Route::get('/test_3', [TestingController::class, 'fake_data']);
 Route::get('/test_notify', [TestingController::class, 'notify']);
+Route::get('/sample_reminder_mail', [TestingController::class, 'showEmailView']);
 Route::get('/github_callback', [ProfileController::class, 'callback']);
 
 // Only Authorised and Verified users
@@ -79,6 +81,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/update-project', [ProjectsController::class, 'updateProject'])->name('update-project');
     Route::get('/edit-project/{id}', [ProjectsController::class, 'editProject'])->name('edit-project');
     Route::post('/delete-project', [ProjectsController::class, 'remove_project'])->name('delete-project');
+    Route::get('/all-notifications', [NotificationsController::class, 'notificationsView'])->name('notifications-view');
+    Route::get('/notifications/{page}', [NotificationsController::class, 'getAllNotifications'])->name('get-notifications');
 });
 
 // Email Verification Routes
