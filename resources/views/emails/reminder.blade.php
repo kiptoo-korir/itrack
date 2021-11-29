@@ -15,9 +15,6 @@ You set a reminder on the project <b>{{$reminder->project_name}}</b> to check on
 @component('mail::button', ['url' => route('view_specific_project', $reminder->project_id)])
 View Project On iTrack
 @endcomponent
-{{-- @component('mail::button', ['url' => 'https://github.com/' . $reminder->fullname])
-Access Repository On Github
-@endcomponent --}}
 @endisset
 
 @lang('Regards'),<br>
