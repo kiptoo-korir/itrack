@@ -196,6 +196,8 @@
                 <div class="modal-body">
                     <span id="form_result_delete"></span>
                     <p id="delete_title">Are you sure you want to remove this project?</p>
+                    <p class="text-smaller text-navy">All the resources assosciated with the project will be removed as
+                        well, this includes notes and reminders.</p>
                 </div>
                 <div class="modal-footer">
                     <form class="" id="remove_form" action="" method="post">
@@ -292,7 +294,8 @@
                 },
                 dataType: "json",
                 success: function(data) {
-                    var project = data.project;
+                    let project = data.project;
+                    project.linkedRepoNames = data.linkedRepositories;
                     add_project_cards(project, null);
                     feedback(data.success, 'success');
                 },
@@ -328,7 +331,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(postData)
-                })
+                });
 
                 const responseBody = await response.json();
                 const status = response.status;
@@ -349,9 +352,10 @@
                     const {
                         linkedRepoNames
                     } = responseBody;
+                    const linkedRepoLength = linkedRepoNames.length;
 
-                    for (let count = 0; count < linkedRepoNames.length; count++) {
-                        const repoName = linkedRepoNames[count];
+                    for (let count = 0; count < linkedRepoLength; count++) {
+                        let repoName = linkedRepoNames[count];
 
                         let element = `
                             <span class="badge badge-info repo-badge-text">
@@ -384,19 +388,57 @@
         }
 
         function add_project_cards(item, index) {
-            var description_class = (item.description) ? 'show' : 'hide';
-            var element = `
-            <div class="col mb-3">
-                <div class="card bg-card h-100">
-                    <div class="card-header">${item.name}</div>
-                    <div class="card-body">
-                        <p class="card-text ${description_class}">Description: ${item.description}</p>
-                        <p class="card-text">Created On: ${item.date_created_online}</p>
-                        <p class="card-text">Updated On: ${item.date_updated_online}</p>
+            const {
+                linkedRepoNames,
+                created_at: createdAt
+            } = item;
+
+            const createdAtDate = new Date(createdAt);
+            const linkedRepoLength = linkedRepoNames.length;
+
+            let repoBadges = '';
+
+            for (let count = 0; count < linkedRepoLength; count++) {
+                let repoName = linkedRepoNames[count];
+
+                repoBadges += `
+                    <span class="badge badge-info repo-badge-text">
+                        ${repoName}
+                    </span>
+                `;
+            }
+
+            const viewProjectRoute = `{{ route('view_specific_project', '') }}/${item.id}`;
+
+            const element = `
+                <div class="col" id="project-${item.id}">
+                    <div class="card m-3">
+                        <div class="content">
+                            <div class="note-header" id="project-title-${item.id}">
+                                ${item.name}
+                            </div>
+                            <div class="note-text">
+                                <span class="text-smaller text-navy">Description</span>
+                                <p id="project-description-${item.id}">${item.description}</p>
+                                <span class="text-smaller text-navy">Created on ${createdAtDate.toDateString()}</span>
+                            </div>
+                            <div class="text-right" id="project-repositories-${item.id}">
+                                ${repoBadges}
+                            </div>
+                            <div class="pt-2 mb-2 text-right">
+                                <button class="btn btn-sm btn-outline-danger"
+                                    onclick="deleteProject(${item.id})">Delete</button>
+                                <button class="btn btn-sm btn-outline-edit"
+                                    onclick="editProject(${item.id})">Edit</button>
+                                <a class="btn btn-sm btn-outline-dark"
+                                    href="${viewProjectRoute}">View
+                                    Project</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>`;
-            $('#projects_container').append(element);
+            `;
+            $('#projects_container').prepend(element);
         }
 
         function searchProjects() {
