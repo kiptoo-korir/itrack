@@ -70,6 +70,27 @@
             width: 100% !important;
         }
 
+        .bg-card {
+            transition: 0.3s;
+        }
+
+        .bg-card:hover {
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .card-footer-custom {
+            padding: 0.75rem 1.25rem;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .card-footer-custom:last-child {
+            border-radius: 0 0 calc(0.25rem - 1px) calc(0.25rem - 1px);
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+        }
+
     </style>
     <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
@@ -77,6 +98,7 @@
 
 @section('content')
     <div class="container">
+        <h4 class="text-navy mr-auto pb-3">{{ $projectInfo->name }}</h4>
         <ul class="nav nav-pills mb-3 nav-fill project-tab-list" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link project-tab active" id="pills-repositories-tab" data-toggle="pill"
@@ -118,7 +140,7 @@
                     <input type="text" class="form-control" id="search" placeholder="Search for note..."
                         onkeyup="searchNotes()">
                 </div>
-                <div class="card-columns mt-3" id="card-container">
+                <div class="card-columns mt-3" id="notes-container">
                 </div>
             </div>
             {{-- Reminders Tab Pane --}}
@@ -563,7 +585,7 @@
             });
         });
 
-        function showEditModal(id) {
+        function showEditNoteModal(id) {
             $.ajax({
                 url: "{{ route('get_note') }}",
                 data: {
@@ -600,32 +622,32 @@
         }
 
         function appendNotes(item, index) {
-            var element = `
-            <div class="card shadow note" id="note-${item.id}">
-                <div onclick="showEditModal(${item.id})" class="content">
-                    <div class="note-header">
-                        ${item.title}
+            const element = `
+                <div class="card shadow note" id="note-${item.id}">
+                    <div onclick="showEditNoteModal(${item.id})" class="content">
+                        <div class="note-header">
+                            ${item.title}
+                        </div>
+                        <div class="note-text">
+                            ${item.message}
+                        </div>
                     </div>
-                    <div class="note-text">
-                        ${item.message}
+                    <div class="dropdown dropleft">
+                        <span class="float-right" id="dropdown-${item.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </span>
+                        <div class="dropdown-menu" aria-labelledby="dropdown-${item.id}">
+                            <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-id="${item.id}" data-target="#removeModal">Delete</a>
+                        </div>
                     </div>
                 </div>
-                <div class="dropdown dropleft">
-                    <span class="float-right" id="dropdown-${item.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </span>
-                    <div class="dropdown-menu" aria-labelledby="dropdown-${item.id}">
-                        <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-id="${item.id}" data-target="#removeModal">Delete</a>
-                    </div>
-                </div>
-            </div>
-        `;
-            $('.card-columns').append(element);
+            `;
+            $('#notes-container').append(element);
         }
 
         function searchNotes() {
             var text = $('#search').val().toUpperCase();
-            var notes = document.getElementById('card-container').children;
+            var notes = document.getElementById('notes-container').children;
 
             for (i = 0; i < notes.length; i++) {
                 var content = notes[i].children[0];
@@ -652,7 +674,7 @@
                 dataType: "json",
                 success: function(data) {
                     document.getElementById('repo_container').innerHTML = '';
-                    var repositories = data.repositories;
+                    const repositories = data.repositories;
                     repositories.forEach(appendRepos);
                 },
             });
@@ -660,19 +682,26 @@
 
         function appendRepos(item, index) {
             const repoRoute = "{{ route('view_specific_repository', '') }}" + `/${item.id}`;
+            const {
+                date_created_online,
+                date_updated_online
+            } = item;
+            const createdDate = new Date(date_created_online);
+            const updatedDate = new Date(date_updated_online);
             let elementContent = `
                 <div class="card bg-card shadow h-100">
-                    <div class="card-header">${item.name}</div>
                     <div class="card-body">
-                        <p class="card-text">Description: ${item.description}</p>
-                        <p class="card-text">Created On: ${item.date_created_online}</p>
-                        <p class="card-text">Updated On: ${item.date_updated_online}</p>
+                        <h5><b>${item.name}</b></h5>
+                        <p>${item.description}</p>
+                        <p class="card-text">Created ${createdDate.toDateString()}</p>
+                        <p class="card-text">Updated ${updatedDate.toDateString()}</p>
                         <i class="bi bi-journal-x"></i><span> ${item.issues_count} Issues</span>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer-custom">
                         <a class="btn btn-primary btn-sm" href="${repoRoute}">Open</a>
                     </div>
-                </div>`;
+                </div>                    
+            `;
             let newElement = document.createElement('div');
             newElement.classList.add('col', 'mb-3');
             newElement.innerHTML = elementContent;
@@ -775,7 +804,7 @@
                     {
                         targets: 4,
                         render: function(data, type, row) {
-                            return `<button type = "button" name="remove" onclick="showEditModal(${data})" class="delete btn btn-info btn-sm mb-1">Edit</button> | 
+                            return `<button type = "button" name="remove" onclick="showEditReminderModal(${data})" class="delete btn btn-info btn-sm mb-1">Edit</button> | 
                         <button type = "button" name="remove" data-toggle="modal" data-target="#remove-reminder-modal" data-id="${data}" class="delete btn btn-danger btn-sm mb-1">Delete</button>
                         `
                         }
@@ -812,7 +841,7 @@
             });
         });
 
-        function showEditModal(id) {
+        function showEditReminderModal(id) {
             $.ajax({
                 url: "{{ route('get_reminder') }}",
                 data: {

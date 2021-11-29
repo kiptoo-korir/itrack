@@ -36,9 +36,12 @@ class ProjectsController extends Controller
                     'owner' => $user_id,
                 ]);
             }
+
             DB::table('project_repository')->insert($insert_arr);
 
-            return response()->json(['success' => 'Project created successfully.', 'project' => $project], 200);
+            $linkedRepositories = $this->fetchLinkedRepositoriesNames($repos);
+
+            return response()->json(['success' => 'Project created successfully.', 'project' => $project, 'linkedRepositories' => $linkedRepositories], 200);
         }
 
         return response()->json(['error' => 'An error seems to have occurred, please try again.'], 400);
@@ -52,6 +55,8 @@ class ProjectsController extends Controller
 
         if (DB::table('projects')->where('id', $request->projectId)->delete()) {
             DB::table('project_repository')->where('project_id', $request->projectId)->delete();
+            DB::table('notes')->where('project', $request->projectId)->delete();
+            DB::table('reminders')->where('project', $request->projectId)->delete();
 
             return response()->json(['success' => 'Project has been removed successfully.'], 200);
         }
@@ -166,11 +171,7 @@ class ProjectsController extends Controller
                 return response()->json(['message' => 'Something seems to have gone wrong, please contact admin and try again.'], 400);
             }
 
-            $linkedRepoNames = DB::table('repositories')
-                ->whereIn('id', $repositoriesList)
-                ->pluck('name')
-                ->toArray()
-            ;
+            $linkedRepoNames = $this->fetchLinkedRepositoriesNames($repositoriesList);
 
             return response()->json(['message' => 'Project updated successfully.', 'linkedRepoNames' => $linkedRepoNames], 200);
         }
@@ -181,6 +182,15 @@ class ProjectsController extends Controller
         return DB::table('project_repository')
             ->where('project_id', $projectId)
             ->pluck('repository_id')
+            ->toArray()
+        ;
+    }
+
+    protected function fetchLinkedRepositoriesNames(array $repositoryIds): array
+    {
+        return $linkedRepoNames = DB::table('repositories')
+            ->whereIn('id', $repositoryIds)
+            ->pluck('name')
             ->toArray()
         ;
     }
