@@ -48,7 +48,7 @@
                         </div>
                         <div class="card-footer-custom">
                             <a class="btn btn-primary btn-sm"
-                                href="{{ route('view_specific_repository', $repo->id) }}">Open</a>
+                                href="{{ route('view_specific_repository', $repo->id) }}">View</a>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                         <i class="bi bi-journal-x"></i><span> ${item.issues_count} Issues</span>
                     </div>
                     <div class="card-footer-custom">
-                        <a class="btn btn-primary btn-sm" href="${repoRoute}">Open</a>
+                        <a class="btn btn-primary btn-sm" href="${repoRoute}">View</a>
                     </div>
                 </div>`;
             let newElement = document.createElement('div');
