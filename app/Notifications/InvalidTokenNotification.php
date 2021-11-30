@@ -54,12 +54,12 @@ class InvalidTokenNotification extends Notification implements ShouldBroadcast
         $count = $notificationService->getNotificationCount($notifiable->id);
 
         return new BroadcastMessage([
-            'notifications_count' => $count,
+            'notificationsCount' => $count,
             'id' => $this->id,
-            'notification_message' => 'You currently don\'t have a valid token to facilitate access to Github, you can generate a new one from the profile tab or through this',
-            'notification_title' => 'Invalid Github Token',
-            'notification_type' => 'Github Token Status',
-            'action_link' => "https://github.com/login/oauth/authorize?client_id={$this->clientId}&scope=repo%20notifications%20user",
+            'notificationMessage' => 'You currently don\'t have a valid token to facilitate access to Github, you can generate a new one from the profile tab or through this',
+            'notificationTitle' => 'Invalid Github Token',
+            'notificationType' => 'Github Token Status',
+            'actionLink' => "https://github.com/login/oauth/authorize?client_id={$this->clientId}&scope=repo%20notifications%20user",
         ]);
     }
 }

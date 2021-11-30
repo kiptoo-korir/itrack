@@ -65,7 +65,6 @@ class ReminderNotification extends Notification implements ShouldBroadcast
             'notification_message' => $this->reminder->message,
             'notification_title' => $this->reminder->title,
             'notification_type' => 'reminder',
-            'action_link' => "{{ route('view_specific_project', {$this->reminder->project_id})}}",
         ];
     }
 
@@ -75,13 +74,12 @@ class ReminderNotification extends Notification implements ShouldBroadcast
         $count = $notificationService->getNotificationCount($notifiable->id);
 
         return new BroadcastMessage([
-            'reminder_id' => $this->reminder->reminder_id,
-            'notifications_count' => $count,
-            'notification_title' => $this->reminder->title,
-            'notification_message' => $this->reminder->message,
+            'reminderId' => $this->reminder->reminder_id,
+            'notificationsCount' => $count,
+            'notificationTitle' => $this->reminder->title,
+            'notificationMessage' => $this->reminder->message,
             'id' => $this->id,
-            'notification_type' => 'reminder',
-            'action_link' => "{{ route('view_specific_project', {$this->reminder->project_id})}}",
+            'notificationType' => 'reminder',
         ]);
     }
 }
