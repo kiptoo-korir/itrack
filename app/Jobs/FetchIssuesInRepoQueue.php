@@ -41,7 +41,7 @@ class FetchIssuesInRepoQueue implements ShouldQueue
      */
     public function handle()
     {
-        $url = 'https://api.github.com/repos/'.$this->repoFullname.'/issues?sort=created&page=1&per_page=50';
+        $url = 'https://api.github.com/repos/'.$this->repoFullname.'/issues?sort=created&page=1&per_page=50&state=all';
 
         $invalidTokenService = new InvalidTokenService();
         $apiService = (new ApiCallsService($this->tokenService, $invalidTokenService));
@@ -52,56 +52,80 @@ class FetchIssuesInRepoQueue implements ShouldQueue
             return;
         }
 
-        $latestDate = Issue::where('owner', $this->userId)
-            ->orderBy('date_created_online', 'desc')
-            ->limit(1)->pluck('date_created_online')->first();
-        $latestDateUnix = strtotime($latestDate);
-
-        $latestUpdated = Issue::where('owner', $this->userId)
+        $latestUpdated = Issue::where(['owner' => $this->userId, 'repository' => $this->repoId])
             ->orderBy('date_updated_online', 'desc')
             ->limit(1)->pluck('date_updated_online')->first();
         $latestUpdatedUnix = strtotime($latestUpdated);
 
         $count = Issue::where(['owner' => $this->userId, 'repository' => $this->repoId])->count();
 
-        $bulkInsert = [];
-        $bulkUpdate = [];
+        $existingIssueNos = DB::table('issues')->where(['owner' => $this->userId, 'repository' => $this->repoId])
+            ->select('issue_no')
+            ->distinct()
+            ->pluck('issue_no')
+            ->toArray()
+        ;
+
+        $newIssues = [];
+        $issuesToUpdate = [];
+
+        $incomingIssueNos = array_map(function ($issue) {
+            return $issue->number;
+        }, $issuesInRepository);
+
+        $newIssuesNos = array_diff($incomingIssueNos, $existingIssueNos);
+        $issuesToRemoveNos = array_diff($existingIssueNos, $incomingIssueNos);
 
         foreach ($issuesInRepository as $issue) {
-            $issueCreated = strtotime($issue->created_at);
-            if (0 == $count) {
-                $arr = $this->createArr($issue);
-                array_push($bulkInsert, $arr);
-            } elseif (isset($latestDateUnix) && $issueCreated > $latestDateUnix) {
-                $arr = $this->createArr($issue);
-                array_push($bulkInsert, $arr);
-            } elseif ($issue->updated_at > $latestUpdatedUnix) {
-                $updateArr = [
-                    'issue_no' => $issue->number,
-                    'state' => $issue->state,
-                    'title' => $issue->title,
-                    'body' => $issue->body,
-                    'date_updated_online' => $issue->updated_at,
-                    'labels' => json_encode($issue->labels),
-                    'date_closed_online' => $issue->closed_at,
-                    'updated_at' => now(),
-                ];
+            // First time issues are added to repository
+            if (0 === $count) {
+                array_push($newIssues, $this->createArr($issue));
 
-                array_push($bulkUpdate, $updateArr);
+                continue;
+            }
+
+            // Get Newly Created Issues
+            if (in_array($issue->number, $newIssuesNos)) {
+                array_push($newIssues, $this->createArr($issue));
+
+                continue;
+            }
+
+            // Updated issues pushed to a single array
+            if (($latestUpdatedUnix) && strtotime($issue->updated_at) > $latestUpdatedUnix) {
+                array_push($issuesToUpdate, $this->updateArr($issue));
+
+                continue;
             }
         }
 
-        if (!empty($bulkInsert)) {
-            Issue::insert($bulkInsert);
-            FetchIssuesInRepoEvent::dispatch($this->repoId, $bulkInsert);
+        // Insert new issues into database
+        if (!empty($newIssues)) {
+            Issue::insert($newIssues);
+            FetchIssuesInRepoEvent::dispatch($this->repoId, $newIssues);
         }
 
-        if (!empty($bulkUpdate)) {
-            foreach ($bulkUpdate as $update) {
-                DB::table('issues')->where('repository', $update['repository'])
+        // Update existing issues that have been changed
+        if (!empty($issuesToUpdate)) {
+            foreach ($issuesToUpdate as $update) {
+                DB::table('issues')->where(
+                    [
+                        'repository' => $this->repoId,
+                        'issue_no' => $update['issue_no'],
+                        'owner' => $this->userId,
+                    ]
+                )
                     ->update($update)
                 ;
             }
+        }
+
+        // Remove issues from DB that have been removed online
+        if (count($issuesToRemoveNos) > 0) {
+            DB::table('issues')->where('repository', $this->repoId)
+                ->whereIn('issue_no', $issuesToRemoveNos)
+                ->delete()
+            ;
         }
     }
 
@@ -119,6 +143,20 @@ class FetchIssuesInRepoQueue implements ShouldQueue
             'labels' => json_encode($issue->labels),
             'date_closed_online' => $issue->closed_at,
             'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+
+    protected function updateArr($issue): array
+    {
+        return [
+            'issue_no' => $issue->number,
+            'state' => $issue->state,
+            'title' => $issue->title,
+            'body' => $issue->body,
+            'date_updated_online' => $issue->updated_at,
+            'labels' => json_encode($issue->labels),
+            'date_closed_online' => $issue->closed_at,
             'updated_at' => now(),
         ];
     }
