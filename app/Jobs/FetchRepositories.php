@@ -44,87 +44,134 @@ class FetchRepositories implements ShouldQueue
         $invalidTokenService = new InvalidTokenService();
         $apiService = (new ApiCallsService($this->tokenService, $invalidTokenService));
 
-        $repos = $apiService->githubCallsHandler($url, $this->user);
+        $repositories = $apiService->githubCallsHandler($url, $this->user);
 
-        if (0 === count($repos)) {
+        if (0 === count($repositories)) {
             return;
         }
 
-        $latest_date = Repository::where('owner', $this->user)
-            ->orderBy('date_created_online', 'desc')->limit(1)->pluck('date_created_online')->first();
-        $latest_date = strtotime($latest_date);
+        $latestUpdated = Repository::where('owner', $this->user)
+            ->orderBy('date_updated_online', 'desc')
+            ->limit(1)
+            ->pluck('date_updated_online')
+            ->first()
+        ;
 
-        $latest_updated = Repository::where('owner', $this->user)
-            ->orderBy('date_updated_online', 'desc')->limit(1)->pluck('date_updated_online')->first();
+        $latestUpdatedUnix = strtotime($latestUpdated);
+
+        $existingRepoIds = DB::table('repositories')->where(['owner' => $this->user])
+            ->select('repository_id')
+            ->distinct()
+            ->pluck('repository_id')
+            ->toArray()
+        ;
 
         $count = Repository::where('owner', $this->user)->count();
 
-        $bulk_insert = [];
-        $bulk_update = [];
+        $newRepos = [];
+        $reposToUpdate = [];
 
-        foreach ($repos as $repo) {
-            $repo_created = strtotime($repo->created_at);
-            if (0 == $count) {
-                $arr = $this->create_arr($repo);
-                array_push($bulk_insert, $arr);
-            } elseif (isset($latest_date) && $repo_created > $latest_date) {
-                $arr = $this->create_arr($repo);
-                array_push($bulk_insert, $arr);
-            } elseif ($repo->updated_at > $latest_updated) {
-                $update_arr = [
-                    'name' => $repo->name,
-                    'fullname' => $repo->full_name,
-                    'repository_id' => $repo->id,
-                    'description' => $repo->description,
-                    'date_updated_online' => $repo->updated_at,
-                    'issues_count' => $repo->open_issues_count,
-                ];
+        $incomingRepoIds = array_map(function ($repository) {
+            return $repository->id;
+        }, $repositories);
 
-                array_push($bulk_update, $update_arr);
+        $newRepoIds = array_diff($incomingRepoIds, $existingRepoIds);
+        $reposToRemoveIds = array_diff($existingRepoIds, $incomingRepoIds);
+
+        foreach ($repositories as $repository) {
+            // First time issues are added to repository
+            if (0 === $count) {
+                array_push($newRepos, $this->createArr($repository));
+
+                continue;
+            }
+
+            // Get Newly Created Issues
+            if (in_array($repository->id, $newRepoIds)) {
+                array_push($newRepos, $this->createArr($repository));
+
+                continue;
+            }
+
+            // Updated issues pushed to a single array
+            if (isset($latestUpdatedUnix) && strtotime($repository->updated_at) > $latestUpdatedUnix) {
+                array_push($reposToUpdate, $this->updateArr($repository));
+
+                continue;
             }
         }
 
-        if (!empty($bulk_insert)) {
-            Repository::insert($bulk_insert);
-            RepositoriesFetched::dispatch($bulk_insert, $this->user);
+        if (!empty($newRepos)) {
+            Repository::insert($newRepos);
+            RepositoriesFetched::dispatch($newRepos, $this->user);
         }
 
-        if (!empty($bulk_update)) {
-            foreach ($bulk_update as $update) {
+        if (!empty($reposToUpdate)) {
+            foreach ($reposToUpdate as $update) {
                 DB::table('repositories')->where('repository_id', $update['repository_id'])
                     ->update($update)
                 ;
             }
         }
+
+        if (count($reposToRemoveIds) > 0) {
+            $this->deleteRepositories($reposToRemoveIds);
+        }
     }
 
-    protected function create_arr($repo): array
+    protected function createArr($repository): array
     {
         return [
             'owner' => $this->user,
             'platform' => 1,
-            'name' => $repo->name,
-            'fullname' => $repo->full_name,
-            'repository_id' => $repo->id,
-            'description' => $repo->description,
-            'date_created_online' => $repo->created_at,
-            'date_pushed_online' => $repo->pushed_at,
-            'date_updated_online' => $repo->updated_at,
-            'issues_count' => $repo->open_issues_count,
+            'name' => $repository->name,
+            'fullname' => $repository->full_name,
+            'repository_id' => $repository->id,
+            'description' => $repository->description,
+            'date_created_online' => $repository->created_at,
+            'date_pushed_online' => $repository->pushed_at,
+            'date_updated_online' => $repository->updated_at,
+            'issues_count' => $repository->open_issues_count,
             'created_at' => now(),
             'updated_at' => now(),
         ];
     }
 
-    protected function check_number()
+    protected function updateArr($repository): array
     {
-        // $response = Http::get('https://api.github.com/users/Liyengwas/repos?per_page=1');
-        // $header = $response->headers()['Link'][0];
-        // $start = strrpos($header, 'e=') + 2;
-        // $end = strrpos($header, '>;');
-        // $length = $end - $start;
-        // $num = intval(substr($header, $start, $length));
-        // dd($header, $start, $end, $num, $length);
-        // dd($header);
+        return [
+            'name' => $repository->name,
+            'fullname' => $repository->full_name,
+            'repository_id' => $repository->id,
+            'description' => $repository->description,
+            'date_updated_online' => $repository->updated_at,
+            'issues_count' => $repository->open_issues_count,
+        ];
+    }
+
+    protected function deleteRepositories(array $repositoryIds): void
+    {
+        if (count($repositoryIds) > 0) {
+            $itrackRepoIds = DB::table('repositories')->whereIn('repository_id', $repositoryIds)
+                ->pluck('id')
+                ->toArray()
+            ;
+
+            DB::table('repositories')->whereIn('repository_id', $repositoryIds)
+                ->delete()
+            ;
+
+            DB::table('project_repository')->whereIn('repository_id', $itrackRepoIds)
+                ->delete()
+            ;
+
+            DB::table('repository_languages')->whereIn('repository_id', $itrackRepoIds)
+                ->delete()
+            ;
+
+            DB::table('issues')->whereIn('repository', $itrackRepoIds)
+                ->delete()
+            ;
+        }
     }
 }

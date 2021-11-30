@@ -20,6 +20,7 @@ class RepositoryController extends Controller
         FetchRepositories::dispatch($userId);
         $data['repositories'] = Repository::select(['id', 'name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])
             ->selectRaw('to_char(date_updated_online, \'Dy Mon DD YYYY\') as date_updated_online, to_char(date_created_online, \'Dy Mon DD YYYY\') as date_created_online')
+            ->orderBy('repositories.date_created_online', 'desc')
             ->get()
         ;
 
