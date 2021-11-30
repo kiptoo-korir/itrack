@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -11,9 +11,12 @@ class HomeController extends Controller
     /**
      * Create a new controller instance.
      */
-    public function __construct()
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
     {
         $this->middleware('auth');
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -63,15 +66,8 @@ class HomeController extends Controller
 
     public function get_top_three_notifications()
     {
-        $user_id = Auth::id();
-        $notifications = DB::table('notifications')
-            ->select('id', 'data', 'created_at')
-            ->where(['notifiable_id' => $user_id, 'notifiable_type' => 'App\Models\User'])
-            ->whereNull('read_at')
-            ->latest()
-            ->limit(3)
-            ->get()
-        ;
+        $userId = Auth::id();
+        $notifications = $this->notificationService->getTopThreeNotifications($userId);
 
         return response()->json(['notifications' => $notifications], 200);
     }
@@ -83,8 +79,16 @@ class HomeController extends Controller
                 'read_at' => now(),
             ])
         ;
-        $notificationCount = User::findOrFail(Auth::id())->unreadNotifications->count();
+        $userId = Auth::id();
+        $notificationCount = $this->notificationService->getNotificationCount(Auth::id());
+        $topNotifications = $this->notificationService->getTopThreeNotifications($userId);
 
-        return response()->json(['message' => 'Notification marked as read.', 'notificationCount' => $notificationCount], 200);
+        $returnData = [
+            'message' => 'Notification marked as read.',
+            'notificationCount' => $notificationCount,
+            'topNotifications' => $topNotifications,
+        ];
+
+        return response()->json($returnData, 200);
     }
 }
