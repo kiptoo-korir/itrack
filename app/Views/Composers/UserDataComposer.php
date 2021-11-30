@@ -2,18 +2,18 @@
 
 namespace App\Views\Composers;
 
-use App\Services\UserDataService;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use illuminate\View\View;
 
 class UserDataComposer
 {
-    protected $userDataService;
+    protected $notificationService;
 
-    public function __construct(UserDataService $userDataService)
+    public function __construct(NotificationService $notificationService)
     {
         // Dependencies are automatically resolved by the service container
-        $this->userDataService = $userDataService;
+        $this->notificationService = $notificationService;
     }
 
     public function compose(View $view)
@@ -21,7 +21,7 @@ class UserDataComposer
         $userData = Auth::user();
         $firstLetter = substr($userData->name, 0, 1);
         $userData->first_letter = $firstLetter;
-        $notificationCount = $this->userDataService->fetch_notifications_count();
+        $notificationCount = $this->notificationService->getNotificationCount($userData->id);
 
         $view->with([
             'user_data' => $userData,
