@@ -22,15 +22,9 @@ function fetch_top_three_notifications() {
             let notifications = data.notifications;
             if (notifications.length > 0) {
                 notifications.forEach((notification) => {
-                    let data = JSON.parse(notification.data);
-                    let processedNotification = {
-                        created_at: notification.created_at,
-                        id: notification.id,
-                        notification_title: data.notification_title,
-                        notification_message: data.notification_message,
-                        action_link: data.action_link,
-                    };
-                    add_incoming_notification(processedNotification);
+                    let processedNotification =
+                        transformNotificationResponse(notification);
+                    addIncomingNotification(processedNotification);
                     $("#notification_list").show();
                     $("#no_notifications").hide();
                 });
@@ -41,25 +35,22 @@ function fetch_top_three_notifications() {
 }
 
 Echo.private(`App.Models.User.${userId}`).notification((notification) => {
-    add_incoming_notification(notification);
+    addIncomingNotification(notification);
     $("#notification_list").show();
     $("#no_notifications").hide();
-    feedback(
-        `New notification on ${notification.notification_type}`,
-        "warning"
-    );
+    feedback(`New notification on ${notification.notificationType}`, "warning");
 });
 
-function add_incoming_notification(notification) {
-    const actionLink = notification.action_link
-        ? ` <a href="${notification.action_link}">link</a>`
+function addIncomingNotification(notification) {
+    const actionLink = notification.actionLink
+        ? ` <a href="${notification.actionLink}">link</a>`
         : "";
     let elementContent = `
         <div">
             <div class="align-items-center">
                 <div class="toast-body mx-2">
-                    <h4 class="header-notification">${notification.notification_title}</h4>
-                    <p class="text-notification mb-0 truncate-fade">${notification.notification_message}${actionLink}</p>
+                    <h4 class="header-notification">${notification.notificationTitle}</h4>
+                    <p class="text-notification mb-0 truncate-fade">${notification.notificationMessage}${actionLink}</p>
                     <div class="text-right text-notification"><a class="mark-as-read"
                             href="javascript:void(0)"
                             onclick="markAsRead('${notification.id}')">Mark as read</a></div>
@@ -78,9 +69,9 @@ function add_incoming_notification(notification) {
         notificationContainer.removeChild(childrenElements[length - 1]);
     }
 
-    if (notification.notifications_count) {
+    if (notification.notificationsCount) {
         document.getElementById("notification_count").textContent =
-            notification.notifications_count;
+            notification.notificationsCount;
     }
 
     length > 0
@@ -101,9 +92,12 @@ function markAsRead(notificationId) {
                 `not-${notificationId}`
             );
             notification.remove();
-            let { notificationCount } = data;
+            let { notificationCount, topNotifications } = data;
             document.getElementById("notification_count").textContent =
                 notificationCount;
+
+            replaceNotifications(topNotifications);
+
             if (notificationCount !== 0) {
                 $("#notification_list").show();
                 $("#no_notifications").hide();
@@ -114,4 +108,40 @@ function markAsRead(notificationId) {
         },
         error: function (jqXhr, textStatus, errorThrown) {},
     });
+}
+
+function replaceNotifications(notifications) {
+    const existingNotifications =
+        document.getElementById("notification_list").children;
+
+    const length = existingNotifications.length;
+    const existingNotificationsIds = [];
+    for (counter = 0; counter < length; counter++) {
+        const id = existingNotifications[counter].id;
+        existingNotificationsIds.push(id.slice(4));
+    }
+
+    const notificationsToAdd = notifications.filter(
+        (notification) => !existingNotificationsIds.includes(notification.id)
+    );
+
+    notificationsToAdd.forEach((notification) => {
+        const processedNotification =
+            transformNotificationResponse(notification);
+        addIncomingNotification(processedNotification);
+    });
+}
+
+function transformNotificationResponse(notification) {
+    let data = JSON.parse(notification.data);
+
+    let processedNotification = {
+        createdAt: notification.created_at,
+        id: notification.id,
+        notificationTitle: data.notification_title,
+        notificationMessage: data.notification_message,
+        actionLink: data.action_link,
+    };
+
+    return processedNotification;
 }

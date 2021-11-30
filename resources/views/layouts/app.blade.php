@@ -81,5 +81,12 @@
 </script>
 @yield('js_scripts')
 <script src="{{ asset('js/add_notification.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('notification-dropdown').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+</script>
 
 </html>
