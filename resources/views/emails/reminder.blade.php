@@ -2,7 +2,13 @@
 
 {{-- Greeting --}}
 # Hello, {{$reminder->name}}
+
+@if (isset($project->id))
 You set a reminder on the project <b>{{$reminder->project_name}}</b> to check on:
+@else
+You set a reminder to check on:
+@endif
+
 <br>
 <h2>{{$reminder->title}}</h2>
 <p>{{$reminder->message}}</p>
