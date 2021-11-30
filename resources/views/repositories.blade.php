@@ -101,13 +101,12 @@
             let newElement = document.createElement('div');
             newElement.classList.add('col', 'mb-3');
             newElement.innerHTML = elementContent;
-            document.getElementById('repo_container').appendChild(newElement);
-        }
 
-        function splitDate(actionDate) {
-            let newDate = new Date(actionDate);
-            let dateString = newDate.toISOString.split('T')[0];
-            // let timeString = 
+            const length = document.getElementById('repo_container').children.length;
+            (length > 0) ?
+            document.getElementById('repo_container').children[0]
+                .insertAdjacentElement("beforebegin", newElement): document.getElementById('repo_container').appendChild(
+                    newElement);
         }
     </script>
 @endsection
