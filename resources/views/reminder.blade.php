@@ -97,6 +97,10 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
+                                <div class="col-12">
+                                    <p class="mb-0 text-muted" style="font-size: 0.9rem">Date is in the format MM-DD-YYYY
+                                    </p>
+                                </div>
                                 <label class="col-md-4">Date</label>
                                 <div class="col-md-4">
                                     <input type="date" name="due_date" class="form-control">
