@@ -48,6 +48,22 @@ class FetchIssuesInRepoQueue implements ShouldQueue
 
         $issuesInRepository = $apiService->githubCallsHandler($url, $this->userId);
 
+        $count = Issue::where(['owner' => $this->userId, 'repository' => $this->repoId])->count();
+
+        // Early return if the api call produced an error
+        if ('array' !== gettype($issuesInRepository)) {
+            return;
+        }
+
+        // Checks if all issues have been removed from the repository yet they exist in DB
+        // If the check is true, removes the issues
+        if ($count > 0 && 0 === count($issuesInRepository)) {
+            DB::table('issues')->where('repository', $this->repoId)
+                ->delete()
+            ;
+        }
+
+        // Early If API calls returns no issues
         if (0 === count($issuesInRepository)) {
             return;
         }
@@ -56,8 +72,6 @@ class FetchIssuesInRepoQueue implements ShouldQueue
             ->orderBy('date_updated_online', 'desc')
             ->limit(1)->pluck('date_updated_online')->first();
         $latestUpdatedUnix = strtotime($latestUpdated);
-
-        $count = Issue::where(['owner' => $this->userId, 'repository' => $this->repoId])->count();
 
         $existingIssueNos = DB::table('issues')->where(['owner' => $this->userId, 'repository' => $this->repoId])
             ->select('issue_no')
@@ -69,11 +83,15 @@ class FetchIssuesInRepoQueue implements ShouldQueue
         $newIssues = [];
         $issuesToUpdate = [];
 
+        // Get the issue nos of the issues fetched from online
         $incomingIssueNos = array_map(function ($issue) {
             return $issue->number;
         }, $issuesInRepository);
 
+        // Get the issue nos of issues that are not in DB
         $newIssuesNos = array_diff($incomingIssueNos, $existingIssueNos);
+
+        // Get the issue nos of issues that are in DB but not in online records
         $issuesToRemoveNos = array_diff($existingIssueNos, $incomingIssueNos);
 
         foreach ($issuesInRepository as $issue) {

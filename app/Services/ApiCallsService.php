@@ -24,7 +24,7 @@ class ApiCallsService
         if (!$tokenStatus) {
             (new NotificationService())->notifyOfInvalidToken($userId);
 
-            return [];
+            return 'error';
         }
 
         $client = $this->tokenService->client($userId);
@@ -36,7 +36,7 @@ class ApiCallsService
 
         // Early return for errorneous response
         if ($this->checkForError($statusCode)) {
-            return [];
+            return 'error';
         }
 
         $resources = json_decode($response->body());

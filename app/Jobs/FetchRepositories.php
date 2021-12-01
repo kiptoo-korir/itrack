@@ -46,6 +46,20 @@ class FetchRepositories implements ShouldQueue
 
         $repositories = $apiService->githubCallsHandler($url, $this->user);
 
+        // Early return if the api call produced an error
+        if ('array' !== gettype($repositories)) {
+            return;
+        }
+
+        $count = Repository::where('owner', $this->user)->count();
+
+        // Checks if all repositories have been removed online yet they exist in DB
+        // If the check is true, removes the repositories
+        if ($count > 0 && 0 === count($repositories)) {
+            $this->deleteAll();
+        }
+
+        // Early If API calls returns no repositories
         if (0 === count($repositories)) {
             return;
         }
@@ -66,16 +80,18 @@ class FetchRepositories implements ShouldQueue
             ->toArray()
         ;
 
-        $count = Repository::where('owner', $this->user)->count();
-
         $newRepos = [];
         $reposToUpdate = [];
 
+        // Get the Github IDs of the repositories fetched from Github
         $incomingRepoIds = array_map(function ($repository) {
             return $repository->id;
         }, $repositories);
 
+        // Get ids of repos that are not in DB
         $newRepoIds = array_diff($incomingRepoIds, $existingRepoIds);
+
+        // Get ids of repos that are in DB but are not online
         $reposToRemoveIds = array_diff($existingRepoIds, $incomingRepoIds);
 
         foreach ($repositories as $repository) {
@@ -173,5 +189,29 @@ class FetchRepositories implements ShouldQueue
                 ->delete()
             ;
         }
+    }
+
+    protected function deleteAll(): void
+    {
+        $itrackRepoIds = DB::table('repositories')->whereIn('owner', $this->user)
+            ->pluck('id')
+            ->toArray()
+        ;
+
+        DB::table('repositories')->whereIn('owner', $this->user)
+            ->delete()
+        ;
+
+        DB::table('project_repository')->whereIn('repository_id', $itrackRepoIds)
+            ->delete()
+        ;
+
+        DB::table('repository_languages')->whereIn('repository_id', $itrackRepoIds)
+            ->delete()
+        ;
+
+        DB::table('issues')->whereIn('repository', $itrackRepoIds)
+            ->delete()
+        ;
     }
 }

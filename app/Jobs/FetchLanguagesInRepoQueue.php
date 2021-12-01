@@ -49,6 +49,12 @@ class FetchLanguagesInRepoQueue implements ShouldQueue
         $apiService = (new ApiCallsService($this->tokenService, $invalidTokenService));
         $languagesInRepo = $apiService->githubCallsHandler($url, $this->userId);
 
+        // Early return if API calls produces an error
+        if ('array' !== gettype($languagesInRepo)) {
+            return;
+        }
+
+        // Early return if the API calls produces empty result set
         if (0 === count($languagesInRepo)) {
             return;
         }
