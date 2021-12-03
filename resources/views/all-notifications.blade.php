@@ -167,7 +167,7 @@
             const notElement = document.getElementById(`not-view-${notificationId}`);
             notElement.classList.remove('text-bold', 'unread');
             notElement.classList.add('read');
-
+            markAsRead(notificationId);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
