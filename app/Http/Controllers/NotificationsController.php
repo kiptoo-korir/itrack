@@ -16,8 +16,18 @@ class NotificationsController extends Controller
     public function getAllNotifications(int $page)
     {
         $userId = Auth::id();
-        $limit = 50;
+        $limit = 3;
         $offset = ($page - 1) * $limit;
+
+        $totalCount = DB::table('notifications')
+            ->selectRaw('count(distinct(id))')
+            ->where([
+                'notifiable_type' => 'App\Models\User',
+                'notifiable_id' => $userId,
+            ])
+            ->get()[0]->count
+        ;
+
         $notifications = DB::table('notifications')->select('data', 'created_at', 'id', 'read_at')
             ->where([
                 'notifiable_type' => 'App\Models\User',
@@ -30,9 +40,8 @@ class NotificationsController extends Controller
         ;
 
         $notificationCount = $notifications->count();
-        $endOfPagination = ($limit * $page > $notificationCount) ? $notificationCount : ($limit * $page);
-
-        $paginationString = ($offset * $limit + 1).'-'.$endOfPagination.' of '.$notificationCount;
+        $notificationsShown = $offset + $notificationCount;
+        $endOfContent = ($notificationsShown === $totalCount) ? true : false;
 
         $notificationsDecoded = $notifications->map(function ($notification) {
             $notificationData = json_decode($notification->data);
@@ -43,6 +52,6 @@ class NotificationsController extends Controller
             return $notificationData;
         });
 
-        return response()->json(['notifications' => $notificationsDecoded, 'paginationString' => $paginationString], 200);
+        return response()->json(['notifications' => $notificationsDecoded, 'endOfContentStatus' => $endOfContent, $notificationsShown], 200);
     }
 }

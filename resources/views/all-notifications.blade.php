@@ -35,10 +35,53 @@
             display: none;
         }
 
+        .back-to-top {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Fixed/sticky position */
+            bottom: 20px;
+            /* Place the button at the bottom of the page */
+            right: 30px;
+            /* Place the button 30px from the right */
+            z-index: 99;
+            /* Make sure it does not overlap */
+            border: none;
+            /* Remove borders */
+            outline: none;
+            /* Remove outline */
+            background-color: #075db8;
+            /* Set a background color */
+            color: #f8f9fa;
+            /* Text color */
+            cursor: pointer;
+            /* Add a mouse pointer on hover */
+            padding: 15px;
+            /* Some padding */
+            border-radius: 10px;
+            /* Rounded corners */
+            font-size: 18px;
+            /* Increase font size */
+        }
+
+        @media screen and (prefers-reduced-motion: no-preference) {
+            html {
+                scroll-behavior: smooth;
+            }
+        }
+
     </style>
 @endsection
 
 @section('content')
+    <button onclick="backToTop()" class="back-to-top" id="btn-top" title="Go to top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-circle-fill"
+            viewBox="0 0 16 16">
+            <path
+                d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z" />
+        </svg>
+    </button>
+
     <div class="container">
         <h3 class="text-black">All Notifications</h3>
         <div class="position-sticky border-bottom pb-2 mb-3">
@@ -55,33 +98,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col align-self-center">
-                    <div class="text-align-end">
-                        <span class="text-95 mr-3" id="pagination-string"></span>
-                        <button type="button" class="btn btn-sm btn-outline-dark">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-chevron-left" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z">
-                                </path>
-                            </svg>
-                            {{-- <span class="visually-hidden">Newer</span> --}}
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-dark">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-chevron-right" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
-                                </path>
-                            </svg>
-                            {{-- <span class="visually-hidden">Older</span> --}}
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="bg-white rounded" id="notifications-container">
 
+        </div>
+        <div class="text-center py-3">
+            <button class="btn btn-outline-dark" id="btn-show-more" onclick="showMore()">Show More Notifications</button>
         </div>
     </div>
 @endsection
@@ -92,6 +115,9 @@
 
 @section('js_scripts')
     <script>
+        let endOfContent = false;
+        let notificationPage = 1;
+
         async function fetchUnreadNotifications(page) {
             showSpinner();
             const route = `{{ route('get-notifications', '') }}/${page}`;
@@ -99,12 +125,16 @@
             const body = await response.json();
             const {
                 notifications,
-                paginationString
+                endOfContentStatus
             } = body;
             hideSpinner();
             notifications.forEach(loadNotifications);
-            document.getElementById('pagination-string').innerHTML = paginationString;
             filterNotifications();
+            endOfContent = endOfContentStatus;
+
+            if (endOfContent) {
+                document.getElementById('btn-show-more').disabled = true
+            }
         }
 
         function loadNotifications(notification, index) {
@@ -173,6 +203,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('select-filter').value = 'all';
             fetchUnreadNotifications(1);
+            notificationPage++;
         });
 
         document.getElementById('select-filter').addEventListener('change', filterNotifications);
@@ -211,6 +242,31 @@
                 });
                 return;
             }
+        }
+
+        window.onscroll = function() {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            const backToTopBtn = document.getElementById('btn-top');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                backToTopBtn.style.display = "block";
+            } else {
+                backToTopBtn.style.display = "none";
+            }
+        }
+
+        function backToTop() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+
+        function showMore() {
+            if (endOfContent) return;
+
+            fetchUnreadNotifications(notificationPage);
+            notificationPage++;
         }
     </script>
 @endsection
