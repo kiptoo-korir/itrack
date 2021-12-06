@@ -59,7 +59,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-6 col-12">
                 <div class="row">
@@ -120,24 +120,6 @@
                     </table>
                 </div>
             </div>
-            {{-- <div class="col-md-6 col-12 mx-auto mt-2">
-                <div class="table-responsive">
-                    <!-- Access Tokens table -->
-                    <h5 class="text-black-50 text-uppercase text-center mb-2">ACCESS TOKENS</h5>
-                    <table class="table dt-responsive nowrap" id="access_tokens">
-                        <thead class="thead-light">
-                        <tr>
-                            <th scope="col">Status</th>
-                            <th scope="col">Platform</th>
-                            <th scope="col">Date Added</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div> --}}
         </div>
     </div>
 @endsection
