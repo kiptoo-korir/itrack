@@ -37,6 +37,19 @@ class ReminderNotificationQueue implements ShouldQueue
         foreach ($this->reminders as $reminder) {
             $user = User::findOrFail($reminder->user_id);
             $user->notify(new ReminderNotification($reminder));
+            $this->logReminder($reminder, $user);
         }
+    }
+
+    private function logReminder($reminder, User $user)
+    {
+        activity('dispatch-reminder')
+            ->causedBy($user)
+            ->withProperties([
+                'action' => 'Successful',
+                'reminder' => $reminder,
+            ])
+            ->log("reminder - {$reminder->title} dispatched")
+        ;
     }
 }

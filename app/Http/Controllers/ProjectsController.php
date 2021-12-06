@@ -41,6 +41,8 @@ class ProjectsController extends Controller
 
             $linkedRepositories = $this->fetchLinkedRepositoriesNames($repos);
 
+            $this->logCreateProject($project);
+
             return response()->json(['success' => 'Project created successfully.', 'project' => $project, 'linkedRepositories' => $linkedRepositories], 200);
         }
 
@@ -188,10 +190,24 @@ class ProjectsController extends Controller
 
     protected function fetchLinkedRepositoriesNames(array $repositoryIds): array
     {
-        return $linkedRepoNames = DB::table('repositories')
+        return DB::table('repositories')
             ->whereIn('id', $repositoryIds)
             ->pluck('name')
             ->toArray()
+        ;
+    }
+
+    private function logCreateProject(Project $project)
+    {
+        $user = Auth::user();
+        activity('create-project')
+            ->causedBy($user)
+            ->performedOn($project)
+            ->withProperties([
+                'action' => 'Successful',
+                'project' => $project,
+            ])
+            ->log("project - {$project->name} created")
         ;
     }
 }

@@ -28,6 +28,8 @@ class NotesController extends Controller
         ];
 
         if ($note = Note::create($note_record)) {
+            $this->logCreateNote($note);
+
             return response()->json(['success' => 'Note created successfully.', 'note' => $note], 200);
         }
 
@@ -110,5 +112,19 @@ class NotesController extends Controller
             ->orderByDesc('created_at')->limit(50)->get();
 
         return response()->json(['notes' => $notes], 200);
+    }
+
+    private function logCreateNote(Note $note)
+    {
+        $user = Auth::user();
+        activity('create-note')
+            ->causedBy($user)
+            ->performedOn($note)
+            ->withProperties([
+                'action' => 'Successful',
+                'note' => $note,
+            ])
+            ->log("note - {$note->title} created")
+        ;
     }
 }

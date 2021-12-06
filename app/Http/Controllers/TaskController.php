@@ -28,7 +28,9 @@ class TaskController extends Controller
             'description' => $request->description,
         ];
 
-        if (Task::create($task_record)) {
+        if ($task = Task::create($task_record)) {
+            $this->logCreateTask($task);
+
             return response()->json(['success' => 'Task created successfully.'], 200);
         }
 
@@ -54,11 +56,20 @@ class TaskController extends Controller
         $task_id = $request->get('task_id');
         $task = Task::find($task_id);
 
+        $createdAt = strtotime($task->created_at);
+        $updatedAt = strtotime($task->updated_at);
+        $statusBefore = $task->status;
+        $statusAfter = $request->get('status');
+
         $task->update([
             'status' => $request->get('status'),
             'title' => $request->get('title'),
             'description' => $request->get('description'),
         ]);
+
+        if ('Todo' === $statusBefore && 'Done' === $statusAfter && $createdAt === $updatedAt) {
+            $this->logUpdateTask($task);
+        }
 
         return response()->json(['success' => 'Task updated successfully.'], 200);
     }
@@ -75,5 +86,34 @@ class TaskController extends Controller
         if ($task->delete()) {
             return response()->json(['success' => 'Task has been removed.'], 200);
         }
+    }
+
+    private function logCreateTask(Task $task)
+    {
+        $user = Auth::user();
+        activity('create-task')
+            ->causedBy($user)
+            ->performedOn($task)
+            ->withProperties([
+                'action' => 'Successful',
+                'task' => $task,
+            ])
+            ->log("task - {$task->title} created")
+        ;
+    }
+
+    // Only logs for marking the task as done the first time
+    private function logUpdateTask(Task $task)
+    {
+        $user = Auth::user();
+        activity('update-task')
+            ->causedBy($user)
+            ->performedOn($task)
+            ->withProperties([
+                'action' => 'Successful',
+                'task' => $task,
+            ])
+            ->log("task - {$task->title} marked as done")
+        ;
     }
 }

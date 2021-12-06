@@ -45,6 +45,8 @@ class RemindersController extends Controller
         ];
 
         if ($reminder = Reminder::create($reminder_record)) {
+            $this->logCreateReminder($reminder);
+
             return response()->json(['success' => 'Reminder created successfully.', 'reminder' => $reminder], 200);
         }
 
@@ -143,5 +145,19 @@ class RemindersController extends Controller
             ->where('owner', $userId)->get();
 
         return view('reminder')->with($data);
+    }
+
+    private function logCreateReminder(Reminder $reminder)
+    {
+        $user = Auth::user();
+        activity('create-reminder')
+            ->causedBy($user)
+            ->performedOn($reminder)
+            ->withProperties([
+                'action' => 'Successful',
+                'reminder' => $reminder,
+            ])
+            ->log("reminder - {$reminder->title} created")
+        ;
     }
 }

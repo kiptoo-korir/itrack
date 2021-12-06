@@ -16,7 +16,7 @@ class NotificationsController extends Controller
     public function getAllNotifications(int $page)
     {
         $userId = Auth::id();
-        $limit = 3;
+        $limit = 50;
         $offset = ($page - 1) * $limit;
 
         $totalCount = DB::table('notifications')
