@@ -40,7 +40,7 @@
             /* Hidden by default */
             position: fixed;
             /* Fixed/sticky position */
-            bottom: 20px;
+            bottom: 40px;
             /* Place the button at the bottom of the page */
             right: 30px;
             /* Place the button 30px from the right */
@@ -50,18 +50,12 @@
             /* Remove borders */
             outline: none;
             /* Remove outline */
-            background-color: #075db8;
+            background-color: transparent;
             /* Set a background color */
-            color: #f8f9fa;
+            color: #075db8;
             /* Text color */
             cursor: pointer;
             /* Add a mouse pointer on hover */
-            padding: 15px;
-            /* Some padding */
-            border-radius: 10px;
-            /* Rounded corners */
-            font-size: 18px;
-            /* Increase font size */
         }
 
         @media screen and (prefers-reduced-motion: no-preference) {
@@ -75,7 +69,7 @@
 
 @section('content')
     <button onclick="backToTop()" class="back-to-top" id="btn-top" title="Go to top">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-circle-fill"
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-arrow-up-circle-fill"
             viewBox="0 0 16 16">
             <path
                 d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z" />
