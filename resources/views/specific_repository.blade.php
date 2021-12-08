@@ -234,34 +234,32 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="" class="form-groups" method="POST" id="issue-form">
-                    <div class="modal-body">
-                        @csrf
-                        <input type="hidden" name="repositoryId" value="{{ $repository->id }}">
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-md-4">Issue Title</label>
-                                <div class="col-md-6">
-                                    <input type="text" name="title" class="form-control" id="title" required>
-                                </div>
-                                <div class="clearfix"></div>
+                <div class="modal-body">
+                    @csrf
+                    <input type="hidden" name="repositoryId" value="{{ $repository->id }}">
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-md-4">Issue Title</label>
+                            <div class="col-md-6">
+                                <input type="text" name="title" class="form-control" id="title" required>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-md-4">Issue Body</label>
-                                <div class="col-md-7">
-                                    <textarea name="body" rows="3" class="form-control" id="body" required></textarea>
-                                </div>
-                                <div class="clearfix"></div>
-                            </div>
+                            <div class="clearfix"></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-md-4">Issue Body</label>
+                            <div class="col-md-7">
+                                <textarea name="body" rows="3" class="form-control" id="body" required></textarea>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
             </div>
         </div>
     </div>
