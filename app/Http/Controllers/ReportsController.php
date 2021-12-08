@@ -56,6 +56,16 @@ class ReportsController extends Controller
 
     public function summaryStatsReport(Request $request)
     {
-        return view('reports.summary-report');
+        $stats = $request->get('stats');
+        $name = $request->get('name');
+        $header = $request->get('header');
+
+        $data = [
+            'stats' => $stats,
+            'name' => $name,
+            'header' => $header,
+        ];
+
+        return view('reports.summary-report')->with($data);
     }
 }

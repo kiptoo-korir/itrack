@@ -73,14 +73,15 @@
         <div class="mx-auto text-center mb-4">
             <img src="{{ asset('img/2.png') }}" alt="iTrack" height="50px">
         </div>
-        <h5 class="text-center text-uppercase mb-4"><b>SUMMARY STATISTICS</b></h5>
+        <h5 class="text-center text-uppercase mb-5"><b>{{ $name }}</b></h5>
+        <h5 class="text-center text-uppercase mb-5"><b>{{ $header }}</b></h5>
         <div class="container" id="stats-list">
             <div class="card-custom shadow mx-auto">
                 <div class="card-body">
                     <div class="d-flex flex-row justify-content-between">
                         <div class="d-flex flex-column">
                             <h6 class="text-uppercase text-black-50 mb-3"><b>TIMES LOGGED IN</b></h6>
-                            <p class="num-text"><b>32</b></p>
+                            <p class="num-text"><b>{{ $stats['logIn'] }}</b></p>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
                             class="bi bi-unlock-fill" viewBox="0 0 16 16">
@@ -95,7 +96,7 @@
                     <div class="d-flex flex-row justify-content-between">
                         <div class="d-flex flex-column">
                             <h6 class="text-uppercase text-black-50 mb-3"><b>TASKS CREATED</b></h6>
-                            <p class="num-text"><b>32</b></p>
+                            <p class="num-text"><b>{{ $stats['tasks'] }}</b></p>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
                             class="bi bi-list-task" viewBox="0 0 16 16">
@@ -114,7 +115,7 @@
                     <div class="d-flex flex-row justify-content-between">
                         <div class="d-flex flex-column">
                             <h6 class="text-uppercase text-black-50 mb-3"><b>NOTES CREATED</b></h6>
-                            <p class="num-text"><b>32</b></p>
+                            <p class="num-text"><b>{{ $stats['notes'] }}</b></p>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
                             class="bi bi-sticky-fill" viewBox="0 0 16 16">
@@ -129,7 +130,7 @@
                     <div class="d-flex flex-row justify-content-between">
                         <div class="d-flex flex-column">
                             <h6 class="text-uppercase text-black-50 mb-3"><b>PROJECTS CREATED</b></h6>
-                            <p class="num-text"><b>32</b></p>
+                            <p class="num-text"><b>{{ $stats['projects'] }}</b></p>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
                             class="bi bi-kanban-fill" viewBox="0 0 16 16">
@@ -144,7 +145,7 @@
                     <div class="d-flex flex-row justify-content-between">
                         <div class="d-flex flex-column">
                             <h6 class="text-uppercase text-black-50 mb-3"><b>REMINDERS DISPATCHED</b></h6>
-                            <p class="num-text"><b>32</b></p>
+                            <p class="num-text"><b>{{ $stats['reminders'] }}</b></p>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
                             class="bi bi-calendar-date-fill" viewBox="0 0 16 16">
@@ -157,6 +158,7 @@
                 </div>
             </div>
         </div>
+        <h6 class="text-right px-5">{{ now() }}</h6>
     </div>
 @endsection
 

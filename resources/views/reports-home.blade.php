@@ -116,7 +116,7 @@
                     <div class="form-group col-12 col-lg-4 col-md-4 mt-auto px-3">
                         <button class="btn btn-small btn-outline-dark" onclick="filterReports()"
                             type="button">Filter</button> |
-                        <button class="btn btn-small btn-outline-dark" type="button">Export</button>
+                        <button class="btn btn-small btn-outline-dark" type="button" onclick="exportToPDF()">Export</button>
                     </div>
                 </div>
             </form>
@@ -338,15 +338,6 @@
                 data: requestData,
                 dataType: "json",
                 success: function(data) {
-                    const {
-                        logIn,
-                        tasks,
-                        notes,
-                        projects,
-                        reminders
-                    } = data.stats;
-
-
                     hideSpinner();
                 },
                 error: function(jqXhr, textStatus, errorThrown) {
