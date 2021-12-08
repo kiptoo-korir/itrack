@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GenerateReportsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IssuesController;
 use App\Http\Controllers\NotesController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\RemindersController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TestingController;
@@ -83,6 +85,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/delete-project', [ProjectsController::class, 'remove_project'])->name('delete-project');
     Route::get('/all-notifications', [NotificationsController::class, 'notificationsView'])->name('notifications-view');
     Route::get('/notifications/{page}', [NotificationsController::class, 'getAllNotifications'])->name('get-notifications');
+    Route::get('/reports', [ReportsController::class, 'reportsView'])->name('reports');
+    Route::get('/stats-period', [ReportsController::class, 'getStatsInPeriod'])->name('stats-in-period');
+    Route::get('/generate-summary', [GenerateReportsController::class, 'generateSummaryReport'])->name('generate-summary-report');
 });
 
 // Email Verification Routes
