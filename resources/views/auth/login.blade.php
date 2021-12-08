@@ -2,26 +2,6 @@
 
 @section('css_scripts')
     <style>
-        .fixedButton {
-            position: fixed;
-            bottom: 0px;
-            right: 0px;
-            padding: 20px;
-        }
-
-        .roundedFixedBtn {
-            height: 60px;
-            line-height: 80px;
-            width: 60px;
-            font-size: 2em;
-            font-weight: bold;
-            border-radius: 50%;
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            cursor: pointer;
-        }
-
     </style>
 @endsection
 
@@ -104,9 +84,6 @@
             </div>
         </div>
     </div>
-    {{-- <a class="fixedButton" href>
-    <div class="roundedFixedBtn"><i class="bi bi-earbuds"></i></div>
-</a> --}}
 @endsection
 
 @section('js_scripts')

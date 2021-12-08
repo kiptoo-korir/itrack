@@ -31,12 +31,19 @@
     <link rel="stylesheet" href="{{ asset('css/toast_spinner.css') }}">
 
     @yield('css_scripts')
+
+    <style>
+        #app {
+            min-height: 100vh;
+        }
+
+    </style>
 </head>
 
 <body>
-    <div id="app">
-        @include('components.navbar')
-        <main class="py-4 bg-light">
+    <div id="app" class="bg-light">
+        @include('components.navbar-unauthenticated')
+        <main class="py-4">
             @include('components.spinner')
             @yield('content')
             @include('components.toasts')

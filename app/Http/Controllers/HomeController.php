@@ -91,4 +91,9 @@ class HomeController extends Controller
 
         return response()->json($returnData, 200);
     }
+
+    public function landingPage()
+    {
+        return view('landing-page');
+    }
 }
