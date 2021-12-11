@@ -2,9 +2,72 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\StatsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class StatsController extends Controller
 {
-    //
+    protected $statsService;
+
+    public function __construct(StatsService $statsService)
+    {
+        $this->statsService = $statsService;
+    }
+
+    public function tasksStatsViews()
+    {
+        $userId = Auth::id();
+        $createTasksStats = DB::table('activity_log')->where(['log_name' => 'create-task', 'causer_id' => $userId])
+            ->distinct('id')
+            ->count()
+        ;
+
+        $updateTasksStats = DB::table('activity_log')->where(['log_name' => 'update-task', 'causer_id' => $userId])
+            ->distinct('id')
+            ->count()
+        ;
+
+        $data = [
+            'tasks' => $createTasksStats,
+            'tasksDone' => $updateTasksStats,
+        ];
+
+        return view('stats.task')->with($data);
+    }
+
+    public function getTaskActivity()
+    {
+        $userId = Auth::id();
+        $tasksStats = $this->statsService->getTasksStats($userId);
+
+        return DataTables::of($tasksStats)
+            ->make(true)
+        ;
+    }
+
+    public function getTaskActivityInPeriod(Request $request)
+    {
+        $userId = Auth::id();
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+        $tasksStats = $this->statsService->getTasksStatsInPeriod($userId, $startDate, $endDate);
+
+        return DataTables::of($tasksStats)
+            ->make(true)
+        ;
+    }
+
+    public function tasksCreatedAgainstCompleted(Request $request)
+    {
+        $userId = Auth::id();
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        $stats = $this->statsService->createdVsCompleted($userId, $startDate, $endDate);
+
+        return response()->json($stats, 200);
+    }
 }

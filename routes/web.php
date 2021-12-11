@@ -11,6 +11,7 @@ use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\RemindersController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\RepositoryController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TestingController;
 use Illuminate\Support\Facades\Route;
@@ -89,6 +90,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reports', [ReportsController::class, 'reportsView'])->name('reports');
     Route::get('/stats-period', [ReportsController::class, 'getStatsInPeriod'])->name('stats-in-period');
     Route::get('/generate-summary', [GenerateReportsController::class, 'generateSummaryReport'])->name('generate-summary-report');
+    Route::get('/tasks-stats', [StatsController::class, 'tasksStatsViews'])->name('tasks-stats-view');
+    Route::get('/get-tasks-stats', [StatsController::class, 'getTaskActivity'])->name('task-stats');
+    Route::get('/get-tasks-stats-period', [StatsController::class, 'getTaskActivityInPeriod'])->name('task-stats-period');
+    Route::get('/tasks-breakdown', [StatsController::class, 'tasksCreatedAgainstCompleted'])->name('task-breakdown');
 });
 
 // Email Verification Routes

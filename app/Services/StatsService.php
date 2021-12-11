@@ -82,4 +82,73 @@ class StatsService
             'reminders' => $remindersDispatchedStats,
         ];
     }
+
+    public function getTasksStats(int $userId): array
+    {
+        return DB::select(DB::raw('
+            with tasks_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'task\' as task,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name IN (:log_name_1, :log_name_2)
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as task_id, task::jsonb->\'title\' as task_name,
+            task::jsonb->\'description\' as task_description, created_at
+            FROM tasks_info
+        '), [
+            'log_name_1' => 'create-task',
+            'log_name_2' => 'update-task',
+            'causer_id' => $userId,
+        ]);
+    }
+
+    public function getTasksStatsInPeriod(int $userId, string $startDate, string $endDate): array
+    {
+        return DB::select(DB::raw('
+            with tasks_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'task\' as task,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name IN (:log_name_1, :log_name_2)
+            AND activity_log.created_at BETWEEN :start_date AND :end_date
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as task_id, task::jsonb->\'title\' as task_name,
+            task::jsonb->\'description\' as task_description, created_at
+            FROM tasks_info
+        '), [
+            'log_name_1' => 'create-task',
+            'log_name_2' => 'update-task',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'causer_id' => $userId,
+        ]);
+    }
+
+    public function createdVsCompleted(int $userId, string $startDate, string $endDate): array
+    {
+        $createTasksStats = DB::table('activity_log')->where(['log_name' => 'create-task', 'causer_id' => $userId])
+            ->whereRaw('created_at > ? and created_at < ?', [$startDate, $endDate])
+            ->distinct('id')
+            ->count()
+        ;
+
+        $updateTasksStats = DB::table('activity_log')->where(['log_name' => 'update-task', 'causer_id' => $userId])
+            ->whereRaw('created_at > ? and created_at < ?', [$startDate, $endDate])
+            ->distinct('id')
+            ->count()
+        ;
+
+        return [
+            'created' => $createTasksStats,
+            'completed' => $updateTasksStats,
+        ];
+    }
 }

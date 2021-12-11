@@ -70,8 +70,8 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
-        <div class="container">
+    <div class="container">
+        <div class="">
             <form action="" id="report_form">
                 @csrf
                 <div class="row">
@@ -122,7 +122,7 @@
             </form>
         </div>
         <div class="row">
-            <div class="col-md-4 col-lg-3 col-12 mb-5 px-4">
+            <div class="col-md-6 col-lg-4 col-12 mb-5 px-4">
                 <div class="card mt-2 no-border shadow mx-auto">
                     <div class="card-body">
                         <div class="d-flex flex-row justify-content-between">
@@ -132,7 +132,7 @@
                                     d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" />
                             </svg>
                             <div class="d-flex flex-column text-right">
-                                <p class="text-uppercase text-black-50"><b>LOGGED IN</b></p>
+                                <p class="text-uppercase text-black-50"><b>TIMES LOGGED IN</b></p>
                                 <h4 class="text-right"><b id="stats-login">{{ $stats['logIn'] }}</b></h4>
                             </div>
                         </div>
@@ -140,7 +140,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-lg-3 col-12 mb-5 px-4">
+            <div class="col-md-6 col-lg-4 col-12 mb-5 px-4">
                 <div class="card mt-2 no-border shadow mx-auto">
                     <div class="card-body">
                         <div class="d-flex flex-row justify-content-between">
@@ -158,11 +158,11 @@
                                 <h4 class="text-right"><b id="stats-tasks">{{ $stats['tasks'] }}</b></h4>
                             </div>
                         </div>
-                        <a href="#" class="btn btn-gradient btn-sm">Go somewhere</a>
+                        <a href="{{ route('tasks-stats-view') }}" class="btn btn-gradient btn-sm">View Details</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-lg-3 col-12 mb-5 px-4">
+            <div class="col-md-6 col-lg-4 col-12 mb-5 px-4">
                 <div class="card mt-2 no-border shadow mx-auto">
                     <div class="card-body">
                         <div class="d-flex flex-row justify-content-between">
@@ -180,7 +180,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-lg-3 col-12 mb-5 px-4">
+            <div class="col-md-6 col-lg-4 col-12 mb-5 px-4">
                 <div class="card mt-2 no-border shadow mx-auto">
                     <div class="card-body">
                         <div class="d-flex flex-row justify-content-between">
@@ -198,7 +198,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-lg-3 col-12 mb-5 px-4">
+            <div class="col-md-6 col-lg-4 col-12 mb-5 px-4">
                 <div class="card mt-2 no-border shadow mx-auto">
                     <div class="card-body">
                         <div class="d-flex flex-row justify-content-between">
