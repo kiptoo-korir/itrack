@@ -72,6 +72,39 @@ class GenerateReportsController extends Controller
         return response()->download($outputPath);
     }
 
+    public function generateTaskReport(Request $request)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        // Setup where the generated file will be stored
+        $nameLowerCase = strtolower(explode(' ', $user->name)[0]);
+        $filename = $nameLowerCase.strtotime(now()).'.pdf';
+        $outputPath = base_path('public/files/reports/').$filename;
+
+        // Setup wkhtmltopdf process
+        $wkhtml = 'wkhtmltopdf';
+        $route = route('task-report', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'userId' => $userId,
+            'name' => $user->name,
+        ]);
+
+        dd($route);
+        // $process = new Process([$wkhtml, $route, $outputPath]);
+        // $process->run();
+
+        // if (!$process->isSuccessful()) {
+        //     throw new ProcessFailedException($process);
+        // }
+
+        // return response()->download($outputPath);
+    }
+
     private function monthName($month): string
     {
         if ($month > 12) {

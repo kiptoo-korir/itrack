@@ -68,4 +68,27 @@ class ReportsController extends Controller
 
         return view('reports.summary-report')->with($data);
     }
+
+    public function taskStatsReport(Request $request)
+    {
+        $startDate = $request->get('startDate');
+        $endDate = $request->get('endDate');
+        $userId = $request->get('userId');
+        $name = $request->get('name');
+
+        $tasksStats = $this->statsService->getTasksStatsInPeriod($userId, $startDate, $endDate);
+        $statsSummary = $this->statsService->createdVsCompleted($userId, $startDate, $endDate);
+
+        $data = [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'stats' => $tasksStats,
+            'statsSummary' => $statsSummary,
+            'name' => $name,
+        ];
+
+        // dd($data);
+
+        return view('reports.task-report')->with($data);
+    }
 }

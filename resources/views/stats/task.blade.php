@@ -186,6 +186,8 @@
                 endDate
             };
 
+            const errorCheck = validateRequest(startDate, endDate);
+
             const response = await fetch(`${route}?${new URLSearchParams(requestBody)}`);
 
             const body = await response.json();
@@ -202,29 +204,53 @@
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
 
-            if (errorArray.includes(startDate)) {
-                feedback('Please ensure a start date is selected', 'warning');
-                return;
-            }
-
-            if (errorArray.includes(endDate)) {
-                feedback('Please ensure an end date is selected', 'warning');
-                return;
-            }
-
-            if (endDate < startDate || endDate === startDate) {
-                feedback('Please ensure that the end date comes before the start date', 'warning');
-                return;
-            }
-
             const requestData = {
                 startDate,
                 endDate
             };
 
+            const errorCheck = validateRequest(startDate, endDate);
+            if (errorCheck) return;
+
             const tableRoute = "{{ route('task-stats-period') }}";
             fetchTasksBreakdown(startDate, endDate);
             fetchTasksTable(tableRoute, requestData);
+        }
+
+        async function exportToPDF() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            const requestBody = {
+                startDate,
+                endDate
+            };
+
+            const errorCheck = validateRequest(startDate, endDate);
+
+            if (errorCheck) return;
+
+            const route = "{{ route('generate-task-report') }}";
+            const response = await fetch(`${route}?${new URLSearchParams(requestBody)}`);
+
+            // const body = await response.json();
+        }
+
+        function validateRequest(startDate, endDate) {
+            if (errorArray.includes(startDate)) {
+                feedback('Please ensure a start date is selected', 'warning');
+                return true;
+            }
+
+            if (errorArray.includes(endDate)) {
+                feedback('Please ensure an end date is selected', 'warning');
+                return true;
+            }
+
+            if (endDate < startDate || endDate === startDate) {
+                feedback('Please ensure that the end date comes before the start date', 'warning');
+                return true;
+            }
         }
     </script>
 @endsection
