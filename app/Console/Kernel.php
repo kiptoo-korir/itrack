@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\ReminderCommand::class,
+        Commands\DeleteReports::class,
     ];
 
     /**
@@ -21,8 +22,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
         $schedule->command('reminder:minute')->everyMinute();
+        $schedule->command('reports:delete')->daily();
     }
 
     /**
