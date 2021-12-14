@@ -55,6 +55,7 @@ class ApiCallsService
         return $this->typeConverter($mergedArray);
     }
 
+    // Returns associative array from link header
     protected function parseLinkHeader(string $header): array
     {
         if (0 == strlen($header)) {
@@ -78,6 +79,7 @@ class ApiCallsService
         return $links;
     }
 
+    // If input is not an array, it converts and returns an array
     protected function typeConverter(mixed $input): array
     {
         if ('array' === gettype($input)) {
