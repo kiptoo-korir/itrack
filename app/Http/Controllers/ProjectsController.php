@@ -69,7 +69,13 @@ class ProjectsController extends Controller
     public function specificProject($projectId)
     {
         $userId = Auth::id();
-        $data['projectInfo'] = Project::findOrFail($projectId);
+        $project = Project::findOrFail($projectId);
+
+        if ($userId !== $project->owner) {
+            abort(403);
+        }
+
+        $data['projectInfo'] = $project;
         $data['notes'] = Note::where('project', $projectId)->get();
         $data['reminder'] = Reminder::where('project', $projectId)->get();
         $data['repositories'] = DB::table('repositories', 'repos')

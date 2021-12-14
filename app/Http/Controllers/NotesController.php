@@ -99,8 +99,13 @@ class NotesController extends Controller
 
     public function get_specific_note(Request $request)
     {
+        $userId = Auth::id();
         $note_id = $request->note_id;
         $note = Note::find($note_id);
+
+        if ($note->owner !== $userId) {
+            abort(403);
+        }
 
         return response()->json(['note' => $note], 200);
     }
