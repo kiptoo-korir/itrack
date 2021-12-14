@@ -20,6 +20,7 @@ class RepositoryController extends Controller
         FetchRepositories::dispatch($userId);
         $data['repositories'] = Repository::select(['id', 'name', 'description', 'issues_count', 'date_updated_online', 'date_created_online'])
             ->selectRaw('to_char(date_updated_online, \'Dy Mon DD YYYY\') as date_updated_online, to_char(date_created_online, \'Dy Mon DD YYYY\') as date_created_online')
+            ->where('owner', $userId)
             ->orderBy('repositories.date_created_online', 'desc')
             ->get()
         ;
@@ -29,7 +30,13 @@ class RepositoryController extends Controller
 
     public function specific_repository($id)
     {
+        $userId = Auth::id();
         $data['repository'] = Repository::findOrFail($id);
+
+        if ($userId !== $data['repository']->owner) {
+            abort(403);
+        }
+
         $data['languages'] = RepositoryLanguage::where('repository_id', $id)
             ->pluck('value', 'name')
         ;
@@ -37,7 +44,6 @@ class RepositoryController extends Controller
 
         $repositoryFullname = $data['repository']->fullname;
         $repoId = $data['repository']->id;
-        $userId = Auth::id();
 
         FetchLanguagesInRepoQueue::dispatch($repositoryFullname, $userId, $repoId)
         ;
