@@ -70,4 +70,43 @@ class StatsController extends Controller
 
         return response()->json($stats, 200);
     }
+
+    public function notesStatsViews()
+    {
+        $userId = Auth::id();
+        $projects = DB::table('projects')->select('id', 'name')
+            ->where([
+                'owner' => $userId,
+            ])
+            ->get()
+        ;
+
+        return view('stats.note')->with(['projects' => $projects]);
+    }
+
+    public function getNotesActivity()
+    {
+        $userId = Auth::id();
+        $notesActivities = $this->statsService->getNotes($userId);
+
+        return DataTables::of($notesActivities)->make(true);
+    }
+
+    public function getNoteActivityInPeriod(Request $request)
+    {
+        $userId = Auth::id();
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+        $project = $request->project;
+
+        if ($project) {
+            $notesActivities = $this->statsService->getNotesInPeriodAndProject($userId, (int) $project, $startDate, $endDate);
+        } else {
+            $notesActivities = $this->statsService->getNotesInPeriod($userId, $startDate, $endDate);
+        }
+
+        return DataTables::of($notesActivities)
+            ->make(true)
+        ;
+    }
 }

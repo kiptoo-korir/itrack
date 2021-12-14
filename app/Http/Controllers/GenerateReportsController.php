@@ -104,6 +104,40 @@ class GenerateReportsController extends Controller
         return response()->download($outputPath);
     }
 
+    public function generateNoteReport(Request $request)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+        $project = $request->project;
+
+        // Setup where the generated file will be stored
+        $nameLowerCase = strtolower(explode(' ', $user->name)[0]);
+        $filename = $nameLowerCase.strtotime(now()).'.pdf';
+        $outputPath = base_path('public/files/reports/').$filename;
+
+        // Setup wkhtmltopdf process
+        $wkhtml = 'wkhtmltopdf';
+        $route = route('note-report', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'userId' => $userId,
+            'name' => $user->name,
+            'project' => $project,
+        ]);
+
+        $process = new Process([$wkhtml, $route, $outputPath]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return response()->download($outputPath);
+    }
+
     private function monthName($month): string
     {
         if ($month > 12) {

@@ -136,7 +136,6 @@
                                 <h4 class="text-right"><b id="stats-login">{{ $stats['logIn'] }}</b></h4>
                             </div>
                         </div>
-                        <a href="#" class="btn btn-gradient btn-sm">Go somewhere</a>
                     </div>
                 </div>
             </div>
@@ -176,7 +175,7 @@
                                 <h4 class="text-right"><b id="stats-notes">{{ $stats['notes'] }}</b></h4>
                             </div>
                         </div>
-                        <a href="#" class="btn btn-gradient btn-sm">Go somewhere</a>
+                        <a href="{{ route('notes-stats-view') }}" class="btn btn-gradient btn-sm">View Details</a>
                     </div>
                 </div>
             </div>

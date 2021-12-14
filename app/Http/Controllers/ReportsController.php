@@ -6,6 +6,7 @@ use App\Services\StatsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReportsController extends Controller
 {
@@ -90,5 +91,37 @@ class ReportsController extends Controller
         // dd($data);
 
         return view('reports.task-report')->with($data);
+    }
+
+    public function noteActivityReport(Request $request)
+    {
+        $startDate = $request->get('startDate');
+        $endDate = $request->get('endDate');
+        $userId = $request->get('userId');
+        $name = $request->get('name');
+        $projectId = $request->get('project');
+
+        $project = DB::table('projects')->select('name')
+            ->where('id', $projectId)
+            ->first()
+        ;
+
+        if ($projectId && $startDate && $endDate) {
+            $noteActivity = $this->statsService->getNotesInPeriodAndProject($userId, $projectId, $startDate, $endDate);
+        } elseif ($startDate && !$projectId) {
+            $noteActivity = $this->statsService->getNotesInPeriod($userId, $startDate, $endDate);
+        } else {
+            $noteActivity = $this->statsService->getNotes($userId);
+        }
+
+        $data = [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'activity' => $noteActivity,
+            'name' => $name,
+            'projectInfo' => $project,
+        ];
+
+        return view('reports.note-report')->with($data);
     }
 }

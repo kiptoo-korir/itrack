@@ -95,6 +95,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-tasks-stats-period', [StatsController::class, 'getTaskActivityInPeriod'])->name('task-stats-period');
     Route::get('/tasks-breakdown', [StatsController::class, 'tasksCreatedAgainstCompleted'])->name('task-breakdown');
     Route::get('/generate-task-report', [GenerateReportsController::class, 'generateTaskReport'])->name('generate-task-report');
+    Route::get('/notes-stats', [StatsController::class, 'notesStatsViews'])->name('notes-stats-view');
+    Route::get('/get-notes-stats', [StatsController::class, 'getNotesActivity'])->name('note-stats');
+    Route::get('/get-notes-stats-period', [StatsController::class, 'getNoteActivityInPeriod'])->name('note-stats-period');
+    Route::get('/generate-note-report', [GenerateReportsController::class, 'generateNoteReport'])->name('generate-note-report');
 });
 
 // Email Verification Routes

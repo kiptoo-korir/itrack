@@ -96,8 +96,8 @@ class StatsService
             LIMIT 1000
             )
 
-            SELECT log_name, subject_id as task_id, task::jsonb->\'title\' as task_name,
-            task::jsonb->\'description\' as task_description, created_at
+            SELECT log_name, subject_id as task_id, task::jsonb->>\'title\' as task_name,
+            task::jsonb->>\'description\' as task_description, created_at
             FROM tasks_info
         '), [
             'log_name_1' => 'create-task',
@@ -120,8 +120,8 @@ class StatsService
             LIMIT 1000
             )
 
-            SELECT log_name, subject_id as task_id, task::jsonb->\'title\' as task_name,
-            task::jsonb->\'description\' as task_description, created_at
+            SELECT log_name, subject_id as task_id, task::jsonb->>\'title\' as task_name,
+            task::jsonb->>\'description\' as task_description, created_at
             FROM tasks_info
         '), [
             'log_name_1' => 'create-task',
@@ -150,5 +150,82 @@ class StatsService
             'created' => $createTasksStats,
             'completed' => $updateTasksStats,
         ];
+    }
+
+    public function getNotes(int $userId): array
+    {
+        return DB::select(DB::raw('
+            with notes_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'note\' as note,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as note_id, note::jsonb->>\'title\' as note_title,
+            note::jsonb->>\'message\' as note_description, 
+            note::jsonb->>\'project\' as project, created_at
+            FROM notes_info
+        '), [
+            'log_name' => 'create-note',
+            'causer_id' => $userId,
+        ]);
+    }
+
+    public function getNotesInPeriod(int $userId, string $startDate, string $endDate): array
+    {
+        return DB::select(DB::raw('
+            with notes_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'note\' as note,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND activity_log.created_at BETWEEN :start_date AND :end_date
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as note_id, note::jsonb->>\'title\' as note_title,
+            note::jsonb->>\'message\' as note_description, 
+            note::jsonb->>\'project\' as project, created_at
+            FROM notes_info
+        '), [
+            'log_name' => 'create-note',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'causer_id' => $userId,
+        ]);
+    }
+
+    public function getNotesInPeriodAndProject(int $userId, int $project, string $startDate, string $endDate): array
+    {
+        return DB::select(DB::raw('
+            with notes_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'note\' as note,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND activity_log.created_at BETWEEN :start_date AND :end_date
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as note_id, note::jsonb->>\'title\' as note_title,
+            note::jsonb->>\'message\' as note_description,
+            note::jsonb->>\'project\' as project, created_at
+            FROM notes_info
+            WHERE note::jsonb->>\'project\' = :project
+        '), [
+            'log_name' => 'create-note',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'causer_id' => $userId,
+            'project' => $project,
+        ]);
     }
 }

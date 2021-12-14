@@ -176,6 +176,7 @@
                                 <label class="col-md-4">Project</label>
                                 <div class="col-md-7">
                                     <select name="project" class="form-control" id="edit_project">
+                                        <option value="">No Project</option>
                                         @forelse ($projects as $project)
                                             <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @empty
