@@ -128,7 +128,7 @@
                     <p id="delete_title">Are you sure you want to remove this note?</p>
                 </div>
                 <div class="modal-footer">
-                    <form class="" id=" remove_form" action="" method="post">
+                    <form class="" id="remove_form" action="" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" id="delete_id" name="note_id" value="">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
