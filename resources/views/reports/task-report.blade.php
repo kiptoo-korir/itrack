@@ -105,7 +105,7 @@
             <h6>Generated On {{ now() }}</h6>
         </div>
         <div class="container" id="stats-list">
-            <h5 class="text-center py-3"><b>Tasks Created In Period</b></h5>
+            <h5 class="text-center py-3"><b>Tasks Information In Period</b></h5>
             <div class="d-flex flex-row mx-auto">
                 <div class="card-custom shadow width-half mx-2">
                     <div class="card-body">

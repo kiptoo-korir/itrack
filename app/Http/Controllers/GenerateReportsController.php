@@ -94,15 +94,14 @@ class GenerateReportsController extends Controller
             'name' => $user->name,
         ]);
 
-        dd($route);
-        // $process = new Process([$wkhtml, $route, $outputPath]);
-        // $process->run();
+        $process = new Process([$wkhtml, $route, $outputPath]);
+        $process->run();
 
-        // if (!$process->isSuccessful()) {
-        //     throw new ProcessFailedException($process);
-        // }
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
 
-        // return response()->download($outputPath);
+        return response()->download($outputPath);
     }
 
     private function monthName($month): string
