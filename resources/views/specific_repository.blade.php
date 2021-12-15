@@ -298,7 +298,9 @@
 
         Echo.private(`issues-in-repo.${repositoryId}`)
             .listen('FetchIssuesInRepoEvent', (response) => {
-                console.log(response);
+                setTimeout(() => {
+                    fetchIssuesTable();
+                }, 1000);
             });
 
         function renderTableCard(issue) {
@@ -312,17 +314,19 @@
 
             badgesElement = '';
 
-            if (errorArray.includes(labels)) {
+            if (!errorArray.includes(labels)) {
+                if (typeof(labels) === 'string') {
 
-            } else {
-                labels.forEach((label) => {
-                    let color = (label.color) ?? '#075db8';
-                    badgesElement += `
-                    <div class="issue-badge" style="background-color: #${color}">
-                        <span class="inverted" style="color: #${color}">${label.name}</span>
-                    </div>
-                `;
-                });
+                } else {
+                    labels.forEach((label) => {
+                        let color = (label.color) ?? '#075db8';
+                        badgesElement += `
+                            <div class="issue-badge" style="background-color: #${color}">
+                                <span class="inverted" style="color: #${color}">${label.name}</span>
+                            </div>
+                        `;
+                    });
+                }
             }
 
             let dateFormatted = new Date(dateCreated.slice(0, -3));
