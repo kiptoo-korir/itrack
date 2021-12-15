@@ -27,6 +27,7 @@ iTrack is a productivity assistance tool for developers that aims to enable them
 10. Find the app_echo.js file and search for "authEndpoint: '/itrack/public/broadcasting/auth'" and change it depending on your server configuration. If you are running a single app, i.e if your app is running on the root of localhost or an online server, change to /public/broadcasting/auth.
 11. Setup a new OAuth App On GitHub and set the scope to [notifications, repo, user]. Setup the Client ID and The Secret Token in the .env file. Learn more about OAuth Apps [here](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)
 12. Run composer install
+13. Run **php artisan storage:link** to setup symbolic links
 
 ## Run The Project
 
