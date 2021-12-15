@@ -28,6 +28,8 @@ iTrack is a productivity assistance tool for developers that aims to enable them
 11. Setup a new OAuth App On GitHub and set the scope to [notifications, repo, user]. Setup the Client ID and The Secret Token in the .env file. Learn more about OAuth Apps [here](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)
 12. Run composer install
 13. Run **php artisan storage:link** to setup symbolic links
+14. Run **php artisan migrate**
+15. Run **php artiasn key:generate**
 
 ## Run The Project
 
@@ -36,5 +38,9 @@ With the project setup, there are a few things that do need to be running. The f
 1. Start Queue Worker: **php artisan queue:work**
 2. Start Websocket Server **php artisan websockets:serve --port=6002**
 3. Start Schedule Worker **php artisan schedule:work**
+
+## Note
+
+Encryption is based off Laravel Encryption which works with the app_key. If the app_key changes, all tokens will be invalidated and users will have to get GitHub tokens afresh.
 
 ### Happy Coding
