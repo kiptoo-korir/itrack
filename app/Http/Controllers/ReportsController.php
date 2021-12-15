@@ -147,4 +147,27 @@ class ReportsController extends Controller
 
         return view('reports.project-report')->with($data);
     }
+
+    public function reminderActivityReport(Request $request)
+    {
+        $startDate = $request->get('startDate');
+        $endDate = $request->get('endDate');
+        $userId = $request->get('userId');
+        $name = $request->get('name');
+
+        if (!$startDate) {
+            $reminderActivities = $this->statsService->getReminderActivity($userId);
+        } else {
+            $reminderActivities = $this->statsService->getReminderActivityInPeriod($userId, $startDate, $endDate);
+        }
+
+        $data = [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'activity' => $reminderActivities,
+            'name' => $name,
+        ];
+
+        return view('reports.reminder-report')->with($data);
+    }
 }

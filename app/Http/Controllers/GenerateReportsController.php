@@ -162,6 +162,36 @@ class GenerateReportsController extends Controller
         return response()->download($outputPath);
     }
 
+    public function generateReminderReport(Request $request)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        // Setup where the generated file will be stored
+        $outputPath = $this->getOutputPath($user->name);
+
+        // Setup report route
+        $route = route('reminder-report', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'userId' => $userId,
+            'name' => $user->name,
+        ]);
+
+        // Setup wkhtmltopdf process
+        $process = new Process([$this->wkhtml, $route, $outputPath]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return response()->download($outputPath);
+    }
+
     private function getOutputPath(string $username): string
     {
         $nameLowerCase = strtolower(explode(' ', $username)[0]);

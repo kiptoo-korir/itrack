@@ -213,7 +213,7 @@
                                 <h4 class="text-right"><b id="stats-reminders">{{ $stats['reminders'] }}</b></h4>
                             </div>
                         </div>
-                        <a href="#" class="btn btn-gradient btn-sm">Go somewhere</a>
+                        <a href="{{ route('reminder-stats-view') }}" class="btn btn-gradient btn-sm">View Details</a>
                     </div>
                 </div>
             </div>

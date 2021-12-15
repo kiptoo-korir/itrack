@@ -275,4 +275,51 @@ class StatsService
             'end_date' => $endDate,
         ]);
     }
+
+    public function getReminderActivity($userId)
+    {
+        return DB::select(DB::raw('
+            with tasks_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'reminder\' as reminder,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as reminder_id, reminder::jsonb->>\'title\' as reminder_title,
+            reminder::jsonb->>\'message\' as reminder_description, created_at
+            FROM tasks_info
+        '), [
+            'log_name' => 'dispatch-reminder',
+            'causer_id' => $userId,
+        ]);
+    }
+
+    public function getReminderActivityInPeriod($userId, $startDate, $endDate)
+    {
+        return DB::select(DB::raw('
+            with tasks_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'reminder\' as reminder,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND causer_id = :causer_id
+            AND activity_log.created_at BETWEEN :start_date AND :end_date
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as reminder_id, reminder::jsonb->>\'title\' as reminder_title,
+            reminder::jsonb->>\'message\' as reminder_description, created_at
+            FROM tasks_info
+        '), [
+            'log_name' => 'dispatch-reminder',
+            'causer_id' => $userId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+    }
 }

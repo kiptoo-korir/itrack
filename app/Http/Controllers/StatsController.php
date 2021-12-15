@@ -133,4 +133,28 @@ class StatsController extends Controller
 
         return DataTables::of($projectsActivities)->make(true);
     }
+
+    public function remindersStatsView()
+    {
+        return view('stats.reminders-dispatched');
+    }
+
+    public function getRemindersActivity()
+    {
+        $userId = Auth::id();
+        $remindersActivities = $this->statsService->getReminderActivity($userId);
+
+        return DataTables::of($remindersActivities)->make(true);
+    }
+
+    public function getRemindersActivityInPeriod(Request $request)
+    {
+        $userId = Auth::id();
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        $remindersActivities = $this->statsService->getReminderActivityInPeriod($userId, $startDate, $endDate);
+
+        return DataTables::of($remindersActivities)->make(true);
+    }
 }

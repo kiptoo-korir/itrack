@@ -23,3 +23,4 @@ Route::get('/summary-stats', [ReportsController::class, 'summaryStatsReport'])->
 Route::get('/task-report', [ReportsController::class, 'taskStatsReport'])->name('task-report');
 Route::get('/note-report', [ReportsController::class, 'noteActivityReport'])->name('note-report');
 Route::get('/project-report', [ReportsController::class, 'projectActivityReport'])->name('project-report');
+Route::get('/reminder-report', [ReportsController::class, 'reminderActivityReport'])->name('reminder-report');

@@ -104,6 +104,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-projects-stats', [StatsController::class, 'getProjectsActivity'])->name('project-stats');
     Route::get('/get-projects-stats-period', [StatsController::class, 'getProjectsActivityInPeriod'])->name('project-stats-period');
     Route::get('/generate-project-report', [GenerateReportsController::class, 'generateProjectReport'])->name('generate-project-report');
+    Route::get('/view-reminders-stats', [StatsController::class, 'remindersStatsView'])->name('reminder-stats-view');
+    Route::get('/get-reminders-stats', [StatsController::class, 'getRemindersActivity'])->name('reminder-stats');
+    Route::get('/get-reminders-stats-period', [StatsController::class, 'getRemindersActivityInPeriod'])->name('reminder-stats-period');
+    Route::get('/generate-reminder-report', [GenerateReportsController::class, 'generateReminderReport'])->name('generate-reminder-report');
 });
 
 // Email Verification Routes
