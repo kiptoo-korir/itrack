@@ -12,6 +12,7 @@ use Symfony\Component\Process\Process;
 class GenerateReportsController extends Controller
 {
     protected $statsService;
+    protected $wkhtml = 'wkhtmltopdf';
 
     public function __construct(StatsService $statsService)
     {
@@ -50,19 +51,17 @@ class GenerateReportsController extends Controller
         }
 
         // Setup where the generated file will be stored
-        $nameLowerCase = strtolower(explode(' ', $user->name)[0]);
-        $filename = $nameLowerCase.strtotime(now()).'.pdf';
-        $outputPath = base_path('public/files/reports/').$filename;
+        $outputPath = $this->getOutputPath($user->name);
 
-        // Setup wkhtmltopdf process
-        $wkhtml = 'wkhtmltopdf';
+        // Setup report route
         $route = route('summary-report', [
             'header' => $header,
             'name' => $user->name,
             'stats' => $stats,
         ]);
 
-        $process = new Process([$wkhtml, $route, $outputPath]);
+        // Setup wkhtmltopdf process
+        $process = new Process([$this->wkhtml, $route, $outputPath]);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -81,12 +80,9 @@ class GenerateReportsController extends Controller
         $endDate = $request->endDate;
 
         // Setup where the generated file will be stored
-        $nameLowerCase = strtolower(explode(' ', $user->name)[0]);
-        $filename = $nameLowerCase.strtotime(now()).'.pdf';
-        $outputPath = base_path('public/files/reports/').$filename;
+        $outputPath = $this->getOutputPath($user->name);
 
-        // Setup wkhtmltopdf process
-        $wkhtml = 'wkhtmltopdf';
+        // Setup report route
         $route = route('task-report', [
             'startDate' => $startDate,
             'endDate' => $endDate,
@@ -94,7 +90,7 @@ class GenerateReportsController extends Controller
             'name' => $user->name,
         ]);
 
-        $process = new Process([$wkhtml, $route, $outputPath]);
+        $process = new Process([$this->wkhtml, $route, $outputPath]);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -114,12 +110,9 @@ class GenerateReportsController extends Controller
         $project = $request->project;
 
         // Setup where the generated file will be stored
-        $nameLowerCase = strtolower(explode(' ', $user->name)[0]);
-        $filename = $nameLowerCase.strtotime(now()).'.pdf';
-        $outputPath = base_path('public/files/reports/').$filename;
+        $outputPath = $this->getOutputPath($user->name);
 
-        // Setup wkhtmltopdf process
-        $wkhtml = 'wkhtmltopdf';
+        // Setup report route
         $route = route('note-report', [
             'startDate' => $startDate,
             'endDate' => $endDate,
@@ -128,7 +121,8 @@ class GenerateReportsController extends Controller
             'project' => $project,
         ]);
 
-        $process = new Process([$wkhtml, $route, $outputPath]);
+        // Setup wkhtmltopdf process
+        $process = new Process([$this->wkhtml, $route, $outputPath]);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -136,6 +130,44 @@ class GenerateReportsController extends Controller
         }
 
         return response()->download($outputPath);
+    }
+
+    public function generateProjectReport(Request $request)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        // Setup where the generated file will be stored
+        $outputPath = $this->getOutputPath($user->name);
+
+        // Setup report route
+        $route = route('project-report', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'userId' => $userId,
+            'name' => $user->name,
+        ]);
+
+        // Setup wkhtmltopdf process
+        $process = new Process([$this->wkhtml, $route, $outputPath]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return response()->download($outputPath);
+    }
+
+    private function getOutputPath(string $username): string
+    {
+        $nameLowerCase = strtolower(explode(' ', $username)[0]);
+        $filename = $nameLowerCase.strtotime(now()).'.pdf';
+
+        return base_path('public/files/reports/').$filename;
     }
 
     private function monthName($month): string

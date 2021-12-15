@@ -2,20 +2,20 @@
 
 @section('css_scripts')
     <style>
-        .note {
+        .project {
             padding: 0.5rem 0.5rem;
             border-bottom: 1px solid #d9d6d6;
             background-color: white;
         }
 
-        .note-body {
+        .project-body {
             font-size: 0.97rem;
             color: hsl(0, 0%, 25%);
             padding: 0.15rem 0;
             margin: 0;
         }
 
-        .note-title {
+        .project-title {
             font-weight: 700;
             font-size: 1.05rem;
         }
@@ -62,25 +62,22 @@
         <div class="mx-auto text-center mb-4">
             <img src="{{ asset('img/2.png') }}" alt="iTrack" height="50px">
             <h5 class="text-center text-uppercase my-4 pt-3"><b>{{ $name }}</b></h5>
-            <h4 class="pt-4">Detailed Report On Notes</h4>
+            <h4 class="pt-4">Detailed Report On Projects</h4>
         </div>
         <div class="bg-gradient details py-2 pl-3 width-100">
             <h5>Report Parameters</h5>
             <h6>Date Range: <b>{{ $startDate }} - {{ $endDate }}</b></h6>
-            @isset($projectInfo)
-                <h6>Notes Limited To Project: <b>{{ $projectInfo->name }}</b></h6>
-            @endisset
             <h6>Generated On {{ now() }}</h6>
         </div>
         <div class="container" id="stats-list">
-            <h5 class="text-center py-3"><b>Notes Created In Period</b></h5>
+            <h5 class="text-center py-3"><b>Projects Created In Period</b></h5>
         </div>
         <div>
-            @forelse ($activity as $note)
-                <div class="note">
-                    <h6 class="note-title">{{ $note->note_title }}</h6>
-                    <p class="note-body">{{ $note->note_description }}</p>
-                    <p class="note-body">Created <b>{{ $note->created_at }}</b></p>
+            @forelse ($activity as $project)
+                <div class="project">
+                    <h6 class="project-title">{{ $project->project_title }}</h6>
+                    <p class="project-body">{{ $project->project_description }}</p>
+                    <p class="project-body">Created <b>{{ $project->created_at }}</b></p>
                 </div>
             @empty
 

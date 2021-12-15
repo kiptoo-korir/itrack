@@ -22,3 +22,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/summary-stats', [ReportsController::class, 'summaryStatsReport'])->name('summary-report');
 Route::get('/task-report', [ReportsController::class, 'taskStatsReport'])->name('task-report');
 Route::get('/note-report', [ReportsController::class, 'noteActivityReport'])->name('note-report');
+Route::get('/project-report', [ReportsController::class, 'projectActivityReport'])->name('project-report');

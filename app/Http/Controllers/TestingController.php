@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\TestMail;
 use App\Models\Note;
+use App\Models\Repository;
 use App\Models\RepositoryLanguage;
 use App\Models\User;
 use App\Notifications\ReminderNotification;
@@ -11,10 +12,13 @@ use App\Services\ApiCallsService;
 use App\Services\InvalidTokenService;
 use App\Services\TokenService;
 use Faker;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Request;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 class TestingController extends Controller
 {
@@ -33,7 +37,77 @@ class TestingController extends Controller
     {
         $apiService = new ApiCallsService($this->tok_service, $this->invalidTokenService);
 
-        $issues = $apiService->githubCallsHandler('https://api.github.com/repos/kiptoo-korir/church-frontend/issues?sort=created&page=1&per_page=50', 4);
+        $repositories = $apiService->githubCallsHandler('https://api.github.com/user/repos?sort=created&page=1&per_page=50', 5);
+        dd($repositories);
+
+        $latestUpdated = Repository::where('owner', 4)
+            ->orderBy('date_updated_online', 'desc')
+            ->limit(1)
+            ->pluck('date_updated_online')
+            ->first()
+        ;
+
+        $latestUpdatedUnix = strtotime($latestUpdated);
+
+        $existingRepoIds = DB::table('repositories')->where(['owner' => 4])
+            ->select('repository_id')
+            ->distinct()
+            ->pluck('repository_id')
+            ->toArray()
+        ;
+
+        $count = Repository::where('owner', 4)->count();
+
+        $newRepos = [];
+        $reposToUpdate = [];
+
+        $incomingRepoIds = array_map(function ($repository) {
+            return $repository->id;
+        }, $repositories);
+
+        $newRepoIds = array_diff($incomingRepoIds, $existingRepoIds);
+        $reposToRemoveIds = array_diff($existingRepoIds, $incomingRepoIds);
+
+        foreach ($repositories as $repository) {
+            // First time issues are added to repository
+            if (0 === $count) {
+                array_push($newRepos, $this->createArr($repository));
+
+                continue;
+            }
+
+            // Get Newly Created Issues
+            if (in_array($repository->id, $newRepoIds)) {
+                array_push($newRepos, $this->createArr($repository));
+
+                continue;
+            }
+
+            // Updated issues pushed to a single array
+            if (isset($latestUpdatedUnix) && strtotime($repository->updated_at) > $latestUpdatedUnix) {
+                array_push($reposToUpdate, $this->updateArr($repository));
+
+                continue;
+            }
+        }
+
+        // dd($incomingIssueNos, $existingIssueNos);
+        dd($reposToUpdate, $newRepos);
+
+        // $issueNos = $issuesCollection->map(function ($issue) {
+        //     return $issue->number;
+        // })->toArray();
+
+        // $newIssueNos = array_diff($issueNos, $existingIssueNos);
+        // $issuesToRemove = array_diff($existingIssueNos, $issueNos);
+
+        // $updatedIssues = $issuesCollection->filter(function ($issue) use ($latestUpdatedUnix) {
+        //     return strtotime($issue->updated_at) > $latestUpdatedUnix;
+        // })->map(function ($issue) {
+        //     return $this->createArr($issue);
+        // });
+
+        // dd($latestUpdatedUnix, $updatedIssues);
     }
 
     public function callback(Request $request)
@@ -175,5 +249,63 @@ class TestingController extends Controller
             $user = User::findOrFail($reminder->user_id);
             $user->notify(new ReminderNotification($reminder));
         }
+    }
+
+    public function getIncomingNos($issue)
+    {
+        return $issue->number;
+    }
+
+    public function testPDFGeneration()
+    {
+        $path = base_path().'vendor/h4cc/wkhtmltopdf-amd64/bin/wkhtmltopdf-amd64';
+
+        $outputPath = base_path('public/files/reports/').'test76.pdf';
+        $route = 'http://localhost/itrack/api/task-report?startDate=2021-11-01&endDate=2021-12-11&userId=4&name=Elijah%20Korir';
+
+        $process = new Process([$path, $route, $outputPath]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return response()->download($outputPath);
+    }
+
+    public function clearReportsDirectory()
+    {
+        $file = new Filesystem();
+        $file->cleanDirectory('public/files/reports');
+    }
+
+    protected function createArr($repo): array
+    {
+        return [
+            'owner' => 4,
+            'platform' => 1,
+            'name' => $repo->name,
+            'fullname' => $repo->full_name,
+            'repository_id' => $repo->id,
+            'description' => $repo->description,
+            'date_created_online' => $repo->created_at,
+            'date_pushed_online' => $repo->pushed_at,
+            'date_updated_online' => $repo->updated_at,
+            'issues_count' => $repo->open_issues_count,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+
+    protected function updateArr($repository): array
+    {
+        return [
+            'name' => $repository->name,
+            'fullname' => $repository->full_name,
+            'repository_id' => $repository->id,
+            'description' => $repository->description,
+            'date_updated_online' => $repository->updated_at,
+            'issues_count' => $repository->open_issues_count,
+        ];
     }
 }

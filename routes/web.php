@@ -39,6 +39,7 @@ Route::get('/test_3', [TestingController::class, 'fake_data']);
 Route::get('/test_notify', [TestingController::class, 'notify']);
 Route::get('/sample_reminder_mail', [TestingController::class, 'showEmailView']);
 Route::get('/github_callback', [ProfileController::class, 'callback']);
+Route::get('/clear-reports', [TestingController::class, 'clearReportsDirectory']);
 
 // Only Authorised and Verified users
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -99,6 +100,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-notes-stats', [StatsController::class, 'getNotesActivity'])->name('note-stats');
     Route::get('/get-notes-stats-period', [StatsController::class, 'getNoteActivityInPeriod'])->name('note-stats-period');
     Route::get('/generate-note-report', [GenerateReportsController::class, 'generateNoteReport'])->name('generate-note-report');
+    Route::get('/view-projects-stats', [StatsController::class, 'projectsStatsView'])->name('projects-stats-view');
+    Route::get('/get-projects-stats', [StatsController::class, 'getProjectsActivity'])->name('project-stats');
+    Route::get('/get-projects-stats-period', [StatsController::class, 'getProjectsActivityInPeriod'])->name('project-stats-period');
+    Route::get('/generate-project-report', [GenerateReportsController::class, 'generateProjectReport'])->name('generate-project-report');
 });
 
 // Email Verification Routes

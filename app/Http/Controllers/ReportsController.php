@@ -124,4 +124,27 @@ class ReportsController extends Controller
 
         return view('reports.note-report')->with($data);
     }
+
+    public function projectActivityReport(Request $request)
+    {
+        $startDate = $request->get('startDate');
+        $endDate = $request->get('endDate');
+        $userId = $request->get('userId');
+        $name = $request->get('name');
+
+        if (!$startDate) {
+            $projectsActivities = $this->statsService->getProjectActivity($userId);
+        } else {
+            $projectsActivities = $this->statsService->getProjectActivityInPeriod($userId, $startDate, $endDate);
+        }
+
+        $data = [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'activity' => $projectsActivities,
+            'name' => $name,
+        ];
+
+        return view('reports.project-report')->with($data);
+    }
 }

@@ -109,4 +109,28 @@ class StatsController extends Controller
             ->make(true)
         ;
     }
+
+    public function projectsStatsView()
+    {
+        return view('stats.project');
+    }
+
+    public function getProjectsActivity()
+    {
+        $userId = Auth::id();
+        $projectsActivities = $this->statsService->getProjectActivity($userId);
+
+        return DataTables::of($projectsActivities)->make(true);
+    }
+
+    public function getProjectsActivityInPeriod(Request $request)
+    {
+        $userId = Auth::id();
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        $projectsActivities = $this->statsService->getProjectActivityInPeriod($userId, $startDate, $endDate);
+
+        return DataTables::of($projectsActivities)->make(true);
+    }
 }

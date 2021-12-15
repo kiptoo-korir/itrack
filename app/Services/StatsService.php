@@ -228,4 +228,51 @@ class StatsService
             'project' => $project,
         ]);
     }
+
+    public function getProjectActivity(int $userId): array
+    {
+        return DB::select(DB::raw('
+            with tasks_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'project\' as project,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND causer_id = :causer_id
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as project_id, project::jsonb->>\'name\' as project_title,
+            project::jsonb->>\'description\' as project_description, created_at
+            FROM tasks_info
+        '), [
+            'log_name' => 'create-project',
+            'causer_id' => $userId,
+        ]);
+    }
+
+    public function getProjectActivityInPeriod(int $userId, string $startDate, string $endDate): array
+    {
+        return DB::select(DB::raw('
+            with tasks_info AS
+            (SELECT log_name, subject_id, properties::jsonb->\'project\' as project,
+            to_char(created_at, \'Dy DD Mon, YYYY at HH:MI AM \') as created_at
+            FROM activity_log
+            WHERE log_name = :log_name
+            AND causer_id = :causer_id
+            AND activity_log.created_at BETWEEN :start_date AND :end_date
+            ORDER BY activity_log.created_at DESC
+            LIMIT 1000
+            )
+
+            SELECT log_name, subject_id as project_id, project::jsonb->>\'name\' as project_title,
+            project::jsonb->>\'description\' as project_description, created_at
+            FROM tasks_info
+        '), [
+            'log_name' => 'create-project',
+            'causer_id' => $userId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+    }
 }
