@@ -19,15 +19,19 @@
                 <!-- Authentication Links -->
                 @if (Route::has('login'))
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">{{ __('Sign In') }}</a>
+                        <a class="nav-link text-black" href="{{ route('login') }}">{{ __('Sign In') }}</a>
                     </li>
                 @endif
 
                 @if (Route::has('register'))
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">{{ __('Sign Up') }}</a>
+                        <a class="nav-link text-black" href="{{ route('register') }}">{{ __('Sign Up') }}</a>
                     </li>
                 @endif
+
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="{{ route('about') }}">{{ __('About') }}</a>
+                </li>
             </ul>
         </div>
     </nav>

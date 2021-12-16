@@ -37,6 +37,10 @@
             min-height: 100vh;
         }
 
+        .text-black {
+            color: black !important;
+        }
+
     </style>
 </head>
 

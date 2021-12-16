@@ -76,7 +76,7 @@
                         <!-- Authentication Links -->
                         @if (Route::has('login'))
                             <li class="nav-item mr-2">
-                                <a class="nav-link text-black" href="{{ route('login') }}">{{ __('Sign In') }}</a>
+                                <a class="nav-link text-black" href="{{ route('home') }}">{{ __('Sign In') }}</a>
                             </li>
                         @endif
 

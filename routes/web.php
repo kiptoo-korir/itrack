@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GenerateReportsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IssuesController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\NotesController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProfileController;
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Auth::routes();
-Route::get('/landing-page', [HomeController::class, 'landingPage']);
+Route::get('/about', [LandingPageController::class, 'landingPage'])->name('about');
 Route::get('/login', [AuthController::class, 'login_view']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class, 'register_view']);
