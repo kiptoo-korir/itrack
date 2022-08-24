@@ -11,10 +11,6 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    {{-- <script src="{{ asset('js/app.js') }}" defer></script> --}}
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css"
-        integrity="sha384-wESLQ85D6gbsF459vf1CiZ2+rr+CsxRY0RpiF1tLlQpDnAgg6rwdsUF1+Ics2bni" crossorigin="anonymous">
 
     {{-- favicon --}}
     <link rel="shortcut icon" href="{{ asset('img/itrack_icon_2.png') }}" type="image/x-icon">
@@ -27,8 +23,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 
     <!-- Styles -->
-    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/toast_spinner.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/simple_toast.min.css') }}">
 
     @yield('css_scripts')
 
@@ -40,7 +37,6 @@
         .text-black {
             color: black !important;
         }
-
     </style>
 </head>
 
@@ -50,14 +46,18 @@
         <main class="py-4">
             @include('components.spinner')
             @yield('content')
-            @include('components.toasts')
             @yield('modals')
         </main>
     </div>
 </body>
-<script src="{{ asset('js/jquery-3.6.0.js') }}"></script>
-<script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
-<script src="{{ asset('js/toast.js') }}"></script>
+<script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('js/simple_toast.min.js') }}"></script>
+<script>
+    const simpleToast = new SimpleToast({
+        duration: 6000,
+        position: "top-right"
+    });
+</script>
 @yield('js_scripts')
 
 </html>
