@@ -6,7 +6,7 @@
                 <img src="{{ asset('img/2.png') }}" height="25px"
                     style="border-radius: 4px; box-shadow: 2px 2px 2px black;" alt="">
             </a>
-            <button class="navbar-toggler mr-auto ml-2" type="button" data-toggle="collapse"
+            <button class="navbar-toggler mr-auto ml-2" type="button" data-bs-toggle="collapse"
                 data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
                 aria-label="{{ __('Toggle navigation') }}">
                 <span class="navbar-toggler-icon"></span>
@@ -62,7 +62,7 @@
                     <div id="notifications" class="d-flex">
                         <div class="dropdown nav-item">
                             <a class="nav-link notification-bell" href="#" id="bell" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <div class="media align-items-center">
                                     <div class="media-body">
                                         <i class="bi bi-bell-fill"></i>
@@ -71,7 +71,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right py-0 overflow-hidden not-dropdown"
+                            <div class="dropdown-menu dropdown-menu-end py-0 overflow-hidden not-dropdown"
                                 id="notification-dropdown">
                                 <!-- List group -->
                                 <div id="notification_list">
@@ -88,7 +88,7 @@
                     <div id="right_dropdown" class="">
                         <div class="dropdown nav-item">
                             <div class="media align-items-center dropdown-toggle d-flex flex-row" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 @isset($user_data->photo)
                                     <img class="rounded-circle avatar" alt="user"
                                         src="{{ url('storage/images/' . $user_data->photo) }}" data-holder-rendered="true">
@@ -102,7 +102,7 @@
                                     <span class="nav-link px-0 pl-1">{{ $user_data->name }}</span>
                                 </div>
                             </div>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right py-0 overflow-hidden">
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0 overflow-hidden">
                                 <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>
                                 <a class="dropdown-item" href="{{ route('reports') }}">Reports</a>
                                 <a class="dropdown-item" href="{{ route('logout') }}"
