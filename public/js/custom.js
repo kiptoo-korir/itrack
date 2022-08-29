@@ -1,10 +1,12 @@
 function showSpinner() {
-    $('.background-spinner, .spin-wrapper').show();
+    document.getElementById("spinner-background").style.display = "block";
+    document.getElementById("spinner-wrapper").style.display = "block";
     setTimeout(() => {
         hideSpinner();
     }, 10000);
 }
 
 function hideSpinner() {
-    $('.background-spinner, .spin-wrapper').hide();
+    document.getElementById("spinner-background").style.display = "";
+    document.getElementById("spinner-wrapper").style.display = "";
 }
