@@ -1,5 +1,5 @@
-<div class="background-spinner">               
+<div class="background-spinner" id="spinner-background">
 </div>
-<div class="spin-wrapper">
+<div class="spin-wrapper" id="spinner-wrapper">
     <div class="spinner"></div>
 </div>
