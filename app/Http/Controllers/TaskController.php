@@ -5,56 +5,56 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 
 class TaskController extends Controller
 {
-    public function task_view()
+    public function taskView()
     {
         return view('task');
     }
 
-    public function create_task(Request $request)
+    public function createTask(Request $request)
     {
         $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
         ]);
 
-        $user_id = Auth::id();
+        $userId = Auth::id();
         $task_record = [
-            'user_id' => $user_id,
+            'user_id' => $userId,
             'title' => $request->title,
             'description' => $request->description,
         ];
 
         if ($task = Task::create($task_record)) {
-            $this->logCreateTask($task);
+            // $this->logCreateTask($task);
 
-            return response()->json(['success' => 'Task created successfully.'], 200);
+            return response()->json(['message' => 'Task created successfully.'], 200);
         }
 
         return response()->json(['error' => 'An error seems to have occurred, please try again.'], 400);
     }
 
-    public function get_tasks()
+    public function getTasks()
     {
+        // TODO: Pick unix timestamp as well for sorting
         $user_id = Auth::id();
         $data = Task::where('user_id', $user_id)->orderByDesc('created_at')->get();
 
-        return DataTables::of($data)->make(true);
+        return response()->json(['tasks' => $data], 200);
     }
 
-    public function edit_task(Request $request)
+    public function editTask(Request $request)
     {
         $request->validate([
-            'task_id' => 'required|integer',
+            'taskId' => 'required',
             'title' => 'required|string',
             'description' => 'required|string',
         ]);
 
-        $task_id = $request->get('task_id');
-        $task = Task::find($task_id);
+        $taskId = $request->get('taskId');
+        $task = Task::find($taskId);
 
         $createdAt = strtotime($task->created_at);
         $updatedAt = strtotime($task->updated_at);
@@ -74,17 +74,17 @@ class TaskController extends Controller
         return response()->json(['success' => 'Task updated successfully.'], 200);
     }
 
-    public function delete_task(Request $request)
+    public function deleteTask(Request $request)
     {
         $request->validate([
-            'task_id' => 'required|integer',
+            'taskId' => 'required|integer',
         ]);
 
-        $task_id = $request->get('task_id');
-        $task = Task::find($task_id);
+        $taskId = $request->get('taskId');
+        $task = Task::find($taskId);
 
         if ($task->delete()) {
-            return response()->json(['success' => 'Task has been removed.'], 200);
+            return response()->json(['message' => 'Task has been removed.'], 200);
         }
     }
 

@@ -53,11 +53,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recent_activities', [ProfileController::class, 'recent_activity'])->name('recent_activity');
     Route::get('/token_list', [ProfileController::class, 'tokens_list'])->name('token_list');
     Route::post('/remove_token', [ProfileController::class, 'remove_token'])->name('delete_token');
-    Route::get('/task', [TaskController::class, 'task_view'])->name('task_view');
-    Route::get('/get_tasks', [TaskController::class, 'get_tasks'])->name('get_tasks');
-    Route::post('/add_task', [TaskController::class, 'create_task'])->name('add_task');
-    Route::post('/edit_task', [TaskController::class, 'edit_task'])->name('edit_task');
-    Route::post('/remove_task', [TaskController::class, 'delete_task'])->name('delete_task');
+    Route::get('/task', [TaskController::class, 'taskView'])->name('task_view');
+    Route::get('/get-tasks', [TaskController::class, 'getTasks'])->name('get-tasks');
+    Route::post('/add_task', [TaskController::class, 'createTask'])->name('add-task');
+    Route::post('/edit-task', [TaskController::class, 'editTask'])->name('edit-task');
+    Route::post('/remove_task', [TaskController::class, 'deleteTask'])->name('delete-task');
     Route::get('/repositories', [RepositoryController::class, 'repositories_view'])->name('repositories');
     Route::get('/notes', [NotesController::class, 'notes_view'])->name('notes_view');
     Route::post('/add_note', [NotesController::class, 'create_note'])->name('add_note');
