@@ -27,9 +27,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 
     <!-- Styles -->
-    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/simple_toast.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/toast_spinner.css') }}">
-    {{-- <link href="{{ URL::asset('css/app.css') }}" rel="stylesheet"> --}}
     <style>
         .avatar-text {
             height: 40px;
@@ -50,7 +50,6 @@
         #app {
             min-height: 100vh;
         }
-
     </style>
     @yield('css_scripts')
 </head>
@@ -68,12 +67,17 @@
         </main>
     </div>
 </body>
-<script src="{{ asset('js/jquery-3.6.0.js') }}"></script>
-<script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
+<script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('js/simple_toast.min.js') }}"></script>
 <script src="{{ asset('js/custom.js') }}"></script>
 <script src="{{ asset('js/app_echo.js') }}"></script>
 <script src="{{ asset('js/toast.js') }}"></script>
 <script>
+    const simpleToast = new SimpleToast({
+        duration: 6000,
+        position: "top-right"
+    });
+
     const userId = {{ $user_data->id }};
     const notification_count = {{ $notification_count }};
     const notificationsRoute = "{{ route('fetch_notifications') }}";
@@ -82,11 +86,67 @@
 @yield('js_scripts')
 <script src="{{ asset('js/add_notification.js') }}"></script>
 <script>
+    const convertObject = (dataObject) => {
+        if (dataObject.length === 0) return {
+            headings: [],
+            data: []
+        };
+
+        let obj = {
+            // Quickly get the headings
+            headings: Object.keys(dataObject[0]),
+
+            // data array
+            data: []
+        };
+
+        const len = dataObject.length;
+        // Loop over the objects to get the values
+        for (let i = 0; i < len; i++) {
+            obj.data[i] = [];
+
+            for (let p in dataObject[i]) {
+                if (dataObject[i].hasOwnProperty(p)) {
+                    obj.data[i].push(dataObject[i][p]);
+                }
+            }
+        }
+
+        return obj
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('notification-dropdown').addEventListener('click', function(e) {
             e.stopPropagation();
         });
+        fetchTopNotifications();
     });
+
+    const handle422Response = (responseBody) => {
+        const {
+            error = null,
+                errors = null
+        } = responseBody;
+
+        let errorMessage = error ?? '';
+
+        if (errors) {
+            for (const key in errors) {
+                errorMessage += `<p class="mb-1">${errors[key][0]}</p>`
+            }
+        }
+
+        return errorMessage;
+    }
+
+    const createFeedbackAlert = (message, variation) => {
+        return `
+            <div class="alert alert-${variation} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    }
 </script>
 
 </html>
