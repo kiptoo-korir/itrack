@@ -71,7 +71,7 @@ class TaskController extends Controller
             $this->logUpdateTask($task);
         }
 
-        return response()->json(['success' => 'Task updated successfully.'], 200);
+        return response()->json(['message' => 'Task updated successfully.'], 200);
     }
 
     public function deleteTask(Request $request)

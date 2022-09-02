@@ -120,6 +120,7 @@
                 </div>
                 <form action="" class="form-groups" method="POST" id="edit-task-form">
                     <div class="modal-body">
+                        <div id="edit-task-form-feedback"></div>
                         @csrf
                         <input type="hidden" name="task_id" id="edit-id">
                         <div class="form-group mb-2">
@@ -144,7 +145,7 @@
                             <div class="row">
                                 <label class="col-md-4">Status</label>
                                 <div class="col-md-6">
-                                    <select name="status" id="edit-status" class="form-control form-control" required>
+                                    <select name="status" id="edit-status" class="form-control form-select" required>
                                         <option value="Todo">Todo</option>
                                         <option value="Done">Done</option>
                                     </select>
@@ -172,6 +173,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             fetchTasks();
         });
+        let taskDatatable = null;
 
         const fetchTasks = async () => {
             const route = "{{ route('get-tasks') }}";
@@ -202,7 +204,10 @@
 
         const setUpTable = (tasks) => {
             const taskTable = document.getElementById('task-table');
-            let datatable = new simpleDatatables.DataTable(taskTable, {
+
+            if (taskDatatable != null) taskDatatable.destroy();
+
+            taskDatatable = new simpleDatatables.DataTable(taskTable, {
                 data: tasks,
                 columns: [{
                     select: [1, 2, 3, 4, 5, 6, 7],
@@ -281,6 +286,7 @@
             document.getElementById('delete-btn').disabled = true;
             document.getElementById('delete-task-form-feedback').innerHTML = createFeedbackAlert(responseBody
                 .message, 'success');
+            fetchTasks();
             hideSpinner();
         });
 
@@ -322,83 +328,48 @@
             hideSpinner();
         });
 
-        document.getElementById('edit-task-form').addEventListener('submit', function(event) {
+        document.getElementById('edit-task-form').addEventListener('submit', async function(event) {
             event.preventDefault();
-            console.log('Yes');
+
+            const editUrl = "{{ route('edit-task') }}";
+
+            const taskId = document.getElementById('edit-id').value;
+            const title = document.getElementById('edit-title').value;
+            const description = document.getElementById('edit-description').value;
+            const status = document.getElementById('edit-status').value;
+
+            const _token = "{{ csrf_token() }}";
+
+            showSpinner();
+
+            const response = await fetch(editUrl, {
+                method: "POST",
+                body: JSON.stringify({
+                    taskId,
+                    title,
+                    description,
+                    status,
+                    _token
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            const responseBody = await response.json();
+            const responseStatus = response.status;
+            if (status === 422 || status === 500) {
+                document.getElementById('edit-task-form-feedback').innerHTML = createFeedbackAlert(
+                    handle422Response(responseBody), 'danger');
+                hideSpinner();
+                return;
+            }
+
+            document.getElementById('edit-task-form-feedback').innerHTML = createFeedbackAlert(responseBody
+                .message, 'success');
+            fetchTasks();
+            hideSpinner();
         });
-
-        // (function($) {
-        //     var task_form = $('#task_form');
-
-        //     function processTaskForm(e) {
-        //         let formDetails = task_form.serialize();
-        //         showSpinner();
-
-        //         $.ajax({
-        //             headers: {
-        //                 "Accept": "application/json"
-        //             },
-        //             url: "{{ route('add-task') }}",
-        //             type: "post",
-        //             contentType: "application/x-www-form-urlencoded",
-        //             data: formDetails,
-        //             success: function(data, textStatus, jQxhr) {
-        //                 feedback(data.success, 'success');
-        //                 hideSpinner();
-        //                 $('#task_list').DataTable().ajax.reload();
-        //             },
-        //             error: function(jqXhr, textStatus, errorThrown) {
-        //                 var errors = JSON.parse(jqXhr.responseText);
-        //                 if (jqXhr.status == 422) {
-        //                     feedback(errors.errors.description || errors.title, 'error');
-        //                     hideSpinner();
-        //                 } else if (jqXhr.status == 400) {
-        //                     feedback(errors.error, 'error');
-        //                     hideSpinner();
-        //                 }
-        //             }
-        //         })
-        //         e.preventDefault();
-        //     }
-
-        //     task_form.submit(processTaskForm);
-        // })(jQuery);
-
-        // (function($) {
-        //     var edit_task = $('#edit_task_form');
-
-        //     function processEditForm(e) {
-        //         let formDetails = edit_task.serialize();
-        //         showSpinner();
-
-        //         $.ajax({
-        //             headers: {
-        //                 "Accept": "application/json"
-        //             },
-        //             url: "{{ route('edit-task') }}",
-        //             type: "post",
-        //             contentType: "application/x-www-form-urlencoded",
-        //             data: formDetails,
-        //             success: function(data, textStatus, jQxhr) {
-        //                 feedback(data.success, 'success');
-        //                 hideSpinner();
-        //                 $('#task_list').DataTable().ajax.reload();
-        //             },
-        //             error: function(jqXhr, textStatus, errorThrown) {
-        //                 var errors = JSON.parse(jqXhr.responseText);
-        //                 if (jqXhr.status == 422) {
-        //                     feedback(errors.errors.description || errors.title || errors.status, 'error');
-        //                     hideSpinner();
-        //                 } else if (jqXhr.status == 400) {
-        //                     feedback(errors.error, 'error');
-        //                     hideSpinner();
-        //                 }
-        //             }
-        //         })
-        //         e.preventDefault();
-        //     }
-
-        //     edit_task.submit(processEditForm);
-        // })(jQuery);
     </script>
 @endsection
